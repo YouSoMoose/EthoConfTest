@@ -399,9 +399,9 @@ async function loginGoogle() {
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Redirecting…';
   const { error } = await sb.auth.signInWithOAuth({
-  provider: 'google',
-  options: { redirectTo: 'https://yousomoose.github.io/admin.html' }
-});
+    provider: 'google',
+    options: { redirectTo: window.location.href }
+  });
   if (error) { showToast('Login error: ' + error.message); btn.disabled = false; btn.innerHTML = 'Continue with Google'; }
 }
 
