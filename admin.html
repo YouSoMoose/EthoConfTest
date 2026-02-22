@@ -420,26 +420,19 @@ async function logout() {
 }
 
 sb.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_OUT') return; // stay on page, adminlogin handles login
   if (session?.user) {
     currentUser = session.user;
     currentProfile = await loadProfile(currentUser.id);
-    if (!currentProfile) {
-      showToast('Could not load profile — try signing in again');
-      setTimeout(() => sb.auth.signOut(), 2000);
-      return;
-    }
+    if (!currentProfile) { showToast('Could not load profile, try again'); return; }
     if (lvl() === 0) {
-      window.location.href = 'applogin.html';
+      showToast('This panel is for staff & presenters only.');
+      await sb.auth.signOut();
       return;
     }
     buildDash();
     goPage('pg-dash');
     if (hasLvl(2)) subscribeMessages();
-  } else {
-    // Only redirect to login if we're not on a page that's already shown
-    if (!document.getElementById('pg-dash').classList.contains('active')) {
-      window.location.href = 'adminlogin.html';
-    }
   }
 });
 

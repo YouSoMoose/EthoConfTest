@@ -503,16 +503,14 @@ async function logout() {
 }
 
 sb.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_OUT') return; // stay on page, applogin handles login
   if (session?.user) {
     currentUser = session.user;
     currentProfile = await loadProfile(currentUser.id);
-    if (!currentProfile) { window.location.href = 'applogin.html'; return; }
+    if (!currentProfile) { showToast('Could not load profile, try again'); return; }
     await loadUserData();
     buildUI();
     navTo('pg-dash');
-  } else {
-    // Not logged in — send to login page
-    window.location.href = 'applogin.html';
   }
 });
 
