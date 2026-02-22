@@ -1,522 +1,1818 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Ethos 2025</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,800;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<style>
-:root{
-  --bg:#f5f0eb;--white:#fff;--s1:#ede8e2;--s2:#e4ddd5;--border:#d5cec6;
-  --g:#2d5016;--gl:rgba(45,80,22,.12);--gb:rgba(45,80,22,.25);
-  --warm:#FCBD9D;--text:#1a1814;--sub:#6b6560;--muted:#9e9990;
-  --r:14px;--fh:'Fraunces',serif;--fb:'DM Sans',sans-serif;
-}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100dvh}
-.page{display:none;min-height:100dvh;flex-direction:column;animation:fi .22s ease}
-.page.active{display:flex}
-@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Ethos 2025</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,800;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f5f0eb;
+      --white: #fff;
+      --s1: #ede8e2;
+      --s2: #e4ddd5;
+      --border: #d5cec6;
+      --g: #2d5016;
+      --gl: rgba(45, 80, 22, .12);
+      --gb: rgba(45, 80, 22, .25);
+      --warm: #FCBD9D;
+      --text: #1a1814;
+      --sub: #6b6560;
+      --muted: #9e9990;
+      --r: 14px;
+      --fh: 'Fraunces', serif;
+      --fb: 'DM Sans', sans-serif;
+    }
 
-/* LOGIN */
-#pg-login{background:linear-gradient(160deg,#1e3a0a,#2d5016 35%,#1a1814);align-items:center;justify-content:flex-end;padding:0}
-.login-hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px 20px;text-align:center}
-.login-leaf{font-size:52px;margin-bottom:16px}
-.login-conf{font-size:11px;font-weight:600;letter-spacing:.15em;color:rgba(255,255,255,.5);text-transform:uppercase;margin-bottom:8px}
-.login-title{font-family:var(--fh);font-size:42px;font-weight:800;color:#fff;line-height:1.1}
-.login-year{font-family:var(--fh);font-size:42px;font-weight:300;font-style:italic;color:var(--warm)}
-.login-sub{font-size:14px;color:rgba(255,255,255,.6);margin-top:10px;line-height:1.5}
-.login-card{background:var(--white);border-radius:28px 28px 0 0;padding:28px 24px max(28px,env(safe-area-inset-bottom));width:100%;max-width:480px}
-.btn-google{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:14px 20px;font-size:15px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;font-family:var(--fb);color:var(--text)}
-.btn-google:hover{border-color:var(--g);box-shadow:0 0 0 3px var(--gl)}
-.btn-google:disabled{opacity:.6;cursor:not-allowed}
-.login-fine{font-size:11px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.5}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent
+    }
 
-/* TOPBAR */
-.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;min-height:52px}
-.topbar-back{background:none;border:none;color:var(--sub);cursor:pointer;padding:4px 6px;border-radius:8px;font-size:18px;line-height:1}
-.topbar-title{font-family:var(--fh);font-weight:700;font-size:16px;flex:1}
-.topbar-action{background:none;border:none;color:var(--g);cursor:pointer;padding:4px 8px;border-radius:8px;font-size:13px;font-weight:600}
-.avatar{width:32px;height:32px;border-radius:50%;background:var(--g);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;cursor:pointer;overflow:hidden;flex-shrink:0}
-.avatar img{width:100%;height:100%;object-fit:cover}
+    html,
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--fb);
+      min-height: 100dvh
+    }
 
-/* CONTENT */
-.content{flex:1;overflow-y:auto;padding:16px 16px 110px;-webkit-overflow-scrolling:touch}
-.sec{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;margin-top:4px}
+    .page {
+      display: none;
+      min-height: 100dvh;
+      flex-direction: column;
+      animation: fi .22s ease
+    }
 
-/* DASH HEADER */
-.dash-header{background:var(--g);padding:20px 16px 24px;color:#fff}
-.dash-conf{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:4px}
-.dash-hi{font-family:var(--fh);font-weight:800;font-size:26px}
-.dash-date{font-size:12px;color:rgba(255,255,255,.6);margin-top:4px}
-.dash-chips{display:flex;gap:8px;margin-top:14px;overflow-x:auto;scrollbar-width:none}
-.dash-chips::-webkit-scrollbar{display:none}
-.dchip{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:6px 14px;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;color:#fff}
-.dchip.hi{background:#fff;color:var(--g)}
+    .page.active {
+      display: flex
+    }
 
-/* ACCESS BADGE */
-.lvl-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:100px;padding:4px 10px;font-size:11px;font-weight:700;color:#fff;margin-top:8px}
-.lvl-dots{display:flex;gap:3px}
-.lvl-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3)}
-.lvl-dot.on{background:#fff}
+    @keyframes fi {
+      from {
+        opacity: 0;
+        transform: translateY(8px)
+      }
 
-/* CARDS */
-.card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px}
-.card.green{background:var(--gl);border-color:var(--gb)}
-.card-title{font-family:var(--fh);font-weight:700;font-size:16px;margin-bottom:4px}
-.card-sub{font-size:13px;color:var(--sub)}
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
 
-/* QUICK GRID */
-.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
-.quick-tile{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .18s;display:flex;flex-direction:column;gap:6px}
-.quick-tile:active{transform:scale(.97);background:var(--s1)}
-.quick-ico{font-size:24px}
-.quick-name{font-family:var(--fh);font-weight:700;font-size:14px}
-.quick-desc{font-size:11px;color:var(--sub)}
+    /* LOGIN */
+    #pg-login {
+      background: linear-gradient(160deg, #1e3a0a, #2d5016 35%, #1a1814);
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0
+    }
 
-/* SCHEDULE */
-.sched-day{font-family:var(--fh);font-weight:700;font-size:17px;margin-bottom:12px;margin-top:20px;padding-bottom:6px;border-bottom:2px solid var(--g)}
-.sched-item{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:8px;display:flex;gap:12px}
-.sched-time{font-size:12px;font-weight:600;color:var(--g);white-space:nowrap;min-width:48px}
-.sched-name{font-family:var(--fh);font-weight:600;font-size:14px;margin-bottom:2px}
-.sched-loc{font-size:12px;color:var(--sub)}
-.sched-spkr{font-size:12px;color:var(--muted);margin-top:2px;font-style:italic}
+    .login-hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px 20px;
+      text-align: center
+    }
 
-/* ENTITY CARDS (pitch / research / booth) */
-.ent-search{width:100%;background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;font-size:14px;font-family:var(--fb);outline:none;margin-bottom:14px;transition:border-color .2s}
-.ent-search:focus{border-color:var(--g)}
-.ent-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:10px;cursor:pointer;transition:all .18s}
-.ent-card.interacted{border-color:var(--gb);background:var(--gl)}
-.ent-card:active{transform:scale(.98)}
-.ent-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:8px}
-.ent-logo{width:46px;height:46px;border-radius:11px;background:var(--s1);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;overflow:hidden}
-.ent-logo img{width:100%;height:100%;object-fit:cover}
-.ent-name{font-family:var(--fh);font-weight:700;font-size:15px}
-.ent-tag{font-size:12px;color:var(--sub);margin-top:2px}
-.done-chip{font-size:11px;font-weight:600;color:var(--g);background:var(--gl);border:1px solid var(--gb);border-radius:6px;padding:2px 8px;white-space:nowrap}
+    .login-leaf {
+      font-size: 52px;
+      margin-bottom: 16px
+    }
 
-/* FILTER TABS */
-.ftabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
-.ftabs::-webkit-scrollbar{display:none}
-.ftab{background:var(--s1);border:1px solid var(--border);border-radius:100px;padding:6px 14px;font-size:12px;font-family:var(--fh);font-weight:600;cursor:pointer;color:var(--sub);white-space:nowrap;transition:all .15s}
-.ftab.active{background:var(--g);color:#fff;border-color:var(--g)}
+    .login-conf {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .15em;
+      color: rgba(255, 255, 255, .5);
+      text-transform: uppercase;
+      margin-bottom: 8px
+    }
 
-/* VOTE SLIDERS */
-.q-group{margin-bottom:20px}
-.q-label{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.q-text{font-size:14px;font-weight:500}
-.q-val{font-family:var(--fh);font-weight:800;font-size:20px;color:var(--g)}
-.q-val.zero{color:var(--muted)}
-.slider-wrap{position:relative;height:36px;display:flex;align-items:center}
-.slider-bg{position:absolute;left:0;right:0;height:8px;background:var(--s2);border-radius:100px;border:1px solid var(--border)}
-.slider-fill{position:absolute;left:0;height:8px;background:linear-gradient(90deg,var(--g),#5a9a2a);border-radius:100px;pointer-events:none;transition:width .1s}
-.slider-input{width:100%;height:36px;opacity:0;cursor:pointer;position:relative;z-index:2;-webkit-appearance:none}
-.q-pips{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:2px}
+    .login-title {
+      font-family: var(--fh);
+      font-size: 42px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.1
+    }
 
-/* STAR RATING */
-.stars{display:flex;gap:6px;margin:10px 0}
-.star{font-size:28px;cursor:pointer;transition:transform .1s;user-select:none}
-.star:active{transform:scale(1.2)}
+    .login-year {
+      font-family: var(--fh);
+      font-size: 42px;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--warm)
+    }
 
-/* PASSPORT */
-.passport-header{background:var(--g);border-radius:var(--r);padding:20px;color:#fff;margin-bottom:16px;text-align:center}
-.passport-title{font-family:var(--fh);font-weight:800;font-size:22px;margin-bottom:4px}
-.room-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px}
-.room-name{font-family:var(--fh);font-weight:700;font-size:16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
-.prog-wrap{background:var(--s1);border-radius:100px;height:10px;overflow:hidden;margin-bottom:6px;border:1px solid var(--border)}
-.prog-bar{height:100%;border-radius:100px;background:var(--g);transition:width .5s ease}
-.prog-pct{font-size:12px;color:var(--sub);text-align:right}
-.stamp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
-.stamp{width:100%;aspect-ratio:1;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;border:1.5px solid var(--border);background:var(--s1)}
-.stamp.earned{background:var(--gl);border-color:var(--gb)}
+    .login-sub {
+      font-size: 14px;
+      color: rgba(255, 255, 255, .6);
+      margin-top: 10px;
+      line-height: 1.5
+    }
 
-/* NOTES */
-.note-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:8px;cursor:pointer;transition:all .18s}
-.note-card:active{transform:scale(.98)}
-.note-title{font-family:var(--fh);font-weight:700;font-size:14px;margin-bottom:4px}
-.note-preview{font-size:12px;color:var(--sub);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.note-meta{font-size:11px;color:var(--muted);margin-top:6px}
-.note-title-inp{width:100%;background:none;border:none;border-bottom:1.5px solid var(--border);padding:10px 0;font-family:var(--fh);font-weight:700;font-size:20px;color:var(--text);outline:none;margin-bottom:12px}
-.note-body-inp{width:100%;background:none;border:none;font-size:14px;color:var(--text);outline:none;resize:none;font-family:var(--fb);line-height:1.65;min-height:300px}
+    .login-card {
+      background: var(--white);
+      border-radius: 28px 28px 0 0;
+      padding: 28px 24px max(28px, env(safe-area-inset-bottom));
+      width: 100%;
+      max-width: 480px
+    }
 
-/* BUSINESS CARD */
-.bc-card{background:linear-gradient(135deg,var(--g),#3d6b22);border-radius:20px;padding:24px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden}
-.bc-card::after{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.07)}
-.bc-name{font-family:var(--fh);font-weight:800;font-size:22px;margin-bottom:4px}
-.bc-title{font-size:13px;color:rgba(255,255,255,.8)}
-.bc-contact{display:flex;gap:16px;margin-top:14px;flex-wrap:wrap}
-.bc-contact span{font-size:12px;color:rgba(255,255,255,.7)}
-.qr-box{background:var(--white);border-radius:var(--r);padding:20px;text-align:center;margin-bottom:16px}
-.qr-canvas{display:block;margin:0 auto 10px}
+    .btn-google {
+      width: 100%;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 20px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all .2s;
+      font-family: var(--fb);
+      color: var(--text)
+    }
 
-/* ENTITY DASHBOARD (LVL 1) */
-.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
-.stat-box{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center}
-.stat-n{font-family:var(--fh);font-weight:800;font-size:28px;color:var(--g)}
-.stat-l{font-size:11px;color:var(--sub);margin-top:2px}
-.score-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.score-bar-label{font-size:12px;color:var(--sub);width:90px;flex-shrink:0}
-.score-bar-track{flex:1;background:var(--s1);border-radius:100px;height:8px;overflow:hidden;border:1px solid var(--border)}
-.score-bar-fill{height:100%;background:var(--g);border-radius:100px}
-.score-bar-val{font-family:var(--fh);font-weight:700;font-size:13px;width:28px;text-align:right;flex-shrink:0}
-.review-item{background:var(--s1);border-radius:10px;padding:12px;margin-bottom:8px}
-.review-stars{color:#f0a000;font-size:13px;margin-bottom:4px}
-.review-body{font-size:13px;line-height:1.5;color:var(--text)}
-.review-meta{font-size:11px;color:var(--muted);margin-top:4px}
+    .btn-google:hover {
+      border-color: var(--g);
+      box-shadow: 0 0 0 3px var(--gl)
+    }
 
-/* CHAT */
-.chat-fab{position:fixed;bottom:80px;right:16px;z-index:150;width:52px;height:52px;background:var(--g);border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 16px rgba(45,80,22,.3);transition:all .2s}
-.chat-fab:active{transform:scale(.9)}
-.chat-pip{position:absolute;top:2px;right:2px;width:14px;height:14px;background:#e55;border-radius:50%;border:2px solid var(--bg);display:none;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff}
-.chat-drawer{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;background:var(--white);transform:translateY(100%);transition:transform .3s ease}
-.chat-drawer.open{transform:translateY(0)}
-.chat-header{background:var(--g);padding:16px;padding-top:max(16px,env(safe-area-inset-top));display:flex;align-items:center;gap:12px}
-.chat-title{font-family:var(--fh);font-weight:700;font-size:17px;color:#fff;flex:1}
-.chat-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
-.chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
-.cbw{display:flex;flex-direction:column}
-.cbw.me{align-items:flex-end}
-.cbw.them{align-items:flex-start}
-.cbubble{max-width:80%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.5}
-.cbw.me .cbubble{background:var(--g);color:#fff;border-bottom-right-radius:4px}
-.cbw.them .cbubble{background:var(--s1);border:1px solid var(--border);border-bottom-left-radius:4px}
-.cbname{font-size:11px;color:var(--muted);margin-bottom:3px}
-.cbtime{font-size:10px;color:var(--muted);margin-top:3px}
-.chat-input-row{padding:10px 12px max(12px,env(safe-area-inset-bottom));background:var(--white);border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end}
-.chat-inp{flex:1;background:var(--s1);border:1.5px solid var(--border);border-radius:20px;padding:10px 16px;font-size:14px;font-family:var(--fb);outline:none;resize:none;max-height:100px;line-height:1.4}
-.chat-inp:focus{border-color:var(--g)}
-.chat-send{width:40px;height:40px;border-radius:50%;background:var(--g);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .btn-google:disabled {
+      opacity: .6;
+      cursor: not-allowed
+    }
 
-/* FORMS */
-.form-group{margin-bottom:14px}
-.form-label{font-size:12px;color:var(--sub);font-weight:500;margin-bottom:5px;display:block}
-.form-input{width:100%;background:var(--white);border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;font-family:var(--fb);transition:border-color .2s;outline:none}
-.form-input:focus{border-color:var(--g)}
-.form-input::placeholder{color:var(--muted)}
-textarea.form-input{resize:vertical;min-height:80px}
-.btn{width:100%;padding:14px;border:none;border-radius:11px;font-size:15px;font-weight:600;font-family:var(--fh);cursor:pointer;transition:all .2s}
-.btn-green{background:var(--g);color:#fff}
-.btn-green:hover{background:#3d6b22}
-.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
-.btn-sm{width:auto;padding:9px 18px;font-size:13px}
-.btn:disabled{opacity:.5;cursor:not-allowed}
+    .login-fine {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 14px;
+      line-height: 1.5
+    }
 
-/* BOTTOM NAV */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--border);display:flex;padding:6px 0 max(8px,env(safe-area-inset-bottom));z-index:100}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;padding:6px 2px;color:var(--muted);transition:color .2s}
-.nav-btn.active{color:var(--g)}
-.nav-btn svg{width:20px;height:20px;stroke-width:2}
-.nav-btn span{font-size:10px;font-weight:500}
+    /* TOPBAR */
+    .topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      min-height: 52px
+    }
 
-/* INFO */
-.info-group{background:var(--white);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:12px}
-.info-row{display:flex;align-items:flex-start;gap:12px;padding:14px;border-bottom:1px solid var(--border)}
-.info-row:last-child{border:none}
-.info-ico{font-size:18px;flex-shrink:0}
-.info-key{font-size:11px;color:var(--sub);margin-bottom:2px;font-weight:500}
-.info-val{font-size:14px;font-weight:500}
+    .topbar-back {
+      background: none;
+      border: none;
+      color: var(--sub);
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 8px;
+      font-size: 18px;
+      line-height: 1
+    }
 
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
-.modal-overlay.open{opacity:1;pointer-events:all}
-.modal{background:var(--white);border-radius:24px 24px 0 0;padding:24px 20px max(24px,env(safe-area-inset-bottom));width:100%;max-width:500px;transform:translateY(40px);transition:transform .3s;max-height:88dvh;overflow-y:auto}
-.modal-overlay.open .modal{transform:translateY(0)}
-.modal-handle{width:36px;height:4px;background:var(--border);border-radius:4px;margin:0 auto 20px}
-.modal-title{font-family:var(--fh);font-weight:800;font-size:20px;margin-bottom:4px}
-.modal-sub{font-size:13px;color:var(--sub);margin-bottom:20px}
+    .topbar-title {
+      font-family: var(--fh);
+      font-weight: 700;
+      font-size: 16px;
+      flex: 1
+    }
 
-/* MISC */
-.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--g);color:#fff;border-radius:12px;padding:10px 20px;font-size:13px;font-weight:500;white-space:nowrap;z-index:600;opacity:0;transition:all .3s;pointer-events:none}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.empty{text-align:center;padding:44px 20px;color:var(--muted)}
-.empty-ico{font-size:38px;margin-bottom:10px}
-.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(0,0,0,.15);border-top-color:var(--g);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
-@keyframes spin{to{transform:rotate(360deg)}}
-.divider{height:1px;background:var(--border);margin:16px 0}
-</style>
+    .topbar-action {
+      background: none;
+      border: none;
+      color: var(--g);
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--g);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      overflow: hidden;
+      flex-shrink: 0
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    /* CONTENT */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px 110px;
+      -webkit-overflow-scrolling: touch
+    }
+
+    .sec {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+      margin-top: 4px
+    }
+
+    /* DASH HEADER */
+    .dash-header {
+      background: var(--g);
+      padding: 20px 16px 24px;
+      color: #fff
+    }
+
+    .dash-conf {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .6);
+      margin-bottom: 4px
+    }
+
+    .dash-hi {
+      font-family: var(--fh);
+      font-weight: 800;
+      font-size: 26px
+    }
+
+    .dash-date {
+      font-size: 12px;
+      color: rgba(255, 255, 255, .6);
+      margin-top: 4px
+    }
+
+    .dash-chips {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+      overflow-x: auto;
+      scrollbar-width: none
+    }
+
+    .dash-chips::-webkit-scrollbar {
+      display: none
+    }
+
+    .dchip {
+      background: rgba(255, 255, 255, .15);
+      border: 1px solid rgba(255, 255, 255, .2);
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      color: #fff
+    }
+
+    .dchip.hi {
+      background: #fff;
+      color: var(--g)
+    }
+
+    /* ACCESS BADGE */
+    .lvl-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(255, 255, 255, .15);
+      border: 1px solid rgba(255, 255, 255, .25);
+      border-radius: 100px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 8px
+    }
+
+    .lvl-dots {
+      display: flex;
+      gap: 3px
+    }
+
+    .lvl-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .3)
+    }
+
+    .lvl-dot.on {
+      background: #fff
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 16px;
+      margin-bottom: 12px
+    }
+
+    .card.green {
+      background: var(--gl);
+      border-color: var(--gb)
+    }
+
+    .card-title {
+      font-family: var(--fh);
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 4px
+    }
+
+    .card-sub {
+      font-size: 13px;
+      color: var(--sub)
+    }
+
+    /* QUICK GRID */
+    .quick-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px
+    }
+
+    .quick-tile {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 14px;
+      cursor: pointer;
+      transition: all .18s;
+      display: flex;
+      flex-direction: column;
+      gap: 6px
+    }
+
+    .quick-tile:active {
+      transform: scale(.97);
+      background: var(--s1)
+    }
+
+    .quick-ico {
+      font-size: 24px
+    }
+
+    .quick-name {
+      font-family: var(--fh);
+      font-weight: 700;
+      font-size: 14px
+    }
+
+    .quick-desc {
+      font-size: 11px;
+      color: var(--sub)
+    }
+
+    /* SCHEDULE */
+    .sched-day {
+      font-family: var(--fh);
+      font-weight: 700;
+      font-size: 17px;
+      margin-bottom: 12px;
+      margin-top: 20px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--g)
+    }
+
+    .sched-item {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 14px;
+      margin-bottom: 8px;
+      display: flex;
+      gap: 12px
+    }
+
+    .sched-time {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--g);
+      white-space: nowrap;
+      min-width: 48px
+    }
+
+    .sched-name {
+      font-family: var(--fh);
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 2px
+    }
+
+    .sched-loc {
+      font-size: 12px;
+      color: var(--sub)
+    }
+
+    .sched-spkr {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+      font-style: italic
+    }
+
+    /* ENTITY CARDS (pitch / research / booth) */
+    .ent-search {
+      width: 100%;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-size: 14px;
+      font-family: var(--fb);
+      outline: none;
+      margin-bottom: 14px;
+      transition: border-color .2s
+    }
+
+    .ent-search:focus {
+      border-color: var(--g)
+    }
+
+    .ent-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 16px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all .18s
+    }
+
+    .ent-card.interacted {
+      border-color: var(--gb);
+      background: var(--gl)
+    }
+
+    .ent-card:active {
+      transform: scale(.98)
+    }
+
+    .ent-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 8px
+    }
+
+    .ent-logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 11px;
+      background: var(--s1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      overflow: hidden
+    }
+
+    .ent-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .ent-name {
+      font-family: var(--fh);
+      font-weight: 700;
+      font-size: 15px
+    }
+
+    .ent-tag {
+      font-size: 12px;
+      color: var(--sub);
+      margin-top: 2px
+    }
+
+    .done-chip {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--g);
+      background: var(--gl);
+      border: 1px solid var(--gb);
+      border-radius: 6px;
+      padding: 2px 8px;
+      white-space: nowrap
+    }
+
+    /* FILTER TABS */
+    .ftabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 2px
+    }
+
+    .ftabs::-webkit-scrollbar {
+      display: none
+    }
+
+    .ftab {
+      background: var(--s1);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-family: var(--fh);
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--sub);
+      white-space: nowrap;
+      transition: all .15s
+    }
+
+    .ftab.active {
+      background: var(--g);
+      color: #fff;
+      border-color: var(--g)
+    }
+
+    /* VOTE SLIDERS */
+    .q-group {
+      margin-bottom: 20px
+    }
+
+    .q-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px
+    }
+
+    .q-text {
+      font-size: 14px;
+      font-weight: 500
+    }
+
+    .q-val {
+      font-family: var(--fh);
+      font-weight: 800;
+      font-size: 20px;
+      color: var(--g)
+    }
+
+    .q-val.zero {
+      color: var(--muted)
+    }
+
+    .slider-wrap {
+      position: relative;
+      height: 36px;
+      display: flex;
+      align-items: center
+    }
+
+    .slider-bg {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 8px;
+      background: var(--s2);
+      border-radius: 100px;
+      border: 1px solid var(--border)
+    }
+
+    .slider-fill {
+      position: absolute;
+      left: 0;
+      height: 8px;
+      background: linear-gradient(90deg, var(--g), #5a9a2a);
+      border-radius: 100px;
+      pointer-events: none;
+      transition: width .1s
+    }
+
+    .slider-input {
+      width: 100%;
+      height: 36px;
+      opacity: 0;
+      cursor: pointer;
+      position: relative;
+      z-index: 2;
+      -webkit-appearance: none
+    }
+
+    .q-pips {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px
+    }
+
+    /* STAR RATING */
+    .stars {
+      display: flex;
+      gap: 6px;
+      margin: 10px 0
+    }
+
+    .star {
+      font-size: 28px;
+      cursor: pointer;
+      transition: transform .1s;
+      user-select: none
+    }
+
+    .star:active {
+      transform: scale(1.2)
+    }
+
+    /* PASSPORT */
+    .passport-header {
+      background: var(--g);
+      border-radius: var(--r);
+      padding: 20px;
+      color: #fff;
+      margin-bottom: 16px;
+      text-align: center
+    }
+
+    .passport-title {
+      font-family: var(--fh);
+      font-weight: 800;
+      font-size: 22px;
+      margin-bottom: 4px
+    }
+
+    .room-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 16px;
+      margin-bottom: 12px
+    }
+
+    .room-name {
+      font-family: var(--fh);
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .prog-wrap {
+      background: var(--s1);
+      border-radius: 100px;
+      height: 10px;
+      overflow: hidden;
+      margin-bottom: 6px;
+      border: 1px solid var(--border)
+    }
+
+    .prog-bar {
+      height: 100%;
+      border-radius: 100px;
+      background: var(--g);
+      transition: width .5s ease
+    }
+
+    .prog-pct {
+      font-size: 12px;
+      color: var(--sub);
+      text-align: right
+    }
+
+    .stamp-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 12px
+    }
+
+    .stamp {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      border: 1.5px solid var(--border);
+      background: var(--s1)
+    }
+
+    .stamp.earned {
+      background: var(--gl);
+      border-color: var(--gb)
+    }
+
+    /* NOTES */
+    .note-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 14px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all .18s
+    }
+
+    .note-card:active {
+      transform: scale(.98)
+    }
+
+    .note-title {
+      font-family: var(--fh);
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 4px
+    }
+
+    .note-preview {
+      font-size: 12px;
+      color: var(--sub);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden
+    }
+
+    .note-meta {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px
+    }
+
+    .note-title-inp {
+      width: 100%;
+      background: none;
+      border: none;
+      border-bottom: 1.5px solid var(--border);
+      padding: 10px 0;
+      font-family: var(--fh);
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--text);
+      outline: none;
+      margin-bottom: 12px
+    }
+
+    .note-body-inp {
+      width: 100%;
+      background: none;
+      border: none;
+      font-size: 14px;
+      color: var(--text);
+      outline: none;
+      resize: none;
+      font-family: var(--fb);
+      line-height: 1.65;
+      min-height: 300px
+    }
+
+    /* BUSINESS CARD */
+    .bc-card {
+      background: linear-gradient(135deg, var(--g), #3d6b22);
+      border-radius: 20px;
+      padding: 24px;
+      color: #fff;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .bc-card::after {
+      content: '';
+      position: absolute;
+      top: -30px;
+      right: -30px;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .07)
+    }
+
+    .bc-name {
+      font-family: var(--fh);
+      font-weight: 800;
+      font-size: 22px;
+      margin-bottom: 4px
+    }
+
+    .bc-title {
+      font-size: 13px;
+      color: rgba(255, 255, 255, .8)
+    }
+
+    .bc-contact {
+      display: flex;
+      gap: 16px;
+      margin-top: 14px;
+      flex-wrap: wrap
+    }
+
+    .bc-contact span {
+      font-size: 12px;
+      color: rgba(255, 255, 255, .7)
+    }
+
+    .qr-box {
+      background: var(--white);
+      border-radius: var(--r);
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 16px
+    }
+
+    .qr-canvas {
+      display: block;
+      margin: 0 auto 10px
+    }
+
+    /* ENTITY DASHBOARD (LVL 1) */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px
+    }
+
+    .stat-box {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 14px;
+      text-align: center
+    }
+
+    .stat-n {
+      font-family: var(--fh);
+      font-weight: 800;
+      font-size: 28px;
+      color: var(--g)
+    }
+
+    .stat-l {
+      font-size: 11px;
+      color: var(--sub);
+      margin-top: 2px
+    }
+
+    .score-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px
+    }
+
+    .score-bar-label {
+      font-size: 12px;
+      color: var(--sub);
+      width: 90px;
+      flex-shrink: 0
+    }
+
+    .score-bar-track {
+      flex: 1;
+      background: var(--s1);
+      border-radius: 100px;
+      height: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border)
+    }
+
+    .score-bar-fill {
+      height: 100%;
+      background: var(--g);
+      border-radius: 100px
+    }
+
+    .score-bar-val {
+      font-family: var(--fh);
+      font-weight: 700;
+      font-size: 13px;
+      width: 28px;
+      text-align: right;
+      flex-shrink: 0
+    }
+
+    .review-item {
+      background: var(--s1);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 8px
+    }
+
+    .review-stars {
+      color: #f0a000;
+      font-size: 13px;
+      margin-bottom: 4px
+    }
+
+    .review-body {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text)
+    }
+
+    .review-meta {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px
+    }
+
+    /* CHAT */
+    .chat-fab {
+      position: fixed;
+      bottom: 80px;
+      right: 16px;
+      z-index: 150;
+      width: 52px;
+      height: 52px;
+      background: var(--g);
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 16px rgba(45, 80, 22, .3);
+      transition: all .2s
+    }
+
+    .chat-fab:active {
+      transform: scale(.9)
+    }
+
+    .chat-pip {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 14px;
+      height: 14px;
+      background: #e55;
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-weight: 700;
+      color: #fff
+    }
+
+    .chat-drawer {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      background: var(--white);
+      transform: translateY(100%);
+      transition: transform .3s ease
+    }
+
+    .chat-drawer.open {
+      transform: translateY(0)
+    }
+
+    .chat-header {
+      background: var(--g);
+      padding: 16px;
+      padding-top: max(16px, env(safe-area-inset-top));
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    .chat-title {
+      font-family: var(--fh);
+      font-weight: 700;
+      font-size: 17px;
+      color: #fff;
+      flex: 1
+    }
+
+    .chat-close {
+      background: rgba(255, 255, 255, .2);
+      border: none;
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .chat-msgs {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px
+    }
+
+    .cbw {
+      display: flex;
+      flex-direction: column
+    }
+
+    .cbw.me {
+      align-items: flex-end
+    }
+
+    .cbw.them {
+      align-items: flex-start
+    }
+
+    .cbubble {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.5
+    }
+
+    .cbw.me .cbubble {
+      background: var(--g);
+      color: #fff;
+      border-bottom-right-radius: 4px
+    }
+
+    .cbw.them .cbubble {
+      background: var(--s1);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px
+    }
+
+    .cbname {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 3px
+    }
+
+    .cbtime {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 3px
+    }
+
+    .chat-input-row {
+      padding: 10px 12px max(12px, env(safe-area-inset-bottom));
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+      align-items: flex-end
+    }
+
+    .chat-inp {
+      flex: 1;
+      background: var(--s1);
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-family: var(--fb);
+      outline: none;
+      resize: none;
+      max-height: 100px;
+      line-height: 1.4
+    }
+
+    .chat-inp:focus {
+      border-color: var(--g)
+    }
+
+    .chat-send {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--g);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0
+    }
+
+    /* FORMS */
+    .form-group {
+      margin-bottom: 14px
+    }
+
+    .form-label {
+      font-size: 12px;
+      color: var(--sub);
+      font-weight: 500;
+      margin-bottom: 5px;
+      display: block
+    }
+
+    .form-input {
+      width: 100%;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 14px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: var(--fb);
+      transition: border-color .2s;
+      outline: none
+    }
+
+    .form-input:focus {
+      border-color: var(--g)
+    }
+
+    .form-input::placeholder {
+      color: var(--muted)
+    }
+
+    textarea.form-input {
+      resize: vertical;
+      min-height: 80px
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 11px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: var(--fh);
+      cursor: pointer;
+      transition: all .2s
+    }
+
+    .btn-green {
+      background: var(--g);
+      color: #fff
+    }
+
+    .btn-green:hover {
+      background: #3d6b22
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--text)
+    }
+
+    .btn-sm {
+      width: auto;
+      padding: 9px 18px;
+      font-size: 13px
+    }
+
+    .btn:disabled {
+      opacity: .5;
+      cursor: not-allowed
+    }
+
+    /* BOTTOM NAV */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      display: flex;
+      padding: 6px 0 max(8px, env(safe-area-inset-bottom));
+      z-index: 100
+    }
+
+    .nav-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px 2px;
+      color: var(--muted);
+      transition: color .2s
+    }
+
+    .nav-btn.active {
+      color: var(--g)
+    }
+
+    .nav-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2
+    }
+
+    .nav-btn span {
+      font-size: 10px;
+      font-weight: 500
+    }
+
+    /* INFO */
+    .info-group {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      margin-bottom: 12px
+    }
+
+    .info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .info-row:last-child {
+      border: none
+    }
+
+    .info-ico {
+      font-size: 18px;
+      flex-shrink: 0
+    }
+
+    .info-key {
+      font-size: 11px;
+      color: var(--sub);
+      margin-bottom: 2px;
+      font-weight: 500
+    }
+
+    .info-val {
+      font-size: 14px;
+      font-weight: 500
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .5);
+      z-index: 400;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all
+    }
+
+    .modal {
+      background: var(--white);
+      border-radius: 24px 24px 0 0;
+      padding: 24px 20px max(24px, env(safe-area-inset-bottom));
+      width: 100%;
+      max-width: 500px;
+      transform: translateY(40px);
+      transition: transform .3s;
+      max-height: 88dvh;
+      overflow-y: auto
+    }
+
+    .modal-overlay.open .modal {
+      transform: translateY(0)
+    }
+
+    .modal-handle {
+      width: 36px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 4px;
+      margin: 0 auto 20px
+    }
+
+    .modal-title {
+      font-family: var(--fh);
+      font-weight: 800;
+      font-size: 20px;
+      margin-bottom: 4px
+    }
+
+    .modal-sub {
+      font-size: 13px;
+      color: var(--sub);
+      margin-bottom: 20px
+    }
+
+    /* MISC */
+    .toast {
+      position: fixed;
+      bottom: 88px;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: var(--g);
+      color: #fff;
+      border-radius: 12px;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      z-index: 600;
+      opacity: 0;
+      transition: all .3s;
+      pointer-events: none
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0)
+    }
+
+    .empty {
+      text-align: center;
+      padding: 44px 20px;
+      color: var(--muted)
+    }
+
+    .empty-ico {
+      font-size: 38px;
+      margin-bottom: 10px
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(0, 0, 0, .15);
+      border-top-color: var(--g);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      vertical-align: middle
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 16px 0
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- LOADING SCREEN (shown while checking auth) -->
-<div id="pg-loading" class="page active" style="background:linear-gradient(160deg,#1e3a0a,#2d5016 35%,#1a1814);align-items:center;justify-content:center">
-  <div style="text-align:center;color:#fff">
-    <div style="font-size:48px;margin-bottom:16px">🌱</div>
-    <div style="font-family:var(--fh);font-weight:800;font-size:24px;margin-bottom:8px">Ethos 2025</div>
-    <div style="font-size:14px;color:rgba(255,255,255,.6)">Loading your experience…</div>
-  </div>
-</div>
-
-<!-- DASHBOARD -->
-<div id="pg-dash" class="page">
-  <div class="dash-header">
-    <div class="dash-conf">Ethos Conference 2025</div>
-    <div class="dash-hi" id="dash-hi">Welcome! 🌿</div>
-    <div class="dash-date" id="dash-date"></div>
-    <div id="dash-lvl-badge"></div>
-    <div class="dash-chips" id="dash-chips"></div>
-  </div>
-  <div class="content" style="padding-top:12px">
-    <div id="dash-announcements"></div>
-    <div id="dash-entity-panel"></div>
-    <div class="sec">Quick Access</div>
-    <div class="quick-grid" id="dash-grid"></div>
-  </div>
-  <div class="bottom-nav" id="main-nav"></div>
-</div>
-
-<!-- SCHEDULE -->
-<div id="pg-schedule" class="page">
-  <div class="topbar"><button class="topbar-back" onclick="navTo('pg-dash')">←</button><div class="topbar-title">Schedule</div></div>
-  <div class="content" id="schedule-content"></div>
-  <div class="bottom-nav" id="sched-nav"></div>
-</div>
-
-<!-- PITCH ROOM -->
-<div id="pg-pitch" class="page">
-  <div class="topbar"><button class="topbar-back" onclick="navTo('pg-dash')">←</button><div class="topbar-title">Pitch Room</div></div>
-  <div class="content">
-    <div class="card green" style="margin-bottom:16px"><div class="card-title">🗳️ Rate each startup</div><div class="card-sub">Score on sustainability, impact, feasibility & overall. 1–10 each.</div></div>
-    <input class="ent-search" id="pitch-search" placeholder="🔍 Search startups…" oninput="renderPitches()"/>
-    <div id="pitches-list"><div style="text-align:center;padding:30px"><div class="spinner"></div></div></div>
-  </div>
-  <div class="bottom-nav" id="pitch-nav"></div>
-</div>
-
-<!-- RESEARCH HALL -->
-<div id="pg-research" class="page">
-  <div class="topbar"><button class="topbar-back" onclick="navTo('pg-dash')">←</button><div class="topbar-title">Research Hall</div></div>
-  <div class="content">
-    <div class="card green" style="margin-bottom:16px"><div class="card-title">🔬 Research Posters</div><div class="card-sub">Browse research presentations and leave feedback for each team.</div></div>
-    <input class="ent-search" id="research-search" placeholder="🔍 Search research…" oninput="renderResearch()"/>
-    <div id="research-list"><div style="text-align:center;padding:30px"><div class="spinner"></div></div></div>
-  </div>
-  <div class="bottom-nav" id="research-nav"></div>
-</div>
-
-<!-- BOOTHS -->
-<div id="pg-booths" class="page">
-  <div class="topbar"><button class="topbar-back" onclick="navTo('pg-dash')">←</button><div class="topbar-title">Exhibitor Booths</div></div>
-  <div class="content">
-    <div class="card green" style="margin-bottom:16px"><div class="card-title">🏢 Exhibitors</div><div class="card-sub">Meet our sponsors and partners. Leave feedback to help them improve!</div></div>
-    <input class="ent-search" id="booth-search" placeholder="🔍 Search booths…" oninput="renderBooths()"/>
-    <div id="booths-list"><div style="text-align:center;padding:30px"><div class="spinner"></div></div></div>
-  </div>
-  <div class="bottom-nav" id="booths-nav"></div>
-</div>
-
-<!-- ENTITY DASHBOARD (LVL 1 only) -->
-<div id="pg-myentity" class="page">
-  <div class="topbar"><button class="topbar-back" onclick="navTo('pg-dash')">←</button><div class="topbar-title">My Dashboard</div></div>
-  <div class="content" id="myentity-content"><div style="text-align:center;padding:30px"><div class="spinner"></div></div></div>
-  <div class="bottom-nav" id="myentity-nav"></div>
-</div>
-
-<!-- PASSPORT -->
-<div id="pg-passport" class="page">
-  <div class="topbar"><button class="topbar-back" onclick="navTo('pg-dash')">←</button><div class="topbar-title">Booth Passport</div></div>
-  <div class="content" id="passport-content"><div style="text-align:center;padding:30px"><div class="spinner"></div></div></div>
-  <div class="bottom-nav" id="passport-nav"></div>
-</div>
-
-<!-- NOTES -->
-<div id="pg-notes" class="page">
-  <div class="topbar"><button class="topbar-back" onclick="navTo('pg-dash')">←</button><div class="topbar-title">Notes</div><button class="topbar-action" onclick="newNote()">+ New</button></div>
-  <div class="content" id="notes-list"></div>
-  <div class="bottom-nav" id="notes-nav"></div>
-</div>
-<div id="pg-note-editor" class="page">
-  <div class="topbar"><button class="topbar-back" onclick="saveNote()">← Save</button><div class="topbar-title">Note</div><button class="topbar-action" style="color:#c44" onclick="deleteNote()">Delete</button></div>
-  <div class="content" style="padding-top:8px">
-    <input class="note-title-inp" id="note-title-inp" placeholder="Title…"/>
-    <textarea class="note-body-inp" id="note-body-inp" placeholder="Start typing…"></textarea>
-  </div>
-</div>
-
-<!-- MY CARD -->
-<div id="pg-card" class="page">
-  <div class="topbar"><button class="topbar-back" onclick="navTo('pg-dash')">←</button><div class="topbar-title">My Card</div><div class="avatar" id="card-av" onclick="openModal('modal-profile')">?</div></div>
-  <div class="content">
-    <div class="bc-card">
-      <div class="bc-name" id="bc-name">Your Name</div>
-      <div class="bc-title" id="bc-title-d">Title · Company</div>
-      <div class="bc-contact"><span id="bc-email-d"></span><span id="bc-phone-d"></span></div>
-    </div>
-    <div class="qr-box">
-      <canvas class="qr-canvas" id="qr-canvas" width="180" height="180"></canvas>
-      <div style="font-size:13px;color:var(--sub)">Others scan this to save your contact</div>
-    </div>
-    <div class="sec">Edit Your Card</div>
-    <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="bc-name-inp" placeholder="Your name" oninput="liveCard()"/></div>
-    <div class="form-group"><label class="form-label">Title</label><input class="form-input" id="bc-title-inp" placeholder="Environmental Scientist" oninput="liveCard()"/></div>
-    <div class="form-group"><label class="form-label">Company / School</label><input class="form-input" id="bc-co-inp" placeholder="MIT" oninput="liveCard()"/></div>
-    <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="bc-phone-inp" type="tel" placeholder="+1 555 000 0000" oninput="liveCard()"/></div>
-    <div class="form-group"><label class="form-label">LinkedIn</label><input class="form-input" id="bc-li-inp" placeholder="linkedin.com/in/you"/></div>
-    <div class="form-group"><label class="form-label">Resume Link</label><input class="form-input" id="bc-resume-inp" placeholder="drive.google.com/…"/></div>
-    <button class="btn btn-green" onclick="saveCard()">Save Card</button>
-  </div>
-  <div class="bottom-nav" id="card-nav"></div>
-</div>
-
-<!-- SCAN -->
-<div id="pg-scan" class="page">
-  <div class="topbar"><button class="topbar-back" onclick="navTo('pg-dash')">←</button><div class="topbar-title">Scan QR</div></div>
-  <div class="content" style="text-align:center">
-    <div style="font-size:64px;margin:32px auto 16px">📷</div>
-    <div style="font-family:var(--fh);font-weight:700;font-size:20px;margin-bottom:8px">Scan a QR Code</div>
-    <div style="font-size:14px;color:var(--sub);margin-bottom:28px">Business cards · Booth stamps</div>
-    <div style="font-size:13px;color:var(--muted);margin-bottom:8px">Paste QR code data manually:</div>
-    <div style="display:flex;gap:8px;max-width:360px;margin:0 auto">
-      <input class="form-input" id="manual-qr" placeholder='{"name":"…"} or BOOTH-e1'/>
-      <button class="btn btn-green btn-sm" onclick="manualScan()">Add</button>
-    </div>
-    <div id="scan-result" style="margin-top:16px;max-width:360px;margin-left:auto;margin-right:auto"></div>
-  </div>
-  <div class="bottom-nav" id="scan-nav"></div>
-</div>
-
-<!-- INFO -->
-<div id="pg-info" class="page">
-  <div class="topbar"><button class="topbar-back" onclick="navTo('pg-dash')">←</button><div class="topbar-title">Conference Info</div></div>
-  <div class="content">
-    <div style="background:var(--g);border-radius:var(--r);padding:18px;color:#fff;margin-bottom:16px">
-      <div style="font-family:var(--fh);font-weight:800;font-size:20px">Ethos Sustainability 2025</div>
-      <div style="font-size:13px;color:rgba(255,255,255,.7);margin-top:4px">Innovation Hall, Building A — Level 3</div>
-    </div>
-    <div class="sec">WiFi</div>
-    <div class="info-group">
-      <div class="info-row"><div class="info-ico">📶</div><div><div class="info-key">Network</div><div class="info-val">Ethos2025</div></div></div>
-      <div class="info-row"><div class="info-ico">🔑</div><div><div class="info-key">Password</div><div class="info-val">sustainability!</div></div></div>
-    </div>
-    <div class="sec">Rooms</div>
-    <div class="info-group">
-      <div class="info-row"><div class="info-ico">🎤</div><div><div class="info-key">Auditorium</div><div class="info-val">Room 301 – Keynotes & Panels</div></div></div>
-      <div class="info-row"><div class="info-ico">🚀</div><div><div class="info-key">Pitch Room</div><div class="info-val">Room 205 – Startup Pitches</div></div></div>
-      <div class="info-row"><div class="info-ico">🔬</div><div><div class="info-key">Research Hall</div><div class="info-val">Atrium – Research Posters</div></div></div>
-      <div class="info-row"><div class="info-ico">🏢</div><div><div class="info-key">Exhibitor Booths</div><div class="info-val">Room 310 – Partners & Sponsors</div></div></div>
-      <div class="info-row"><div class="info-ico">🍽️</div><div><div class="info-key">Catering</div><div class="info-val">Lobby Level – Free all day</div></div></div>
-    </div>
-    <div class="sec">Contact</div>
-    <div class="info-group">
-      <div class="info-row"><div class="info-ico">📧</div><div><div class="info-key">General</div><div class="info-val">staff@ethos2025.org</div></div></div>
-      <div class="info-row"><div class="info-ico">🔧</div><div><div class="info-key">Tech Support</div><div class="info-val">staff@ethos2025.org</div></div></div>
+  <!-- LOADING SCREEN (shown while checking auth) -->
+  <div id="pg-loading" class="page active"
+    style="background:linear-gradient(160deg,#1e3a0a,#2d5016 35%,#1a1814);align-items:center;justify-content:center">
+    <div style="text-align:center;color:#fff">
+      <div style="font-size:48px;margin-bottom:16px">🌱</div>
+      <div style="font-family:var(--fh);font-weight:800;font-size:24px;margin-bottom:8px">Ethos 2025</div>
+      <div style="font-size:14px;color:rgba(255,255,255,.6)">Loading your experience…</div>
     </div>
   </div>
-  <div class="bottom-nav" id="info-nav"></div>
-</div>
 
-<!-- PROFILE MODAL -->
-<div class="modal-overlay" id="modal-profile" onclick="closeModal('modal-profile')">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
-    <div class="modal-title" id="prof-name">Profile</div>
-    <div style="font-size:13px;color:var(--sub);margin-bottom:4px" id="prof-email"></div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:16px" id="prof-role-txt"></div>
-    <button class="btn btn-outline" onclick="logout()" style="border-color:#e44;color:#c33">Sign Out</button>
+  <!-- DASHBOARD -->
+  <div id="pg-dash" class="page">
+    <div class="dash-header">
+      <div class="dash-conf">Ethos Conference 2025</div>
+      <div class="dash-hi" id="dash-hi">Welcome! 🌿</div>
+      <div class="dash-date" id="dash-date"></div>
+      <div id="dash-lvl-badge"></div>
+      <div class="dash-chips" id="dash-chips"></div>
+    </div>
+    <div class="content" style="padding-top:12px">
+      <div id="dash-announcements"></div>
+      <div id="dash-entity-panel"></div>
+      <div class="sec">Quick Access</div>
+      <div class="quick-grid" id="dash-grid"></div>
+    </div>
+    <div class="bottom-nav" id="main-nav"></div>
   </div>
-</div>
 
-<!-- VOTE MODAL (pitch) -->
-<div class="modal-overlay" id="modal-vote" onclick="closeModal('modal-vote')">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
-    <div class="modal-title" id="vote-title">Rate this Pitch</div>
-    <div class="modal-sub" id="vote-sub"></div>
-    <div id="vote-body"></div>
-    <button class="btn btn-green" id="vote-btn" onclick="submitVote()">Submit Vote</button>
+  <!-- SCHEDULE -->
+  <div id="pg-schedule" class="page">
+    <div class="topbar"><button class="topbar-back" onclick="navTo('pg-dash')">←</button>
+      <div class="topbar-title">Schedule</div>
+    </div>
+    <div class="content" id="schedule-content"></div>
+    <div class="bottom-nav" id="sched-nav"></div>
   </div>
-</div>
 
-<!-- FEEDBACK MODAL (research / booth) -->
-<div class="modal-overlay" id="modal-feedback" onclick="closeModal('modal-feedback')">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
-    <div class="modal-title" id="fb-title">Leave Feedback</div>
-    <div class="modal-sub" id="fb-sub"></div>
-    <div id="fb-body"></div>
+  <!-- PITCH ROOM -->
+  <div id="pg-pitch" class="page">
+    <div class="topbar"><button class="topbar-back" onclick="navTo('pg-dash')">←</button>
+      <div class="topbar-title">Pitch Room</div>
+    </div>
+    <div class="content">
+      <div class="card green" style="margin-bottom:16px">
+        <div class="card-title">🗳️ Rate each startup</div>
+        <div class="card-sub">Score on sustainability, impact, feasibility & overall. 1–10 each.</div>
+      </div>
+      <input class="ent-search" id="pitch-search" placeholder="🔍 Search startups…" oninput="renderPitches()" />
+      <div id="pitches-list">
+        <div style="text-align:center;padding:30px">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav" id="pitch-nav"></div>
   </div>
-</div>
 
-<!-- CHAT FAB + DRAWER -->
-<button class="chat-fab" id="chat-fab" style="display:none" onclick="openChat()">
-  💬<div class="chat-pip" id="chat-pip"></div>
-</button>
-<div class="chat-drawer" id="chat-drawer">
-  <div class="chat-header">
-    <button class="chat-close" onclick="closeChat()">✕</button>
-    <div class="chat-title">Chat with Staff</div>
+  <!-- RESEARCH HALL -->
+  <div id="pg-research" class="page">
+    <div class="topbar"><button class="topbar-back" onclick="navTo('pg-dash')">←</button>
+      <div class="topbar-title">Research Hall</div>
+    </div>
+    <div class="content">
+      <div class="card green" style="margin-bottom:16px">
+        <div class="card-title">🔬 Research Posters</div>
+        <div class="card-sub">Browse research presentations and leave feedback for each team.</div>
+      </div>
+      <input class="ent-search" id="research-search" placeholder="🔍 Search research…" oninput="renderResearch()" />
+      <div id="research-list">
+        <div style="text-align:center;padding:30px">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav" id="research-nav"></div>
   </div>
-  <div class="chat-msgs" id="chat-msgs"></div>
-  <div class="chat-input-row">
-    <textarea class="chat-inp" id="chat-inp" placeholder="Ask us anything…" rows="1" oninput="autoResize(this)"></textarea>
-    <button class="chat-send" onclick="sendChat()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" width="17" height="17"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-    </button>
+
+  <!-- BOOTHS -->
+  <div id="pg-booths" class="page">
+    <div class="topbar"><button class="topbar-back" onclick="navTo('pg-dash')">←</button>
+      <div class="topbar-title">Exhibitor Booths</div>
+    </div>
+    <div class="content">
+      <div class="card green" style="margin-bottom:16px">
+        <div class="card-title">🏢 Exhibitors</div>
+        <div class="card-sub">Meet our sponsors and partners. Leave feedback to help them improve!</div>
+      </div>
+      <input class="ent-search" id="booth-search" placeholder="🔍 Search booths…" oninput="renderBooths()" />
+      <div id="booths-list">
+        <div style="text-align:center;padding:30px">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav" id="booths-nav"></div>
   </div>
-</div>
 
-<div class="toast" id="toast"></div>
+  <!-- ENTITY DASHBOARD (LVL 1 only) -->
+  <div id="pg-myentity" class="page">
+    <div class="topbar"><button class="topbar-back" onclick="navTo('pg-dash')">←</button>
+      <div class="topbar-title">My Dashboard</div>
+    </div>
+    <div class="content" id="myentity-content">
+      <div style="text-align:center;padding:30px">
+        <div class="spinner"></div>
+      </div>
+    </div>
+    <div class="bottom-nav" id="myentity-nav"></div>
+  </div>
 
-<script>
-// ─── SUPABASE ───────────────────────────────────────────
-const SUPABASE_URL  = 'https://qtibzgyaldxcvhnkfxok.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0aWJ6Z3lhbGR4Y3ZobmtmeG9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MTE2NzUsImV4cCI6MjA4NzI4NzY3NX0.ovVgmA_GEq2sOWWBo32FX_xmMsSViJvBHMz1hr6Nj7E';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  <!-- PASSPORT -->
+  <div id="pg-passport" class="page">
+    <div class="topbar"><button class="topbar-back" onclick="navTo('pg-dash')">←</button>
+      <div class="topbar-title">Booth Passport</div>
+    </div>
+    <div class="content" id="passport-content">
+      <div style="text-align:center;padding:30px">
+        <div class="spinner"></div>
+      </div>
+    </div>
+    <div class="bottom-nav" id="passport-nav"></div>
+  </div>
 
-// ─── STATE ──────────────────────────────────────────────
-let currentUser    = null;
-let currentProfile = null;
-let entities       = [];
-let myVotes        = new Set();   // entity_ids voted on
-let myFeedback     = new Set();   // entity_ids with feedback
-let myStamps       = new Set();   // "boothId:room"
-let voteState      = {};
-let feedbackState  = { entityId: null, rating: 0, body: '' };
-let activeVoteId   = null;
-let activeNoteId   = null;
-let chatChannel    = null;
+  <!-- NOTES -->
+  <div id="pg-notes" class="page">
+    <div class="topbar"><button class="topbar-back" onclick="navTo('pg-dash')">←</button>
+      <div class="topbar-title">Notes</div><button class="topbar-action" onclick="newNote()">+ New</button>
+    </div>
+    <div class="content" id="notes-list"></div>
+    <div class="bottom-nav" id="notes-nav"></div>
+  </div>
+  <div id="pg-note-editor" class="page">
+    <div class="topbar"><button class="topbar-back" onclick="saveNote()">← Save</button>
+      <div class="topbar-title">Note</div><button class="topbar-action" style="color:#c44"
+        onclick="deleteNote()">Delete</button>
+    </div>
+    <div class="content" style="padding-top:8px">
+      <input class="note-title-inp" id="note-title-inp" placeholder="Title…" />
+      <textarea class="note-body-inp" id="note-body-inp" placeholder="Start typing…"></textarea>
+    </div>
+  </div>
 
-// ─── ACCESS LEVEL HELPERS ───────────────────────────────
-const LVL_LABELS = ['Attendee', 'Presenter', 'Staff', 'Super Admin'];
-const LVL_ICONS  = ['🎫', '🎤', '🛡️', '⭐'];
-function lvl() { return currentProfile?.access_level ?? 0; }
-function hasLvl(n) { return lvl() >= n; }
+  <!-- MY CARD -->
+  <div id="pg-card" class="page">
+    <div class="topbar"><button class="topbar-back" onclick="navTo('pg-dash')">←</button>
+      <div class="topbar-title">My Card</div>
+      <div class="avatar" id="card-av" onclick="openModal('modal-profile')">?</div>
+    </div>
+    <div class="content">
+      <div class="bc-card">
+        <div class="bc-name" id="bc-name">Your Name</div>
+        <div class="bc-title" id="bc-title-d">Title · Company</div>
+        <div class="bc-contact"><span id="bc-email-d"></span><span id="bc-phone-d"></span></div>
+      </div>
+      <div class="qr-box">
+        <canvas class="qr-canvas" id="qr-canvas" width="180" height="180"></canvas>
+        <div style="font-size:13px;color:var(--sub)">Others scan this to save your contact</div>
+      </div>
+      <div class="sec">Edit Your Card</div>
+      <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="bc-name-inp"
+          placeholder="Your name" oninput="liveCard()" /></div>
+      <div class="form-group"><label class="form-label">Title</label><input class="form-input" id="bc-title-inp"
+          placeholder="Environmental Scientist" oninput="liveCard()" /></div>
+      <div class="form-group"><label class="form-label">Company / School</label><input class="form-input" id="bc-co-inp"
+          placeholder="MIT" oninput="liveCard()" /></div>
+      <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="bc-phone-inp"
+          type="tel" placeholder="+1 555 000 0000" oninput="liveCard()" /></div>
+      <div class="form-group"><label class="form-label">LinkedIn</label><input class="form-input" id="bc-li-inp"
+          placeholder="linkedin.com/in/you" /></div>
+      <div class="form-group"><label class="form-label">Resume Link</label><input class="form-input" id="bc-resume-inp"
+          placeholder="drive.google.com/…" /></div>
+      <button class="btn btn-green" onclick="saveCard()">Save Card</button>
+    </div>
+    <div class="bottom-nav" id="card-nav"></div>
+  </div>
 
-// ─── AUTH ───────────────────────────────────────────────
-// ─── AUTH GUARD ─────────────────────────────────────────
-// app.html never has a login page — redirect to applogin.html if not authenticated
-async function loadProfile(uid) {
-  for (let i = 0; i < 8; i++) {
-    if (i > 0) await new Promise(r => setTimeout(r, 500 + i * 400));
-    const { data, error } = await sb.from('profiles').select('*').eq('id', uid).maybeSingle();
-    if (data) return data;
-    // Log errors to help debug — error code 'PGRST116' = 0 rows (maybeSingle won't throw this)
-    if (error) console.warn('[loadProfile] attempt', i, error.code, error.message);
-  }
-  console.error('[loadProfile] gave up after 8 attempts for uid:', uid);
-  return null;
-}
+  <!-- SCAN -->
+  <div id="pg-scan" class="page">
+    <div class="topbar"><button class="topbar-back" onclick="navTo('pg-dash')">←</button>
+      <div class="topbar-title">Scan QR</div>
+    </div>
+    <div class="content" style="text-align:center">
+      <div style="font-size:64px;margin:32px auto 16px">📷</div>
+      <div style="font-family:var(--fh);font-weight:700;font-size:20px;margin-bottom:8px">Scan a QR Code</div>
+      <div style="font-size:14px;color:var(--sub);margin-bottom:28px">Business cards · Booth stamps</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:8px">Paste QR code data manually:</div>
+      <div style="display:flex;gap:8px;max-width:360px;margin:0 auto">
+        <input class="form-input" id="manual-qr" placeholder='{"name":"…"} or BOOTH-e1' />
+        <button class="btn btn-green btn-sm" onclick="manualScan()">Add</button>
+      </div>
+      <div id="scan-result" style="margin-top:16px;max-width:360px;margin-left:auto;margin-right:auto"></div>
+    </div>
+    <div class="bottom-nav" id="scan-nav"></div>
+  </div>
 
-async function logout() {
-  await sb.auth.signOut();
-  currentUser = null; currentProfile = null;
-  if (chatChannel) sb.removeChannel(chatChannel);
-  closeModal('modal-profile');
-  window.location.href = 'applogin.html';
-}
+  <!-- INFO -->
+  <div id="pg-info" class="page">
+    <div class="topbar"><button class="topbar-back" onclick="navTo('pg-dash')">←</button>
+      <div class="topbar-title">Conference Info</div>
+    </div>
+    <div class="content">
+      <div style="background:var(--g);border-radius:var(--r);padding:18px;color:#fff;margin-bottom:16px">
+        <div style="font-family:var(--fh);font-weight:800;font-size:20px">Ethos Sustainability 2025</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.7);margin-top:4px">Innovation Hall, Building A — Level 3
+        </div>
+      </div>
+      <div class="sec">WiFi</div>
+      <div class="info-group">
+        <div class="info-row">
+          <div class="info-ico">📶</div>
+          <div>
+            <div class="info-key">Network</div>
+            <div class="info-val">Ethos2025</div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-ico">🔑</div>
+          <div>
+            <div class="info-key">Password</div>
+            <div class="info-val">sustainability!</div>
+          </div>
+        </div>
+      </div>
+      <div class="sec">Rooms</div>
+      <div class="info-group">
+        <div class="info-row">
+          <div class="info-ico">🎤</div>
+          <div>
+            <div class="info-key">Auditorium</div>
+            <div class="info-val">Room 301 – Keynotes & Panels</div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-ico">🚀</div>
+          <div>
+            <div class="info-key">Pitch Room</div>
+            <div class="info-val">Room 205 – Startup Pitches</div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-ico">🔬</div>
+          <div>
+            <div class="info-key">Research Hall</div>
+            <div class="info-val">Atrium – Research Posters</div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-ico">🏢</div>
+          <div>
+            <div class="info-key">Exhibitor Booths</div>
+            <div class="info-val">Room 310 – Partners & Sponsors</div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-ico">🍽️</div>
+          <div>
+            <div class="info-key">Catering</div>
+            <div class="info-val">Lobby Level – Free all day</div>
+          </div>
+        </div>
+      </div>
+      <div class="sec">Contact</div>
+      <div class="info-group">
+        <div class="info-row">
+          <div class="info-ico">📧</div>
+          <div>
+            <div class="info-key">General</div>
+            <div class="info-val">staff@ethos2025.org</div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-ico">🔧</div>
+          <div>
+            <div class="info-key">Tech Support</div>
+            <div class="info-val">staff@ethos2025.org</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav" id="info-nav"></div>
+  </div>
 
-let _booting = false; // prevent double-boot
+  <!-- PROFILE MODAL -->
+  <div class="modal-overlay" id="modal-profile" onclick="closeModal('modal-profile')">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="prof-name">Profile</div>
+      <div style="font-size:13px;color:var(--sub);margin-bottom:4px" id="prof-email"></div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px" id="prof-role-txt"></div>
+      <button class="btn btn-outline" onclick="logout()" style="border-color:#e44;color:#c33">Sign Out</button>
+    </div>
+  </div>
 
-async function bootApp(user) {
-  if (_booting) return;
-  _booting = true;
-  currentUser = user;
+  <!-- VOTE MODAL (pitch) -->
+  <div class="modal-overlay" id="modal-vote" onclick="closeModal('modal-vote')">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="vote-title">Rate this Pitch</div>
+      <div class="modal-sub" id="vote-sub"></div>
+      <div id="vote-body"></div>
+      <button class="btn btn-green" id="vote-btn" onclick="submitVote()">Submit Vote</button>
+    </div>
+  </div>
 
-  currentProfile = await loadProfile(currentUser.id);
-  if (!currentProfile) {
-    // Profile missing — could be RLS, could be trigger lag
-    // Show a helpful message and let them try again rather than hard-looping
-    document.getElementById('pg-loading').innerHTML = `
+  <!-- FEEDBACK MODAL (research / booth) -->
+  <div class="modal-overlay" id="modal-feedback" onclick="closeModal('modal-feedback')">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="fb-title">Leave Feedback</div>
+      <div class="modal-sub" id="fb-sub"></div>
+      <div id="fb-body"></div>
+    </div>
+  </div>
+
+  <!-- CHAT FAB + DRAWER -->
+  <button class="chat-fab" id="chat-fab" style="display:none" onclick="openChat()">
+    💬<div class="chat-pip" id="chat-pip"></div>
+  </button>
+  <div class="chat-drawer" id="chat-drawer">
+    <div class="chat-header">
+      <button class="chat-close" onclick="closeChat()">✕</button>
+      <div class="chat-title">Chat with Staff</div>
+    </div>
+    <div class="chat-msgs" id="chat-msgs"></div>
+    <div class="chat-input-row">
+      <textarea class="chat-inp" id="chat-inp" placeholder="Ask us anything…" rows="1"
+        oninput="autoResize(this)"></textarea>
+      <button class="chat-send" onclick="sendChat()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" width="17" height="17">
+          <line x1="22" y1="2" x2="11" y2="13" />
+          <polygon points="22 2 15 22 11 13 2 9 22 2" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ─── SUPABASE ───────────────────────────────────────────
+    const SUPABASE_URL = 'https://qtibzgyaldxcvhnkfxok.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0aWJ6Z3lhbGR4Y3ZobmtmeG9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MTE2NzUsImV4cCI6MjA4NzI4NzY3NX0.ovVgmA_GEq2sOWWBo32FX_xmMsSViJvBHMz1hr6Nj7E';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+      auth: { detectSessionInUrl: true, flowType: 'pkce' }
+    });
+
+    // ─── STATE ──────────────────────────────────────────────
+    let currentUser = null;
+    let currentProfile = null;
+    let entities = [];
+    let myVotes = new Set();   // entity_ids voted on
+    let myFeedback = new Set();   // entity_ids with feedback
+    let myStamps = new Set();   // "boothId:room"
+    let voteState = {};
+    let feedbackState = { entityId: null, rating: 0, body: '' };
+    let activeVoteId = null;
+    let activeNoteId = null;
+    let chatChannel = null;
+
+    // ─── ACCESS LEVEL HELPERS ───────────────────────────────
+    const LVL_LABELS = ['Attendee', 'Presenter', 'Staff', 'Super Admin'];
+    const LVL_ICONS = ['🎫', '🎤', '🛡️', '⭐'];
+    function lvl() { return currentProfile?.access_level ?? 0; }
+    function hasLvl(n) { return lvl() >= n; }
+
+    // ─── AUTH ───────────────────────────────────────────────
+    // ─── AUTH GUARD ─────────────────────────────────────────
+    // app.html never has a login page — redirect to applogin.html if not authenticated
+    async function loadProfile(uid) {
+      for (let i = 0; i < 8; i++) {
+        if (i > 0) await new Promise(r => setTimeout(r, 500 + i * 400));
+        const { data, error } = await sb.from('profiles').select('*').eq('id', uid).maybeSingle();
+        if (data) return data;
+        // Log errors to help debug — error code 'PGRST116' = 0 rows (maybeSingle won't throw this)
+        if (error) console.warn('[loadProfile] attempt', i, error.code, error.message);
+      }
+      console.error('[loadProfile] gave up after 8 attempts for uid:', uid);
+      return null;
+    }
+
+    async function logout() {
+      await sb.auth.signOut();
+      currentUser = null; currentProfile = null;
+      if (chatChannel) sb.removeChannel(chatChannel);
+      closeModal('modal-profile');
+      window.location.href = 'applogin.html';
+    }
+
+    let _booting = false; // prevent double-boot
+
+    async function bootApp(user) {
+      if (_booting) return;
+      _booting = true;
+      currentUser = user;
+
+      currentProfile = await loadProfile(currentUser.id);
+      if (!currentProfile) {
+        // Profile missing — could be RLS, could be trigger lag
+        // Show a helpful message and let them try again rather than hard-looping
+        document.getElementById('pg-loading').innerHTML = `
       <div style="text-align:center;color:#fff;padding:32px">
         <div style="font-size:48px;margin-bottom:16px">⚠️</div>
         <div style="font-family:var(--fh);font-weight:800;font-size:22px;margin-bottom:10px">Couldn't load your profile</div>
@@ -524,147 +1820,147 @@ async function bootApp(user) {
         <button onclick="retryBoot()" style="background:#fff;color:#2d5016;border:none;border-radius:12px;padding:14px 28px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:12px;display:block;width:220px;margin:0 auto 12px">Try Again</button>
         <button onclick="logout()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:12px;padding:12px 28px;font-size:14px;cursor:pointer;display:block;width:220px;margin:0 auto">Sign Out & Restart</button>
       </div>`;
-    _booting = false;
-    return;
-  }
+        _booting = false;
+        return;
+      }
 
-  await loadUserData();
-  buildUI();
-  navTo('pg-dash');
-}
+      await loadUserData();
+      buildUI();
+      navTo('pg-dash');
+    }
 
-async function retryBoot() {
-  _booting = false;
-  document.getElementById('pg-loading').innerHTML = `
+    async function retryBoot() {
+      _booting = false;
+      document.getElementById('pg-loading').innerHTML = `
     <div style="text-align:center;color:#fff">
       <div style="font-size:48px;margin-bottom:16px">🌱</div>
       <div style="font-family:var(--fh);font-weight:800;font-size:24px;margin-bottom:8px">Ethos 2025</div>
       <div style="font-size:14px;color:rgba(255,255,255,.6)">Retrying…</div>
     </div>`;
-  const { data: { session } } = await sb.auth.getSession();
-  if (session?.user) {
-    await bootApp(session.user);
-  } else {
-    window.location.href = 'applogin.html';
-  }
-}
+      const { data: { session } } = await sb.auth.getSession();
+      if (session?.user) {
+        await bootApp(session.user);
+      } else {
+        window.location.href = 'applogin.html';
+      }
+    }
 
-// PRIMARY: parse OAuth ?code= from URL and/or restore existing session
-(async () => {
-  const { data: { session }, error } = await sb.auth.getSession();
-  if (error) console.error('[getSession error]', error);
-  if (session?.user) {
-    await bootApp(session.user);
-    return;
-  }
-  // Truly no session — go to login
-  window.location.replace('applogin.html');
-})();
+    // PRIMARY: parse OAuth ?code= from URL and/or restore existing session
+    (async () => {
+      const { data: { session }, error } = await sb.auth.getSession();
+      if (error) console.error('[getSession error]', error);
+      if (session?.user) {
+        await bootApp(session.user);
+        return;
+      }
+      // Truly no session — go to login
+      window.location.replace('applogin.html');
+    })();
 
-// SECONDARY: react to future auth changes (token refresh, sign out)
-sb.auth.onAuthStateChange(async (event, session) => {
-  console.log('[auth event]', event, session?.user?.email);
-  if (event === 'SIGNED_IN' && session?.user && !_booting && !currentUser) {
-    await bootApp(session.user);
-  }
-  if (event === 'SIGNED_OUT') {
-    currentUser = null; currentProfile = null; _booting = false;
-    window.location.replace('applogin.html');
-  }
-  if (event === 'TOKEN_REFRESHED' && session?.user) {
-    currentUser = session.user;
-  }
-});
+    // SECONDARY: react to future auth changes (token refresh, sign out)
+    sb.auth.onAuthStateChange(async (event, session) => {
+      console.log('[auth event]', event, session?.user?.email);
+      if (event === 'SIGNED_IN' && session?.user && !_booting && !currentUser) {
+        await bootApp(session.user);
+      }
+      if (event === 'SIGNED_OUT') {
+        currentUser = null; currentProfile = null; _booting = false;
+        window.location.replace('applogin.html');
+      }
+      if (event === 'TOKEN_REFRESHED' && session?.user) {
+        currentUser = session.user;
+      }
+    });
 
-// ─── LOAD DATA ──────────────────────────────────────────
-async function loadUserData() {
-  const [{ data: ents }, { data: votes }, { data: fbs }, { data: stamps }] = await Promise.all([
-    sb.from('entities').select('*').eq('active', true).order('type'),
-    sb.from('votes').select('entity_id').eq('voter_uid', currentUser.id),
-    sb.from('feedback').select('entity_id').eq('from_uid', currentUser.id),
-    sb.from('stamps').select('booth_id,room').eq('user_id', currentUser.id),
-  ]);
-  entities  = ents || [];
-  myVotes   = new Set((votes||[]).map(v => v.entity_id));
-  myFeedback= new Set((fbs||[]).map(f => f.entity_id));
-  myStamps  = new Set((stamps||[]).map(s => s.booth_id + ':' + s.room));
-}
+    // ─── LOAD DATA ──────────────────────────────────────────
+    async function loadUserData() {
+      const [{ data: ents }, { data: votes }, { data: fbs }, { data: stamps }] = await Promise.all([
+        sb.from('entities').select('*').eq('active', true).order('type'),
+        sb.from('votes').select('entity_id').eq('voter_uid', currentUser.id),
+        sb.from('feedback').select('entity_id').eq('from_uid', currentUser.id),
+        sb.from('stamps').select('booth_id,room').eq('user_id', currentUser.id),
+      ]);
+      entities = ents || [];
+      myVotes = new Set((votes || []).map(v => v.entity_id));
+      myFeedback = new Set((fbs || []).map(f => f.entity_id));
+      myStamps = new Set((stamps || []).map(s => s.booth_id + ':' + s.room));
+    }
 
-// ─── BUILD UI ───────────────────────────────────────────
-function buildUI() {
-  buildNavs();
-  buildDash();
-  loadCard();
-  document.getElementById('chat-fab').style.display = 'flex';
-  subscribeChat();
-  checkAnnouncements();
-}
+    // ─── BUILD UI ───────────────────────────────────────────
+    function buildUI() {
+      buildNavs();
+      buildDash();
+      loadCard();
+      document.getElementById('chat-fab').style.display = 'flex';
+      subscribeChat();
+      checkAnnouncements();
+    }
 
-// Nav items vary by access level
-function getNavItems() {
-  const base = [
-    { page:'pg-dash',     label:'Home',     svg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>' },
-    { page:'pg-pitch',    label:'Pitch',    svg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>' },
-    { page:'pg-research', label:'Research', svg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' },
-    { page:'pg-booths',   label:'Booths',   svg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l1-6h16l1 6"/><path d="M3 9h18v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M9 22V12h6v10"/></svg>' },
-    { page:'pg-passport', label:'Passport', svg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>' },
-  ];
-  // Lvl 1 entity owners get their entity dashboard
-  if (lvl() === 1 && currentProfile.entity_id) {
-    base.push({ page:'pg-myentity', label:'My Page', svg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' });
-  }
-  return base;
-}
+    // Nav items vary by access level
+    function getNavItems() {
+      const base = [
+        { page: 'pg-dash', label: 'Home', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>' },
+        { page: 'pg-pitch', label: 'Pitch', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>' },
+        { page: 'pg-research', label: 'Research', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' },
+        { page: 'pg-booths', label: 'Booths', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l1-6h16l1 6"/><path d="M3 9h18v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M9 22V12h6v10"/></svg>' },
+        { page: 'pg-passport', label: 'Passport', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>' },
+      ];
+      // Lvl 1 entity owners get their entity dashboard
+      if (lvl() === 1 && currentProfile.entity_id) {
+        base.push({ page: 'pg-myentity', label: 'My Page', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' });
+      }
+      return base;
+    }
 
-function buildNavs() {
-  const items = getNavItems();
-  const html = items.map((n,i) =>
-    `<button class="nav-btn ${i===0?'active':''}" data-page="${n.page}" onclick="navTo('${n.page}')">${n.svg}<span>${n.label}</span></button>`
-  ).join('');
-  document.querySelectorAll('.bottom-nav').forEach(el => el.innerHTML = html);
-}
+    function buildNavs() {
+      const items = getNavItems();
+      const html = items.map((n, i) =>
+        `<button class="nav-btn ${i === 0 ? 'active' : ''}" data-page="${n.page}" onclick="navTo('${n.page}')">${n.svg}<span>${n.label}</span></button>`
+      ).join('');
+      document.querySelectorAll('.bottom-nav').forEach(el => el.innerHTML = html);
+    }
 
-function navTo(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(id)?.classList.add('active');
-  window.scrollTo(0,0);
-  document.querySelectorAll('.nav-btn[data-page]').forEach(b => b.classList.toggle('active', b.dataset.page === id));
-  if (id === 'pg-schedule')   renderSchedule();
-  if (id === 'pg-pitch')      renderPitches();
-  if (id === 'pg-research')   renderResearch();
-  if (id === 'pg-booths')     renderBooths();
-  if (id === 'pg-passport')   renderPassport();
-  if (id === 'pg-notes')      loadNotes();
-  if (id === 'pg-myentity')   loadEntityDash();
-}
+    function navTo(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(id)?.classList.add('active');
+      window.scrollTo(0, 0);
+      document.querySelectorAll('.nav-btn[data-page]').forEach(b => b.classList.toggle('active', b.dataset.page === id));
+      if (id === 'pg-schedule') renderSchedule();
+      if (id === 'pg-pitch') renderPitches();
+      if (id === 'pg-research') renderResearch();
+      if (id === 'pg-booths') renderBooths();
+      if (id === 'pg-passport') renderPassport();
+      if (id === 'pg-notes') loadNotes();
+      if (id === 'pg-myentity') loadEntityDash();
+    }
 
-// ─── DASHBOARD ──────────────────────────────────────────
-function buildDash() {
-  const p = currentProfile;
-  document.getElementById('dash-hi').textContent = 'Hi, ' + (p?.name||'').split(' ')[0] + '! 🌿';
-  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+    // ─── DASHBOARD ──────────────────────────────────────────
+    function buildDash() {
+      const p = currentProfile;
+      document.getElementById('dash-hi').textContent = 'Hi, ' + (p?.name || '').split(' ')[0] + '! 🌿';
+      document.getElementById('dash-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
-  // Level badge
-  const l = lvl();
-  const dots = [0,1,2,3].map(i => `<div class="lvl-dot ${i<=l?'on':''}"></div>`).join('');
-  document.getElementById('dash-lvl-badge').innerHTML =
-    `<div class="lvl-badge">${LVL_ICONS[l]} ${LVL_LABELS[l]} <div class="lvl-dots">${dots}</div></div>`;
+      // Level badge
+      const l = lvl();
+      const dots = [0, 1, 2, 3].map(i => `<div class="lvl-dot ${i <= l ? 'on' : ''}"></div>`).join('');
+      document.getElementById('dash-lvl-badge').innerHTML =
+        `<div class="lvl-badge">${LVL_ICONS[l]} ${LVL_LABELS[l]} <div class="lvl-dots">${dots}</div></div>`;
 
-  // Quick chips
-  document.getElementById('dash-chips').innerHTML =
-    `<div class="dchip hi" onclick="navTo('pg-schedule')">📅 Schedule</div>
+      // Quick chips
+      document.getElementById('dash-chips').innerHTML =
+        `<div class="dchip hi" onclick="navTo('pg-schedule')">📅 Schedule</div>
      <div class="dchip" onclick="navTo('pg-pitch')">🚀 Pitches</div>
      <div class="dchip" onclick="navTo('pg-research')">🔬 Research</div>
      <div class="dchip" onclick="navTo('pg-booths')">🏢 Booths</div>`;
 
-  // Entity panel for lvl 1
-  if (l === 1 && p.entity_id) {
-    const ent = entities.find(e => e.id === p.entity_id);
-    if (ent) {
-      document.getElementById('dash-entity-panel').innerHTML = `
+      // Entity panel for lvl 1
+      if (l === 1 && p.entity_id) {
+        const ent = entities.find(e => e.id === p.entity_id);
+        if (ent) {
+          document.getElementById('dash-entity-panel').innerHTML = `
         <div class="card green" style="margin-bottom:16px;cursor:pointer" onclick="navTo('pg-myentity')">
           <div style="display:flex;align-items:center;gap:10px">
-            <div style="font-size:24px">${ent.type==='pitch'?'🚀':ent.type==='research'?'🔬':'🏢'}</div>
+            <div style="font-size:24px">${ent.type === 'pitch' ? '🚀' : ent.type === 'research' ? '🔬' : '🏢'}</div>
             <div>
               <div style="font-size:11px;font-weight:600;color:var(--g);text-transform:uppercase;letter-spacing:.06em">Your ${ent.type}</div>
               <div style="font-family:var(--fh);font-weight:700;font-size:15px">${esc(ent.name)}</div>
@@ -672,176 +1968,180 @@ function buildDash() {
             <div style="margin-left:auto;font-size:18px;color:var(--g)">›</div>
           </div>
         </div>`;
+        }
+      }
+
+      // Quick grid
+      const tiles = [
+        { ico: '📅', name: 'Schedule', desc: 'All sessions', page: 'pg-schedule' },
+        { ico: '🚀', name: 'Pitch Room', desc: 'Vote on startups', page: 'pg-pitch' },
+        { ico: '🔬', name: 'Research', desc: 'Poster hall', page: 'pg-research' },
+        { ico: '🏢', name: 'Booths', desc: 'Exhibitors', page: 'pg-booths' },
+        { ico: '🗺️', name: 'Passport', desc: 'Booth stamps', page: 'pg-passport' },
+        { ico: '📝', name: 'Notes', desc: 'Keynote notes', page: 'pg-notes' },
+        { ico: '👤', name: 'My Card', desc: 'Digital card + QR', page: 'pg-card' },
+        { ico: 'ℹ️', name: 'Info', desc: 'WiFi, rooms', page: 'pg-info' },
+      ];
+      document.getElementById('dash-grid').innerHTML = tiles.map(t =>
+        `<div class="quick-tile" onclick="navTo('${t.page}')"><div class="quick-ico">${t.ico}</div><div class="quick-name">${t.name}</div><div class="quick-desc">${t.desc}</div></div>`
+      ).join('');
     }
-  }
 
-  // Quick grid
-  const tiles = [
-    { ico:'📅', name:'Schedule',  desc:'All sessions',    page:'pg-schedule' },
-    { ico:'🚀', name:'Pitch Room', desc:'Vote on startups', page:'pg-pitch' },
-    { ico:'🔬', name:'Research',  desc:'Poster hall',      page:'pg-research' },
-    { ico:'🏢', name:'Booths',    desc:'Exhibitors',       page:'pg-booths' },
-    { ico:'🗺️', name:'Passport',  desc:'Booth stamps',     page:'pg-passport' },
-    { ico:'📝', name:'Notes',     desc:'Keynote notes',    page:'pg-notes' },
-    { ico:'👤', name:'My Card',   desc:'Digital card + QR',page:'pg-card' },
-    { ico:'ℹ️', name:'Info',      desc:'WiFi, rooms',      page:'pg-info' },
-  ];
-  document.getElementById('dash-grid').innerHTML = tiles.map(t =>
-    `<div class="quick-tile" onclick="navTo('${t.page}')"><div class="quick-ico">${t.ico}</div><div class="quick-name">${t.name}</div><div class="quick-desc">${t.desc}</div></div>`
-  ).join('');
-}
-
-async function checkAnnouncements() {
-  const { data } = await sb.from('messages').select('*').eq('to_uid','broadcast').order('created_at',{ascending:false}).limit(3);
-  if (!data?.length) return;
-  document.getElementById('dash-announcements').innerHTML = data.map(m =>
-    `<div class="card green" style="cursor:pointer;margin-bottom:12px" onclick="openChat()">
+    async function checkAnnouncements() {
+      const { data } = await sb.from('messages').select('*').eq('to_uid', 'broadcast').order('created_at', { ascending: false }).limit(3);
+      if (!data?.length) return;
+      document.getElementById('dash-announcements').innerHTML = data.map(m =>
+        `<div class="card green" style="cursor:pointer;margin-bottom:12px" onclick="openChat()">
       <div style="font-size:11px;font-weight:600;color:var(--g);margin-bottom:4px">📣 Staff Announcement</div>
       <div style="font-size:14px;line-height:1.5">${esc(m.body)}</div>
       <div style="font-size:11px;color:var(--muted);margin-top:6px">${timeAgo(m.created_at)}</div>
     </div>`
-  ).join('');
-}
+      ).join('');
+    }
 
-// ─── SCHEDULE ───────────────────────────────────────────
-const SCHEDULE = [
-  { day:'Day 1 – Morning', sessions:[
-    {time:'8:30', name:'Registration & Breakfast', room:'Lobby', speaker:''},
-    {time:'9:00', name:'Opening Ceremony', room:'Auditorium 301', speaker:'Conference Leads'},
-    {time:'9:30', name:'Keynote: Tipping Points in Climate Systems', room:'Auditorium 301', speaker:'Dr. Maya Chen, MIT'},
-    {time:'10:45',name:'Pitch Room – Session 1', room:'Room 205', speaker:'EcoWave, SolarHive, AirRoots'},
-  ]},
-  { day:'Day 1 – Afternoon', sessions:[
-    {time:'12:00',name:'Lunch Break', room:'Lobby', speaker:''},
-    {time:'13:00',name:'Research Hall + Booths Open', room:'Atrium + Room 310', speaker:''},
-    {time:'13:00',name:'Pitch Room – Session 2', room:'Room 205', speaker:'ReCarbon, TideFlow'},
-    {time:'15:00',name:'Panel: Sustainable Innovation in Practice', room:'Auditorium 301', speaker:'All Keynote Speakers'},
-    {time:'17:30',name:'Closing & Raffle', room:'Auditorium 301', speaker:'Conference Leads'},
-  ]},
-];
-function renderSchedule() {
-  document.getElementById('schedule-content').innerHTML = SCHEDULE.map(d =>
-    `<div class="sched-day">${d.day}</div>` +
-    d.sessions.map(s =>
-      `<div class="sched-item">
+    // ─── SCHEDULE ───────────────────────────────────────────
+    const SCHEDULE = [
+      {
+        day: 'Day 1 – Morning', sessions: [
+          { time: '8:30', name: 'Registration & Breakfast', room: 'Lobby', speaker: '' },
+          { time: '9:00', name: 'Opening Ceremony', room: 'Auditorium 301', speaker: 'Conference Leads' },
+          { time: '9:30', name: 'Keynote: Tipping Points in Climate Systems', room: 'Auditorium 301', speaker: 'Dr. Maya Chen, MIT' },
+          { time: '10:45', name: 'Pitch Room – Session 1', room: 'Room 205', speaker: 'EcoWave, SolarHive, AirRoots' },
+        ]
+      },
+      {
+        day: 'Day 1 – Afternoon', sessions: [
+          { time: '12:00', name: 'Lunch Break', room: 'Lobby', speaker: '' },
+          { time: '13:00', name: 'Research Hall + Booths Open', room: 'Atrium + Room 310', speaker: '' },
+          { time: '13:00', name: 'Pitch Room – Session 2', room: 'Room 205', speaker: 'ReCarbon, TideFlow' },
+          { time: '15:00', name: 'Panel: Sustainable Innovation in Practice', room: 'Auditorium 301', speaker: 'All Keynote Speakers' },
+          { time: '17:30', name: 'Closing & Raffle', room: 'Auditorium 301', speaker: 'Conference Leads' },
+        ]
+      },
+    ];
+    function renderSchedule() {
+      document.getElementById('schedule-content').innerHTML = SCHEDULE.map(d =>
+        `<div class="sched-day">${d.day}</div>` +
+        d.sessions.map(s =>
+          `<div class="sched-item">
         <div class="sched-time">${s.time}</div>
-        <div><div class="sched-name">${esc(s.name)}</div><div class="sched-loc">${esc(s.room)}</div>${s.speaker?`<div class="sched-spkr">${esc(s.speaker)}</div>`:''}</div>
+        <div><div class="sched-name">${esc(s.name)}</div><div class="sched-loc">${esc(s.room)}</div>${s.speaker ? `<div class="sched-spkr">${esc(s.speaker)}</div>` : ''}</div>
       </div>`
-    ).join('')
-  ).join('');
-}
+        ).join('')
+      ).join('');
+    }
 
-// ─── PITCH ROOM ─────────────────────────────────────────
-function renderPitches() {
-  const q = (document.getElementById('pitch-search')?.value||'').toLowerCase();
-  const list = entities.filter(e => e.type==='pitch' && (e.name.toLowerCase().includes(q)||e.tagline.toLowerCase().includes(q)));
-  document.getElementById('pitches-list').innerHTML = list.length ? list.map(p =>
-    `<div class="ent-card ${myVotes.has(p.id)?'interacted':''}" onclick="openVoteModal('${p.id}')">
+    // ─── PITCH ROOM ─────────────────────────────────────────
+    function renderPitches() {
+      const q = (document.getElementById('pitch-search')?.value || '').toLowerCase();
+      const list = entities.filter(e => e.type === 'pitch' && (e.name.toLowerCase().includes(q) || e.tagline.toLowerCase().includes(q)));
+      document.getElementById('pitches-list').innerHTML = list.length ? list.map(p =>
+        `<div class="ent-card ${myVotes.has(p.id) ? 'interacted' : ''}" onclick="openVoteModal('${p.id}')">
       <div class="ent-header">
-        <div class="ent-logo">${p.logo_url?`<img src="${esc(p.logo_url)}">`:'🚀'}</div>
+        <div class="ent-logo">${p.logo_url ? `<img src="${esc(p.logo_url)}">` : '🚀'}</div>
         <div style="flex:1;min-width:0"><div class="ent-name">${esc(p.name)}</div><div class="ent-tag">${esc(p.tagline)}</div></div>
-        ${myVotes.has(p.id)?'<div class="done-chip">✓ Voted</div>':'<div style="font-size:12px;color:var(--sub)">Rate →</div>'}
+        ${myVotes.has(p.id) ? '<div class="done-chip">✓ Voted</div>' : '<div style="font-size:12px;color:var(--sub)">Rate →</div>'}
       </div>
-      <div style="font-size:13px;color:var(--sub);line-height:1.4">${esc(p.description||'')}</div>
+      <div style="font-size:13px;color:var(--sub);line-height:1.4">${esc(p.description || '')}</div>
     </div>`
-  ).join('') : `<div class="empty"><div class="empty-ico">🔍</div><div>No results</div></div>`;
-}
+      ).join('') : `<div class="empty"><div class="empty-ico">🔍</div><div>No results</div></div>`;
+    }
 
-const VOTE_QS = [
-  {key:'sustainability', q:'🌱 How sustainable?'},
-  {key:'impact',         q:'💥 How impactful?'},
-  {key:'feasibility',    q:'⚙️ How feasible?'},
-  {key:'overall',        q:'⭐ Overall impression'},
-];
-function openVoteModal(id) {
-  const p = entities.find(e => e.id===id);
-  if (!p) return;
-  activeVoteId = id;
-  const voted = myVotes.has(id);
-  voteState = {sustainability:0,impact:0,feasibility:0,overall:0};
-  document.getElementById('vote-title').textContent = p.name;
-  document.getElementById('vote-sub').textContent = voted ? 'You already voted — thanks!' : p.tagline;
-  document.getElementById('vote-btn').disabled = voted;
-  document.getElementById('vote-btn').style.opacity = voted ? '.5' : '1';
-  document.getElementById('vote-body').innerHTML = VOTE_QS.map(({key,q}) =>
-    `<div class="q-group">
+    const VOTE_QS = [
+      { key: 'sustainability', q: '🌱 How sustainable?' },
+      { key: 'impact', q: '💥 How impactful?' },
+      { key: 'feasibility', q: '⚙️ How feasible?' },
+      { key: 'overall', q: '⭐ Overall impression' },
+    ];
+    function openVoteModal(id) {
+      const p = entities.find(e => e.id === id);
+      if (!p) return;
+      activeVoteId = id;
+      const voted = myVotes.has(id);
+      voteState = { sustainability: 0, impact: 0, feasibility: 0, overall: 0 };
+      document.getElementById('vote-title').textContent = p.name;
+      document.getElementById('vote-sub').textContent = voted ? 'You already voted — thanks!' : p.tagline;
+      document.getElementById('vote-btn').disabled = voted;
+      document.getElementById('vote-btn').style.opacity = voted ? '.5' : '1';
+      document.getElementById('vote-body').innerHTML = VOTE_QS.map(({ key, q }) =>
+        `<div class="q-group">
       <div class="q-label"><div class="q-text">${q}</div><div class="q-val zero" id="qv-${key}">–</div></div>
       <div class="slider-wrap">
         <div class="slider-bg"></div><div class="slider-fill" id="qf-${key}" style="width:0%"></div>
-        <input type="range" class="slider-input" min="1" max="10" value="5" ${voted?'disabled':''}
+        <input type="range" class="slider-input" min="1" max="10" value="5" ${voted ? 'disabled' : ''}
           oninput="setSlider('${key}',this.value)"/>
       </div>
       <div class="q-pips"><span>1</span><span>5</span><span>10</span></div>
     </div>`
-  ).join('');
-  openModal('modal-vote');
-}
-function setSlider(key,val) {
-  val = parseInt(val); voteState[key]=val;
-  const d=document.getElementById('qv-'+key), f=document.getElementById('qf-'+key);
-  if(d){d.textContent=val;d.classList.remove('zero');} if(f) f.style.width=(val*10)+'%';
-}
-async function submitVote() {
-  const {sustainability,impact,feasibility,overall}=voteState;
-  if(!sustainability||!impact||!feasibility||!overall){showToast('Please rate all 4 questions');return;}
-  const btn=document.getElementById('vote-btn'); btn.disabled=true; btn.textContent='Submitting…';
-  const {error}=await sb.from('votes').insert({
-    id:currentUser.id+'_'+activeVoteId, entity_id:activeVoteId, voter_uid:currentUser.id,
-    sustainability,impact,feasibility,overall
-  });
-  if(error){showToast('Error: '+error.message); btn.disabled=false; btn.textContent='Submit Vote'; return;}
-  myVotes.add(activeVoteId);
-  await sb.from('stamps').upsert({user_id:currentUser.id,booth_id:activeVoteId,room:'pitch_room'});
-  myStamps.add(activeVoteId+':pitch_room');
-  closeModal('modal-vote'); renderPitches(); showToast('Vote submitted ✓');
-}
+      ).join('');
+      openModal('modal-vote');
+    }
+    function setSlider(key, val) {
+      val = parseInt(val); voteState[key] = val;
+      const d = document.getElementById('qv-' + key), f = document.getElementById('qf-' + key);
+      if (d) { d.textContent = val; d.classList.remove('zero'); } if (f) f.style.width = (val * 10) + '%';
+    }
+    async function submitVote() {
+      const { sustainability, impact, feasibility, overall } = voteState;
+      if (!sustainability || !impact || !feasibility || !overall) { showToast('Please rate all 4 questions'); return; }
+      const btn = document.getElementById('vote-btn'); btn.disabled = true; btn.textContent = 'Submitting…';
+      const { error } = await sb.from('votes').insert({
+        id: currentUser.id + '_' + activeVoteId, entity_id: activeVoteId, voter_uid: currentUser.id,
+        sustainability, impact, feasibility, overall
+      });
+      if (error) { showToast('Error: ' + error.message); btn.disabled = false; btn.textContent = 'Submit Vote'; return; }
+      myVotes.add(activeVoteId);
+      await sb.from('stamps').upsert({ user_id: currentUser.id, booth_id: activeVoteId, room: 'pitch_room' });
+      myStamps.add(activeVoteId + ':pitch_room');
+      closeModal('modal-vote'); renderPitches(); showToast('Vote submitted ✓');
+    }
 
-// ─── RESEARCH HALL ──────────────────────────────────────
-function renderResearch() {
-  const q = (document.getElementById('research-search')?.value||'').toLowerCase();
-  const list = entities.filter(e => e.type==='research' && (e.name.toLowerCase().includes(q)||e.tagline.toLowerCase().includes(q)));
-  document.getElementById('research-list').innerHTML = list.length ? list.map(r =>
-    `<div class="ent-card ${myFeedback.has(r.id)?'interacted':''}" onclick="openFeedbackModal('${r.id}')">
+    // ─── RESEARCH HALL ──────────────────────────────────────
+    function renderResearch() {
+      const q = (document.getElementById('research-search')?.value || '').toLowerCase();
+      const list = entities.filter(e => e.type === 'research' && (e.name.toLowerCase().includes(q) || e.tagline.toLowerCase().includes(q)));
+      document.getElementById('research-list').innerHTML = list.length ? list.map(r =>
+        `<div class="ent-card ${myFeedback.has(r.id) ? 'interacted' : ''}" onclick="openFeedbackModal('${r.id}')">
       <div class="ent-header">
         <div class="ent-logo">🔬</div>
         <div style="flex:1;min-width:0"><div class="ent-name">${esc(r.name)}</div><div class="ent-tag">${esc(r.tagline)}</div></div>
-        ${myFeedback.has(r.id)?'<div class="done-chip">✓ Done</div>':'<div style="font-size:12px;color:var(--sub)">Feedback →</div>'}
+        ${myFeedback.has(r.id) ? '<div class="done-chip">✓ Done</div>' : '<div style="font-size:12px;color:var(--sub)">Feedback →</div>'}
       </div>
-      <div style="font-size:13px;color:var(--sub);line-height:1.4">${esc(r.description||'')}</div>
+      <div style="font-size:13px;color:var(--sub);line-height:1.4">${esc(r.description || '')}</div>
     </div>`
-  ).join('') : `<div class="empty"><div class="empty-ico">🔍</div><div>No results</div></div>`;
-}
+      ).join('') : `<div class="empty"><div class="empty-ico">🔍</div><div>No results</div></div>`;
+    }
 
-// ─── BOOTHS ─────────────────────────────────────────────
-function renderBooths() {
-  const q = (document.getElementById('booth-search')?.value||'').toLowerCase();
-  const list = entities.filter(e => e.type==='booth' && (e.name.toLowerCase().includes(q)||e.tagline.toLowerCase().includes(q)));
-  document.getElementById('booths-list').innerHTML = list.length ? list.map(b =>
-    `<div class="ent-card ${myFeedback.has(b.id)?'interacted':''}" onclick="openFeedbackModal('${b.id}')">
+    // ─── BOOTHS ─────────────────────────────────────────────
+    function renderBooths() {
+      const q = (document.getElementById('booth-search')?.value || '').toLowerCase();
+      const list = entities.filter(e => e.type === 'booth' && (e.name.toLowerCase().includes(q) || e.tagline.toLowerCase().includes(q)));
+      document.getElementById('booths-list').innerHTML = list.length ? list.map(b =>
+        `<div class="ent-card ${myFeedback.has(b.id) ? 'interacted' : ''}" onclick="openFeedbackModal('${b.id}')">
       <div class="ent-header">
         <div class="ent-logo">🏢</div>
         <div style="flex:1;min-width:0"><div class="ent-name">${esc(b.name)}</div><div class="ent-tag">${esc(b.tagline)}</div></div>
-        ${myFeedback.has(b.id)?'<div class="done-chip">✓ Done</div>':'<div style="font-size:12px;color:var(--sub)">Feedback →</div>'}
+        ${myFeedback.has(b.id) ? '<div class="done-chip">✓ Done</div>' : '<div style="font-size:12px;color:var(--sub)">Feedback →</div>'}
       </div>
-      <div style="font-size:13px;color:var(--sub);line-height:1.4">${esc(b.description||'')}</div>
+      <div style="font-size:13px;color:var(--sub);line-height:1.4">${esc(b.description || '')}</div>
     </div>`
-  ).join('') : `<div class="empty"><div class="empty-ico">🔍</div><div>No results</div></div>`;
-}
+      ).join('') : `<div class="empty"><div class="empty-ico">🔍</div><div>No results</div></div>`;
+    }
 
-// ─── FEEDBACK MODAL (research + booth) ──────────────────
-function openFeedbackModal(id) {
-  const ent = entities.find(e => e.id===id);
-  if (!ent) return;
-  feedbackState = { entityId: id, rating: 0, body: '' };
-  const done = myFeedback.has(id);
-  document.getElementById('fb-title').textContent = ent.name;
-  document.getElementById('fb-sub').textContent = done ? 'Thanks for your feedback!' : ent.tagline;
-  document.getElementById('fb-body').innerHTML = done
-    ? `<div class="card green"><div class="card-title">✓ Feedback submitted</div><div class="card-sub">Your thoughts have been shared with the team.</div></div>`
-    : `<div>
+    // ─── FEEDBACK MODAL (research + booth) ──────────────────
+    function openFeedbackModal(id) {
+      const ent = entities.find(e => e.id === id);
+      if (!ent) return;
+      feedbackState = { entityId: id, rating: 0, body: '' };
+      const done = myFeedback.has(id);
+      document.getElementById('fb-title').textContent = ent.name;
+      document.getElementById('fb-sub').textContent = done ? 'Thanks for your feedback!' : ent.tagline;
+      document.getElementById('fb-body').innerHTML = done
+        ? `<div class="card green"><div class="card-title">✓ Feedback submitted</div><div class="card-sub">Your thoughts have been shared with the team.</div></div>`
+        : `<div>
         <div class="sec">Overall rating</div>
         <div class="stars" id="fb-stars">
-          ${[1,2,3,4,5].map(i=>`<span class="star" onclick="setFbStar(${i})">☆</span>`).join('')}
+          ${[1, 2, 3, 4, 5].map(i => `<span class="star" onclick="setFbStar(${i})">☆</span>`).join('')}
         </div>
         <div class="form-group" style="margin-top:12px">
           <label class="form-label">Your thoughts (optional)</label>
@@ -849,55 +2149,55 @@ function openFeedbackModal(id) {
         </div>
         <button class="btn btn-green" onclick="submitFeedback()">Submit Feedback</button>
       </div>`;
-  openModal('modal-feedback');
-}
-function setFbStar(n) {
-  feedbackState.rating = n;
-  document.querySelectorAll('#fb-stars .star').forEach((s,i) => s.textContent = i<n ? '⭐' : '☆');
-}
-async function submitFeedback() {
-  const body = document.getElementById('fb-text')?.value?.trim() || '';
-  if (!feedbackState.rating) { showToast('Please select a star rating'); return; }
-  const { error } = await sb.from('feedback').insert({
-    entity_id: feedbackState.entityId,
-    from_uid: currentUser.id,
-    from_name: currentProfile.name || currentUser.email,
-    body, rating: feedbackState.rating
-  });
-  if (error) { showToast('Error submitting — maybe already submitted'); return; }
-  myFeedback.add(feedbackState.entityId);
-  // stamp passport
-  const ent = entities.find(e => e.id === feedbackState.entityId);
-  if (ent) {
-    const room = ent.type === 'research' ? 'research_room' : 'booth_room';
-    await sb.from('stamps').upsert({ user_id: currentUser.id, booth_id: feedbackState.entityId, room });
-    myStamps.add(feedbackState.entityId + ':' + room);
-  }
-  closeModal('modal-feedback');
-  if (ent?.type === 'research') renderResearch(); else renderBooths();
-  showToast('Feedback sent ✓');
-}
+      openModal('modal-feedback');
+    }
+    function setFbStar(n) {
+      feedbackState.rating = n;
+      document.querySelectorAll('#fb-stars .star').forEach((s, i) => s.textContent = i < n ? '⭐' : '☆');
+    }
+    async function submitFeedback() {
+      const body = document.getElementById('fb-text')?.value?.trim() || '';
+      if (!feedbackState.rating) { showToast('Please select a star rating'); return; }
+      const { error } = await sb.from('feedback').insert({
+        entity_id: feedbackState.entityId,
+        from_uid: currentUser.id,
+        from_name: currentProfile.name || currentUser.email,
+        body, rating: feedbackState.rating
+      });
+      if (error) { showToast('Error submitting — maybe already submitted'); return; }
+      myFeedback.add(feedbackState.entityId);
+      // stamp passport
+      const ent = entities.find(e => e.id === feedbackState.entityId);
+      if (ent) {
+        const room = ent.type === 'research' ? 'research_room' : 'booth_room';
+        await sb.from('stamps').upsert({ user_id: currentUser.id, booth_id: feedbackState.entityId, room });
+        myStamps.add(feedbackState.entityId + ':' + room);
+      }
+      closeModal('modal-feedback');
+      if (ent?.type === 'research') renderResearch(); else renderBooths();
+      showToast('Feedback sent ✓');
+    }
 
-// ─── ENTITY DASHBOARD (LVL 1) ───────────────────────────
-async function loadEntityDash() {
-  const p = currentProfile;
-  if (!p.entity_id) {
-    document.getElementById('myentity-content').innerHTML = `<div class="empty"><div class="empty-ico">⚠️</div><div>No entity linked to your account. Ask an admin.</div></div>`;
-    return;
-  }
-  const ent = entities.find(e => e.id === p.entity_id);
-  if (!ent) return;
+    // ─── ENTITY DASHBOARD (LVL 1) ───────────────────────────
+    async function loadEntityDash() {
+      const p = currentProfile;
+      if (!p.entity_id) {
+        document.getElementById('myentity-content').innerHTML = `<div class="empty"><div class="empty-ico">⚠️</div><div>No entity linked to your account. Ask an admin.</div></div>`;
+        return;
+      }
+      const ent = entities.find(e => e.id === p.entity_id);
+      if (!ent) return;
 
-  let statsHTML = '', reviewsHTML = '';
+      let statsHTML = '', reviewsHTML = '';
 
-  if (ent.type === 'pitch') {
-    const { data: votes } = await sb.from('votes').select('*').eq('entity_id', ent.id);
-    const vs = votes || [];
-    const count = vs.length;
-    const avg = k => count ? (vs.reduce((s,v)=>s+v[k],0)/count) : 0;
-    const s = avg('sustainability'), im = avg('impact'), f = avg('feasibility'), o = avg('overall');
-    const overall = count ? ((s+im+f+o)/4).toFixed(1) : '—';
-    statsHTML = `
+      if (ent.type === 'pitch') {
+        const { data: votes } = await sb.from('votes').select('*').eq('entity_id', ent.id);
+        const vs = votes || [];
+        const count = vs.length;
+        const avg = k => count ? (vs.reduce((s, v) => s + v[k], 0) / count) : 0;
+        const s = avg('sustainability'), im = avg('impact'), f = avg('feasibility'), o = avg('overall');
+        const overall = count ? ((s + im + f + o) / 4).toFixed(1) : '—';
+        statsHTML = `
       <div class="sec">Vote Summary</div>
       <div class="stat-row">
         <div class="stat-box"><div class="stat-n">${count}</div><div class="stat-l">Total votes</div></div>
@@ -906,40 +2206,40 @@ async function loadEntityDash() {
       </div>
       <div class="sec">Score Breakdown</div>
       <div class="card" style="margin-bottom:16px">
-        ${[['🌱 Sustainability',s],['💥 Impact',im],['⚙️ Feasibility',f],['⭐ Overall',o]].map(([label,val])=>`
+        ${[['🌱 Sustainability', s], ['💥 Impact', im], ['⚙️ Feasibility', f], ['⭐ Overall', o]].map(([label, val]) => `
           <div class="score-bar-row">
             <div class="score-bar-label">${label}</div>
-            <div class="score-bar-track"><div class="score-bar-fill" style="width:${(val||0)*10}%"></div></div>
-            <div class="score-bar-val">${count?val.toFixed(1):'—'}</div>
+            <div class="score-bar-track"><div class="score-bar-fill" style="width:${(val || 0) * 10}%"></div></div>
+            <div class="score-bar-val">${count ? val.toFixed(1) : '—'}</div>
           </div>`).join('')}
       </div>`;
-    reviewsHTML = count ? '' : `<div class="empty"><div class="empty-ico">🗳️</div><div>No votes yet!</div></div>`;
-  } else {
-    // Research or booth — show feedback
-    const { data: fbs } = await sb.from('feedback').select('*').eq('entity_id', ent.id).order('created_at', {ascending:false});
-    const items = fbs || [];
-    const count = items.length;
-    const avgRating = count ? (items.reduce((s,f)=>s+(f.rating||0),0)/count).toFixed(1) : '—';
-    statsHTML = `
+        reviewsHTML = count ? '' : `<div class="empty"><div class="empty-ico">🗳️</div><div>No votes yet!</div></div>`;
+      } else {
+        // Research or booth — show feedback
+        const { data: fbs } = await sb.from('feedback').select('*').eq('entity_id', ent.id).order('created_at', { ascending: false });
+        const items = fbs || [];
+        const count = items.length;
+        const avgRating = count ? (items.reduce((s, f) => s + (f.rating || 0), 0) / count).toFixed(1) : '—';
+        statsHTML = `
       <div class="sec">Feedback Summary</div>
       <div class="stat-row">
         <div class="stat-box"><div class="stat-n">${count}</div><div class="stat-l">Responses</div></div>
         <div class="stat-box"><div class="stat-n">${avgRating}</div><div class="stat-l">Avg rating</div></div>
         <div class="stat-box"><div class="stat-n">⭐</div><div class="stat-l">out of 5</div></div>
       </div>`;
-    reviewsHTML = count
-      ? `<div class="sec">All Feedback</div>` + items.map(f =>
-          `<div class="review-item">
-            <div class="review-stars">${'⭐'.repeat(f.rating||0)}${'☆'.repeat(5-(f.rating||0))}</div>
+        reviewsHTML = count
+          ? `<div class="sec">All Feedback</div>` + items.map(f =>
+            `<div class="review-item">
+            <div class="review-stars">${'⭐'.repeat(f.rating || 0)}${'☆'.repeat(5 - (f.rating || 0))}</div>
             ${f.body ? `<div class="review-body">${esc(f.body)}</div>` : ''}
-            <div class="review-meta">${esc(f.from_name||'Attendee')} · ${timeAgo(f.created_at)}</div>
+            <div class="review-meta">${esc(f.from_name || 'Attendee')} · ${timeAgo(f.created_at)}</div>
           </div>`
-        ).join('')
-      : `<div class="empty"><div class="empty-ico">💬</div><div>No feedback yet!</div></div>`;
-  }
+          ).join('')
+          : `<div class="empty"><div class="empty-ico">💬</div><div>No feedback yet!</div></div>`;
+      }
 
-  const typeIcon = ent.type==='pitch'?'🚀':ent.type==='research'?'🔬':'🏢';
-  document.getElementById('myentity-content').innerHTML = `
+      const typeIcon = ent.type === 'pitch' ? '🚀' : ent.type === 'research' ? '🔬' : '🏢';
+      document.getElementById('myentity-content').innerHTML = `
     <div style="background:var(--g);border-radius:var(--r);padding:16px;color:#fff;margin-bottom:20px">
       <div style="font-size:11px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">${typeIcon} Your ${ent.type}</div>
       <div style="font-family:var(--fh);font-weight:800;font-size:20px">${esc(ent.name)}</div>
@@ -950,235 +2250,236 @@ async function loadEntityDash() {
     <div class="divider"></div>
     <div class="sec">Edit Your Listing</div>
     <div class="form-group"><label class="form-label">Name</label><input class="form-input" id="ent-name-inp" value="${esc(ent.name)}"/></div>
-    <div class="form-group"><label class="form-label">Tagline</label><input class="form-input" id="ent-tag-inp" value="${esc(ent.tagline||'')}"/></div>
-    <div class="form-group"><label class="form-label">Description</label><textarea class="form-input" id="ent-desc-inp" rows="3">${esc(ent.description||'')}</textarea></div>
-    <div class="form-group"><label class="form-label">Logo URL</label><input class="form-input" id="ent-logo-inp" value="${esc(ent.logo_url||'')}"/></div>
-    <div class="form-group"><label class="form-label">Contact Email</label><input class="form-input" id="ent-email-inp" value="${esc(ent.contact_email||'')}"/></div>
-    <div class="form-group"><label class="form-label">Website</label><input class="form-input" id="ent-web-inp" value="${esc(ent.website||'')}"/></div>
+    <div class="form-group"><label class="form-label">Tagline</label><input class="form-input" id="ent-tag-inp" value="${esc(ent.tagline || '')}"/></div>
+    <div class="form-group"><label class="form-label">Description</label><textarea class="form-input" id="ent-desc-inp" rows="3">${esc(ent.description || '')}</textarea></div>
+    <div class="form-group"><label class="form-label">Logo URL</label><input class="form-input" id="ent-logo-inp" value="${esc(ent.logo_url || '')}"/></div>
+    <div class="form-group"><label class="form-label">Contact Email</label><input class="form-input" id="ent-email-inp" value="${esc(ent.contact_email || '')}"/></div>
+    <div class="form-group"><label class="form-label">Website</label><input class="form-input" id="ent-web-inp" value="${esc(ent.website || '')}"/></div>
     <button class="btn btn-green" onclick="saveEntity('${ent.id}')">Save Changes</button>
   `;
-}
+    }
 
-async function saveEntity(id) {
-  const { error } = await sb.from('entities').update({
-    name: document.getElementById('ent-name-inp').value,
-    tagline: document.getElementById('ent-tag-inp').value,
-    description: document.getElementById('ent-desc-inp').value,
-    logo_url: document.getElementById('ent-logo-inp').value,
-    contact_email: document.getElementById('ent-email-inp').value,
-    website: document.getElementById('ent-web-inp').value,
-  }).eq('id', id);
-  if (error) { showToast('Error saving'); return; }
-  // Refresh local entities
-  const { data } = await sb.from('entities').select('*').eq('id', id).single();
-  if (data) { const idx = entities.findIndex(e=>e.id===id); if(idx>=0) entities[idx]=data; }
-  showToast('Saved ✓');
-}
+    async function saveEntity(id) {
+      const { error } = await sb.from('entities').update({
+        name: document.getElementById('ent-name-inp').value,
+        tagline: document.getElementById('ent-tag-inp').value,
+        description: document.getElementById('ent-desc-inp').value,
+        logo_url: document.getElementById('ent-logo-inp').value,
+        contact_email: document.getElementById('ent-email-inp').value,
+        website: document.getElementById('ent-web-inp').value,
+      }).eq('id', id);
+      if (error) { showToast('Error saving'); return; }
+      // Refresh local entities
+      const { data } = await sb.from('entities').select('*').eq('id', id).single();
+      if (data) { const idx = entities.findIndex(e => e.id === id); if (idx >= 0) entities[idx] = data; }
+      showToast('Saved ✓');
+    }
 
-// ─── PASSPORT ───────────────────────────────────────────
-async function renderPassport() {
-  const { data: stamps } = await sb.from('stamps').select('*').eq('user_id', currentUser.id);
-  const allStamps = stamps || [];
-  const pitches = entities.filter(e => e.type==='pitch');
-  const research = entities.filter(e => e.type==='research');
-  const booths = entities.filter(e => e.type==='booth');
+    // ─── PASSPORT ───────────────────────────────────────────
+    async function renderPassport() {
+      const { data: stamps } = await sb.from('stamps').select('*').eq('user_id', currentUser.id);
+      const allStamps = stamps || [];
+      const pitches = entities.filter(e => e.type === 'pitch');
+      const research = entities.filter(e => e.type === 'research');
+      const booths = entities.filter(e => e.type === 'booth');
 
-  const pitchStamps   = new Set(allStamps.filter(s=>s.room==='pitch_room').map(s=>s.booth_id));
-  const researchStamps= new Set(allStamps.filter(s=>s.room==='research_room').map(s=>s.booth_id));
-  const boothStamps   = new Set(allStamps.filter(s=>s.room==='booth_room').map(s=>s.booth_id));
+      const pitchStamps = new Set(allStamps.filter(s => s.room === 'pitch_room').map(s => s.booth_id));
+      const researchStamps = new Set(allStamps.filter(s => s.room === 'research_room').map(s => s.booth_id));
+      const boothStamps = new Set(allStamps.filter(s => s.room === 'booth_room').map(s => s.booth_id));
 
-  const pct = (n,d) => d ? Math.round(n/d*100) : 0;
+      const pct = (n, d) => d ? Math.round(n / d * 100) : 0;
 
-  const roomCard = (label, items, done, room) => {
-    const p = pct(done.size, items.length);
-    return `<div class="room-card">
+      const roomCard = (label, items, done, room) => {
+        const p = pct(done.size, items.length);
+        return `<div class="room-card">
       <div class="room-name">${label}<span style="font-size:13px;font-weight:400;color:var(--sub)">${done.size}/${items.length}</span></div>
       <div class="prog-wrap"><div class="prog-bar" style="width:${p}%"></div></div>
       <div class="prog-pct">${p}% complete</div>
       <div class="stamp-grid">
-        ${items.map(b=>`<div class="stamp ${done.has(b.id)?'earned':''}" title="${esc(b.name)}">${done.has(b.id)?'✅':'⬜'}</div>`).join('')}
+        ${items.map(b => `<div class="stamp ${done.has(b.id) ? 'earned' : ''}" title="${esc(b.name)}">${done.has(b.id) ? '✅' : '⬜'}</div>`).join('')}
       </div>
     </div>`;
-  };
+      };
 
-  document.getElementById('passport-content').innerHTML = `
+      document.getElementById('passport-content').innerHTML = `
     <div class="passport-header">
       <div class="passport-title">📖 Booth Passport</div>
       <div style="font-size:13px;color:rgba(255,255,255,.7)">Vote & leave feedback to collect stamps</div>
     </div>
-    ${roomCard('🚀 Pitch Room',    pitches,  pitchStamps,   'pitch_room')}
-    ${roomCard('🔬 Research Hall', research, researchStamps,'research_room')}
-    ${roomCard('🏢 Exhibitor Booths',booths, boothStamps,   'booth_room')}
+    ${roomCard('🚀 Pitch Room', pitches, pitchStamps, 'pitch_room')}
+    ${roomCard('🔬 Research Hall', research, researchStamps, 'research_room')}
+    ${roomCard('🏢 Exhibitor Booths', booths, boothStamps, 'booth_room')}
     <div class="card" style="text-align:center;margin-top:4px">
       <div style="font-size:24px;margin-bottom:8px">📷</div>
       <div style="font-family:var(--fh);font-weight:700;font-size:15px;margin-bottom:4px">Scan Booth QR Codes</div>
       <div style="font-size:13px;color:var(--sub);margin-bottom:12px">Visit booths and scan their QR to add extra stamps</div>
       <button class="btn btn-green btn-sm" style="margin:0 auto;display:block" onclick="navTo('pg-scan')">Open Scanner</button>
     </div>`;
-}
+    }
 
-// ─── NOTES ──────────────────────────────────────────────
-async function loadNotes() {
-  const { data } = await sb.from('notes').select('*').eq('user_id', currentUser.id).order('updated_at', {ascending:false});
-  document.getElementById('notes-list').innerHTML = (data||[]).length
-    ? (data||[]).map(n=>`<div class="note-card" onclick="openNote('${n.id}')"><div class="note-title">${esc(n.title||'Untitled')}</div><div class="note-preview">${esc(n.content||'')}</div><div class="note-meta">${timeAgo(n.updated_at)}</div></div>`).join('')
-    : `<div class="empty"><div class="empty-ico">📝</div><div>No notes yet — tap + to start</div></div>`;
-}
-function newNote() {
-  activeNoteId = null;
-  document.getElementById('note-title-inp').value = '';
-  document.getElementById('note-body-inp').value = '';
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('pg-note-editor').classList.add('active');
-}
-async function openNote(id) {
-  const { data } = await sb.from('notes').select('*').eq('id', id).single();
-  if (!data) return;
-  activeNoteId = id;
-  document.getElementById('note-title-inp').value = data.title||'';
-  document.getElementById('note-body-inp').value = data.content||'';
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('pg-note-editor').classList.add('active');
-}
-async function saveNote() {
-  const title = document.getElementById('note-title-inp').value;
-  const content = document.getElementById('note-body-inp').value;
-  if (!title && !content) { navTo('pg-notes'); return; }
-  if (activeNoteId) {
-    await sb.from('notes').update({title, content, updated_at: new Date().toISOString()}).eq('id', activeNoteId);
-  } else {
-    await sb.from('notes').insert({user_id: currentUser.id, title, content});
-  }
-  showToast('Saved ✓'); navTo('pg-notes');
-}
-async function deleteNote() {
-  if (activeNoteId) await sb.from('notes').delete().eq('id', activeNoteId);
-  activeNoteId = null; navTo('pg-notes'); showToast('Deleted');
-}
+    // ─── NOTES ──────────────────────────────────────────────
+    async function loadNotes() {
+      const { data } = await sb.from('notes').select('*').eq('user_id', currentUser.id).order('updated_at', { ascending: false });
+      document.getElementById('notes-list').innerHTML = (data || []).length
+        ? (data || []).map(n => `<div class="note-card" onclick="openNote('${n.id}')"><div class="note-title">${esc(n.title || 'Untitled')}</div><div class="note-preview">${esc(n.content || '')}</div><div class="note-meta">${timeAgo(n.updated_at)}</div></div>`).join('')
+        : `<div class="empty"><div class="empty-ico">📝</div><div>No notes yet — tap + to start</div></div>`;
+    }
+    function newNote() {
+      activeNoteId = null;
+      document.getElementById('note-title-inp').value = '';
+      document.getElementById('note-body-inp').value = '';
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('pg-note-editor').classList.add('active');
+    }
+    async function openNote(id) {
+      const { data } = await sb.from('notes').select('*').eq('id', id).single();
+      if (!data) return;
+      activeNoteId = id;
+      document.getElementById('note-title-inp').value = data.title || '';
+      document.getElementById('note-body-inp').value = data.content || '';
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('pg-note-editor').classList.add('active');
+    }
+    async function saveNote() {
+      const title = document.getElementById('note-title-inp').value;
+      const content = document.getElementById('note-body-inp').value;
+      if (!title && !content) { navTo('pg-notes'); return; }
+      if (activeNoteId) {
+        await sb.from('notes').update({ title, content, updated_at: new Date().toISOString() }).eq('id', activeNoteId);
+      } else {
+        await sb.from('notes').insert({ user_id: currentUser.id, title, content });
+      }
+      showToast('Saved ✓'); navTo('pg-notes');
+    }
+    async function deleteNote() {
+      if (activeNoteId) await sb.from('notes').delete().eq('id', activeNoteId);
+      activeNoteId = null; navTo('pg-notes'); showToast('Deleted');
+    }
 
-// ─── BUSINESS CARD ──────────────────────────────────────
-function loadCard() {
-  const p = currentProfile;
-  const card = p?.business_card || {};
-  document.getElementById('bc-name-inp').value = card.name || p?.name || '';
-  document.getElementById('bc-title-inp').value = card.title || '';
-  document.getElementById('bc-co-inp').value = card.company || '';
-  document.getElementById('bc-phone-inp').value = card.phone || '';
-  document.getElementById('bc-li-inp').value = card.linkedin || '';
-  document.getElementById('bc-resume-inp').value = p?.resume_link || '';
-  const av = document.getElementById('card-av');
-  if (p?.photo_url) av.innerHTML = `<img src="${esc(p.photo_url)}" referrerpolicy="no-referrer"/>`;
-  else av.textContent = (p?.name||'?').charAt(0).toUpperCase();
-  document.getElementById('prof-name').textContent = p?.name || 'Profile';
-  document.getElementById('prof-email').textContent = currentUser?.email || '';
-  document.getElementById('prof-role-txt').textContent = LVL_ICONS[lvl()] + ' ' + LVL_LABELS[lvl()];
-  liveCard();
-}
-function liveCard() {
-  const name = document.getElementById('bc-name-inp').value || currentProfile?.name || 'Your Name';
-  const title = document.getElementById('bc-title-inp').value;
-  const co = document.getElementById('bc-co-inp').value;
-  const phone = document.getElementById('bc-phone-inp').value;
-  document.getElementById('bc-name').textContent = name;
-  document.getElementById('bc-title-d').textContent = [title,co].filter(Boolean).join(' · ') || 'Add your title';
-  document.getElementById('bc-email-d').textContent = currentUser?.email || '';
-  document.getElementById('bc-phone-d').textContent = phone;
-  drawQR(JSON.stringify({name, title, company:co, phone, email:currentUser?.email, linkedin:document.getElementById('bc-li-inp').value}));
-}
-function drawQR(text) {
-  const canvas = document.getElementById('qr-canvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0,0,180,180); ctx.fillStyle='#f5f0eb'; ctx.fillRect(0,0,180,180); ctx.fillStyle='#2d5016';
-  for(let i=0;i<15;i++){for(let j=0;j<15;j++){if(Math.random()>.5||(i<3&&j<3)||(i<3&&j>11)||(i>11&&j<3))ctx.fillRect(8+i*11,8+j*11,10,10);}}
-  ctx.fillStyle='#f5f0eb'; ctx.fillRect(8,8,30,30); ctx.fillRect(141,8,30,30); ctx.fillRect(8,141,30,30);
-  ctx.fillStyle='#2d5016'; ctx.fillRect(10,10,26,26); ctx.fillRect(143,10,26,26); ctx.fillRect(10,143,26,26);
-  ctx.fillStyle='#f5f0eb'; ctx.fillRect(14,14,18,18); ctx.fillRect(147,14,18,18); ctx.fillRect(14,147,18,18);
-  ctx.fillStyle='#2d5016'; ctx.fillRect(18,18,10,10); ctx.fillRect(151,18,10,10); ctx.fillRect(18,151,10,10);
-  canvas.dataset.payload = text;
-}
-async function saveCard() {
-  const card = {
-    name: document.getElementById('bc-name-inp').value,
-    title: document.getElementById('bc-title-inp').value,
-    company: document.getElementById('bc-co-inp').value,
-    phone: document.getElementById('bc-phone-inp').value,
-    linkedin: document.getElementById('bc-li-inp').value,
-  };
-  const { error } = await sb.from('profiles').update({business_card:card, resume_link:document.getElementById('bc-resume-inp').value, name:card.name||currentProfile.name}).eq('id', currentUser.id);
-  if (error) { showToast('Error saving'); return; }
-  currentProfile.business_card = card; showToast('Card saved ✓');
-}
+    // ─── BUSINESS CARD ──────────────────────────────────────
+    function loadCard() {
+      const p = currentProfile;
+      const card = p?.business_card || {};
+      document.getElementById('bc-name-inp').value = card.name || p?.name || '';
+      document.getElementById('bc-title-inp').value = card.title || '';
+      document.getElementById('bc-co-inp').value = card.company || '';
+      document.getElementById('bc-phone-inp').value = card.phone || '';
+      document.getElementById('bc-li-inp').value = card.linkedin || '';
+      document.getElementById('bc-resume-inp').value = p?.resume_link || '';
+      const av = document.getElementById('card-av');
+      if (p?.photo_url) av.innerHTML = `<img src="${esc(p.photo_url)}" referrerpolicy="no-referrer"/>`;
+      else av.textContent = (p?.name || '?').charAt(0).toUpperCase();
+      document.getElementById('prof-name').textContent = p?.name || 'Profile';
+      document.getElementById('prof-email').textContent = currentUser?.email || '';
+      document.getElementById('prof-role-txt').textContent = LVL_ICONS[lvl()] + ' ' + LVL_LABELS[lvl()];
+      liveCard();
+    }
+    function liveCard() {
+      const name = document.getElementById('bc-name-inp').value || currentProfile?.name || 'Your Name';
+      const title = document.getElementById('bc-title-inp').value;
+      const co = document.getElementById('bc-co-inp').value;
+      const phone = document.getElementById('bc-phone-inp').value;
+      document.getElementById('bc-name').textContent = name;
+      document.getElementById('bc-title-d').textContent = [title, co].filter(Boolean).join(' · ') || 'Add your title';
+      document.getElementById('bc-email-d').textContent = currentUser?.email || '';
+      document.getElementById('bc-phone-d').textContent = phone;
+      drawQR(JSON.stringify({ name, title, company: co, phone, email: currentUser?.email, linkedin: document.getElementById('bc-li-inp').value }));
+    }
+    function drawQR(text) {
+      const canvas = document.getElementById('qr-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, 180, 180); ctx.fillStyle = '#f5f0eb'; ctx.fillRect(0, 0, 180, 180); ctx.fillStyle = '#2d5016';
+      for (let i = 0; i < 15; i++) { for (let j = 0; j < 15; j++) { if (Math.random() > .5 || (i < 3 && j < 3) || (i < 3 && j > 11) || (i > 11 && j < 3)) ctx.fillRect(8 + i * 11, 8 + j * 11, 10, 10); } }
+      ctx.fillStyle = '#f5f0eb'; ctx.fillRect(8, 8, 30, 30); ctx.fillRect(141, 8, 30, 30); ctx.fillRect(8, 141, 30, 30);
+      ctx.fillStyle = '#2d5016'; ctx.fillRect(10, 10, 26, 26); ctx.fillRect(143, 10, 26, 26); ctx.fillRect(10, 143, 26, 26);
+      ctx.fillStyle = '#f5f0eb'; ctx.fillRect(14, 14, 18, 18); ctx.fillRect(147, 14, 18, 18); ctx.fillRect(14, 147, 18, 18);
+      ctx.fillStyle = '#2d5016'; ctx.fillRect(18, 18, 10, 10); ctx.fillRect(151, 18, 10, 10); ctx.fillRect(18, 151, 10, 10);
+      canvas.dataset.payload = text;
+    }
+    async function saveCard() {
+      const card = {
+        name: document.getElementById('bc-name-inp').value,
+        title: document.getElementById('bc-title-inp').value,
+        company: document.getElementById('bc-co-inp').value,
+        phone: document.getElementById('bc-phone-inp').value,
+        linkedin: document.getElementById('bc-li-inp').value,
+      };
+      const { error } = await sb.from('profiles').update({ business_card: card, resume_link: document.getElementById('bc-resume-inp').value, name: card.name || currentProfile.name }).eq('id', currentUser.id);
+      if (error) { showToast('Error saving'); return; }
+      currentProfile.business_card = card; showToast('Card saved ✓');
+    }
 
-// ─── SCAN ───────────────────────────────────────────────
-async function manualScan() {
-  const raw = document.getElementById('manual-qr').value.trim();
-  if (!raw) return;
-  if (raw.toUpperCase().startsWith('BOOTH-')) { await stampBooth(raw); return; }
-  try {
-    const card = JSON.parse(raw);
-    if (!card.name) throw new Error('invalid');
-    const { error } = await sb.from('collected_cards').insert({collected_by:currentUser.id, card_data:card});
-    if (error) { showToast('Already saved or error'); return; }
-    document.getElementById('scan-result').innerHTML = `<div class="card green"><div class="card-title">✅ Saved: ${esc(card.name)}</div></div>`;
-    document.getElementById('manual-qr').value = ''; showToast('Card saved ✓');
-  } catch { document.getElementById('scan-result').innerHTML = `<div class="card" style="border-color:#e44;color:#c33">Invalid QR format</div>`; }
-}
-async function stampBooth(code) {
-  const boothId = code.replace(/BOOTH-/i,'');
-  const ent = entities.find(e => e.id === boothId);
-  const room = ent ? (ent.type==='research'?'research_room':ent.type==='booth'?'booth_room':'poster_room') : 'poster_room';
-  const { error } = await sb.from('stamps').upsert({user_id:currentUser.id, booth_id:boothId, room});
-  if (error) { showToast('Already stamped!'); return; }
-  myStamps.add(boothId+':'+room);
-  document.getElementById('scan-result').innerHTML = `<div class="card green"><div class="card-title">🗺️ Booth Stamped!</div><div class="card-sub">Added to your passport</div></div>`;
-  document.getElementById('manual-qr').value = ''; showToast('Stamp collected ✓');
-}
+    // ─── SCAN ───────────────────────────────────────────────
+    async function manualScan() {
+      const raw = document.getElementById('manual-qr').value.trim();
+      if (!raw) return;
+      if (raw.toUpperCase().startsWith('BOOTH-')) { await stampBooth(raw); return; }
+      try {
+        const card = JSON.parse(raw);
+        if (!card.name) throw new Error('invalid');
+        const { error } = await sb.from('collected_cards').insert({ collected_by: currentUser.id, card_data: card });
+        if (error) { showToast('Already saved or error'); return; }
+        document.getElementById('scan-result').innerHTML = `<div class="card green"><div class="card-title">✅ Saved: ${esc(card.name)}</div></div>`;
+        document.getElementById('manual-qr').value = ''; showToast('Card saved ✓');
+      } catch { document.getElementById('scan-result').innerHTML = `<div class="card" style="border-color:#e44;color:#c33">Invalid QR format</div>`; }
+    }
+    async function stampBooth(code) {
+      const boothId = code.replace(/BOOTH-/i, '');
+      const ent = entities.find(e => e.id === boothId);
+      const room = ent ? (ent.type === 'research' ? 'research_room' : ent.type === 'booth' ? 'booth_room' : 'poster_room') : 'poster_room';
+      const { error } = await sb.from('stamps').upsert({ user_id: currentUser.id, booth_id: boothId, room });
+      if (error) { showToast('Already stamped!'); return; }
+      myStamps.add(boothId + ':' + room);
+      document.getElementById('scan-result').innerHTML = `<div class="card green"><div class="card-title">🗺️ Booth Stamped!</div><div class="card-sub">Added to your passport</div></div>`;
+      document.getElementById('manual-qr').value = ''; showToast('Stamp collected ✓');
+    }
 
-// ─── CHAT ───────────────────────────────────────────────
-function subscribeChat() {
-  chatChannel = sb.channel('chat-'+currentUser.id)
-    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'messages',filter:`from_uid=eq.${currentUser.id}`}, ()=>{ if(document.getElementById('chat-drawer').classList.contains('open')) renderChatMsgs(); })
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`to_uid=eq.broadcast`}, ()=>{ document.getElementById('chat-pip').style.display='flex'; checkAnnouncements(); })
-    .subscribe();
-}
-async function renderChatMsgs() {
-  const [{data:myMsgs},{data:broadcasts}] = await Promise.all([
-    sb.from('messages').select('*').eq('from_uid',currentUser.id).order('created_at'),
-    sb.from('messages').select('*').eq('to_uid','broadcast').order('created_at'),
-  ]);
-  const all = [...(broadcasts||[]),(myMsgs||[])].flat().sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
-  const container = document.getElementById('chat-msgs');
-  if (!all.length) { container.innerHTML=`<div class="empty"><div class="empty-ico">💬</div><div>Ask us anything!</div></div>`; return; }
-  container.innerHTML = all.map(m => {
-    const isMe = m.from_uid===currentUser.id && m.to_uid!=='broadcast';
-    const isBroadcast = m.to_uid==='broadcast';
-    let html = isBroadcast
-      ? `<div class="cbw them"><div class="cbname">📣 Ethos Staff</div><div class="cbubble">${esc(m.body)}</div><div class="cbtime">${timeAgo(m.created_at)}</div></div>`
-      : `<div class="cbw ${isMe?'me':'them'}"><div class="cbubble">${esc(m.body)}</div><div class="cbtime">${timeAgo(m.created_at)}</div></div>`;
-    if (m.admin_reply) html += `<div class="cbw them"><div class="cbname">Staff Reply</div><div class="cbubble">${esc(m.admin_reply)}</div><div class="cbtime">${timeAgo(m.replied_at)}</div></div>`;
-    return html;
-  }).join('');
-  container.scrollTop = container.scrollHeight;
-}
-function openChat() { document.getElementById('chat-drawer').classList.add('open'); document.getElementById('chat-pip').style.display='none'; renderChatMsgs(); }
-function closeChat() { document.getElementById('chat-drawer').classList.remove('open'); }
-async function sendChat() {
-  const inp = document.getElementById('chat-inp');
-  const body = inp.value.trim();
-  if (!body || !currentUser) return;
-  const { error } = await sb.from('messages').insert({from_uid:currentUser.id, from_email:currentUser.email, from_name:currentProfile?.name||currentUser.email, to_uid:'admin', body});
-  if (error) { showToast('Error sending'); return; }
-  inp.value=''; inp.style.height='auto'; renderChatMsgs();
-}
+    // ─── CHAT ───────────────────────────────────────────────
+    function subscribeChat() {
+      chatChannel = sb.channel('chat-' + currentUser.id)
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages', filter: `from_uid=eq.${currentUser.id}` }, () => { if (document.getElementById('chat-drawer').classList.contains('open')) renderChatMsgs(); })
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `to_uid=eq.broadcast` }, () => { document.getElementById('chat-pip').style.display = 'flex'; checkAnnouncements(); })
+        .subscribe();
+    }
+    async function renderChatMsgs() {
+      const [{ data: myMsgs }, { data: broadcasts }] = await Promise.all([
+        sb.from('messages').select('*').eq('from_uid', currentUser.id).order('created_at'),
+        sb.from('messages').select('*').eq('to_uid', 'broadcast').order('created_at'),
+      ]);
+      const all = [...(broadcasts || []), (myMsgs || [])].flat().sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      const container = document.getElementById('chat-msgs');
+      if (!all.length) { container.innerHTML = `<div class="empty"><div class="empty-ico">💬</div><div>Ask us anything!</div></div>`; return; }
+      container.innerHTML = all.map(m => {
+        const isMe = m.from_uid === currentUser.id && m.to_uid !== 'broadcast';
+        const isBroadcast = m.to_uid === 'broadcast';
+        let html = isBroadcast
+          ? `<div class="cbw them"><div class="cbname">📣 Ethos Staff</div><div class="cbubble">${esc(m.body)}</div><div class="cbtime">${timeAgo(m.created_at)}</div></div>`
+          : `<div class="cbw ${isMe ? 'me' : 'them'}"><div class="cbubble">${esc(m.body)}</div><div class="cbtime">${timeAgo(m.created_at)}</div></div>`;
+        if (m.admin_reply) html += `<div class="cbw them"><div class="cbname">Staff Reply</div><div class="cbubble">${esc(m.admin_reply)}</div><div class="cbtime">${timeAgo(m.replied_at)}</div></div>`;
+        return html;
+      }).join('');
+      container.scrollTop = container.scrollHeight;
+    }
+    function openChat() { document.getElementById('chat-drawer').classList.add('open'); document.getElementById('chat-pip').style.display = 'none'; renderChatMsgs(); }
+    function closeChat() { document.getElementById('chat-drawer').classList.remove('open'); }
+    async function sendChat() {
+      const inp = document.getElementById('chat-inp');
+      const body = inp.value.trim();
+      if (!body || !currentUser) return;
+      const { error } = await sb.from('messages').insert({ from_uid: currentUser.id, from_email: currentUser.email, from_name: currentProfile?.name || currentUser.email, to_uid: 'admin', body });
+      if (error) { showToast('Error sending'); return; }
+      inp.value = ''; inp.style.height = 'auto'; renderChatMsgs();
+    }
 
-// ─── UTILS ──────────────────────────────────────────────
-function openModal(id)  { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-function showToast(msg) { const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400); }
-function timeAgo(ts)    { if(!ts)return''; const d=Date.now()-new Date(ts).getTime(); if(d<60000)return'just now'; if(d<3600000)return Math.floor(d/60000)+'m ago'; if(d<86400000)return Math.floor(d/3600000)+'h ago'; return Math.floor(d/86400000)+'d ago'; }
-function esc(s)         { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
-</script>
+    // ─── UTILS ──────────────────────────────────────────────
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2400); }
+    function timeAgo(ts) { if (!ts) return ''; const d = Date.now() - new Date(ts).getTime(); if (d < 60000) return 'just now'; if (d < 3600000) return Math.floor(d / 60000) + 'm ago'; if (d < 86400000) return Math.floor(d / 3600000) + 'h ago'; return Math.floor(d / 86400000) + 'd ago'; }
+    function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+    function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
+  </script>
 </body>
+
 </html>
