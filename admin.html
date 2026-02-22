@@ -207,7 +207,10 @@ textarea.form-input{resize:vertical;min-height:90px}
   <div style="text-align:center">
     <div style="width:42px;height:42px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:800;font-size:20px;color:#111;margin:0 auto 16px">E</div>
     <div style="font-family:var(--fh);font-weight:800;font-size:20px;margin-bottom:8px">Ethos<span style="color:var(--accent)">Admin</span></div>
-    <div style="font-size:14px;color:var(--sub)">Checking access…</div>
+    <div style="font-size:14px;color:var(--sub);margin-bottom:28px">Checking access…</div>
+    <button onclick="cancelAndLogout()" style="background:rgba(255,255,255,.07);border:1px solid var(--border);color:var(--sub);border-radius:12px;padding:11px 24px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s">
+      ← Back to Login
+    </button>
   </div>
 </div>
 
@@ -836,6 +839,12 @@ function goPage(id) { document.querySelectorAll('.page').forEach(p=>p.classList.
 
 function exitDemo() {
   sessionStorage.removeItem('demoProfile');
+  window.location.replace('adminlogin.html');
+}
+
+async function cancelAndLogout() {
+  sessionStorage.removeItem('demoProfile');
+  await sb.auth.signOut();
   window.location.replace('adminlogin.html');
 }
 

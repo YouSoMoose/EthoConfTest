@@ -74,12 +74,13 @@ const SUPABASE_URL  = 'https://qtibzgyaldxcvhnkfxok.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0aWJ6Z3lhbGR4Y3ZobmtmeG9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MTE2NzUsImV4cCI6MjA4NzI4NzY3NX0.ovVgmA_GEq2sOWWBo32FX_xmMsSViJvBHMz1hr6Nj7E';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-// If already logged in, skip login page
+// User is on the login page deliberately — sign out any existing session
+// so they don't get auto-bounced somewhere they didn't choose to go
 (async () => {
   const { data: { session } } = await sb.auth.getSession();
-  if (session?.user) {
-    console.log('[applogin] already authenticated, forwarding to app');
-    window.location.replace('app.html');
+  if (session) {
+    await sb.auth.signOut();
+    console.log('[login page] signed out existing session, staying on login');
   }
 })();
 

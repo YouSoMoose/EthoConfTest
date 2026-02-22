@@ -243,7 +243,10 @@ textarea.form-input{resize:vertical;min-height:80px}
   <div style="text-align:center;color:#fff">
     <div style="font-size:48px;margin-bottom:16px">🌱</div>
     <div style="font-family:var(--fh);font-weight:800;font-size:24px;margin-bottom:8px">Ethos 2026</div>
-    <div style="font-size:14px;color:rgba(255,255,255,.6)">Loading your experience…</div>
+    <div style="font-size:14px;color:rgba(255,255,255,.6);margin-bottom:32px">Loading your experience…</div>
+    <button onclick="cancelAndLogout()" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.8);border-radius:12px;padding:11px 24px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s">
+      ← Back to Login
+    </button>
   </div>
 </div>
 
@@ -1198,6 +1201,12 @@ function openModal(id)  { document.getElementById(id).classList.add('open'); }
 
 function exitDemo() {
   sessionStorage.removeItem('demoProfile');
+  window.location.replace('applogin.html');
+}
+
+async function cancelAndLogout() {
+  sessionStorage.removeItem('demoProfile');
+  await sb.auth.signOut();
   window.location.replace('applogin.html');
 }
 
