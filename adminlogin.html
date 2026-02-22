@@ -57,10 +57,11 @@ const SUPABASE_URL  = 'https://qtibzgyaldxcvhnkfxok.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0aWJ6Z3lhbGR4Y3ZobmtmeG9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MTE2NzUsImV4cCI6MjA4NzI4NzY3NX0.ovVgmA_GEq2sOWWBo32FX_xmMsSViJvBHMz1hr6Nj7E';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-// Check if already logged in → skip login screen and go straight to admin
+// If already logged in, skip login page
 (async () => {
   const { data: { session } } = await sb.auth.getSession();
   if (session?.user) {
+    console.log('[adminlogin] already authenticated, forwarding to admin');
     window.location.replace('admin.html');
   }
 })();
@@ -69,11 +70,19 @@ async function loginGoogle() {
   const btn = document.getElementById('login-btn');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Redirecting…';
-  const { error } = await sb.auth.signInWithOAuth({
+  const { data, error } = await sb.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: 'https://yousomoose.github.io/EthoConfTest/admin.html' }
+    options: {
+      redirectTo: 'https://yousomoose.github.io/EthoConfTest/admin.html',
+      queryParams: { prompt: 'select_account' }
+    }
   });
-  if (error) { showToast('Login error: ' + error.message); btn.disabled = false; btn.innerHTML = 'Continue with Google'; }
+  if (error) {
+    console.error('[loginGoogle error]', error);
+    showToast('Login error: ' + error.message);
+    btn.disabled = false;
+    btn.innerHTML = 'Continue with Google';
+  }
 }
 
 function showToast(msg) { const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400); }

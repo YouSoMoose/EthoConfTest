@@ -404,11 +404,13 @@ function hasLvl(n) { return lvl() >= n; }
 // ─── AUTH GUARD ─────────────────────────────────────────
 // admin.html never has a login form — redirects out if not authenticated or not lvl 1+
 async function loadProfile(uid) {
-  for (let i = 0; i < 5; i++) {
-    if (i > 0) await new Promise(r => setTimeout(r, 600 * i));
-    const { data } = await sb.from('profiles').select('*').eq('id', uid).single();
+  for (let i = 0; i < 8; i++) {
+    if (i > 0) await new Promise(r => setTimeout(r, 500 + i * 400));
+    const { data, error } = await sb.from('profiles').select('*').eq('id', uid).maybeSingle();
     if (data) return data;
+    if (error) console.warn('[loadProfile] attempt', i, error.code, error.message);
   }
+  console.error('[loadProfile] gave up after 8 attempts for uid:', uid);
   return null;
 }
 
@@ -419,23 +421,31 @@ async function logout() {
   window.location.href = 'adminlogin.html';
 }
 
-// ─── BOOT ───────────────────────────────────────────────
+let _booting = false;
+
 async function bootAdmin(user) {
-  if (currentUser && currentUser.id === user.id) return;
+  if (_booting) return;
+  _booting = true;
   currentUser = user;
 
   currentProfile = await loadProfile(currentUser.id);
   if (!currentProfile) {
-    showToast('Could not load profile — please try again');
-    await sb.auth.signOut();
-    setTimeout(() => window.location.href = 'adminlogin.html', 1800);
+    document.getElementById('pg-loading').innerHTML = `
+      <div style="text-align:center;padding:32px">
+        <div style="font-size:42px;margin-bottom:16px">⚠️</div>
+        <div style="font-family:var(--fh);font-weight:800;font-size:20px;margin-bottom:8px;color:var(--text)">Couldn't load profile</div>
+        <div style="font-size:13px;color:var(--sub);margin-bottom:20px">Try signing in again.</div>
+        <button onclick="retryBoot()" style="background:var(--accent);color:#111;border:none;border-radius:12px;padding:13px 24px;font-size:14px;font-weight:700;cursor:pointer;display:block;width:200px;margin:0 auto 10px">Retry</button>
+        <button onclick="logout()" style="background:var(--s3);color:var(--sub);border:1px solid var(--border);border-radius:12px;padding:11px 24px;font-size:13px;cursor:pointer;display:block;width:200px;margin:0 auto">Sign Out</button>
+      </div>`;
+    _booting = false;
     return;
   }
 
   if (lvl() === 0) {
     showToast('This panel is for staff & presenters only. Redirecting…');
     await sb.auth.signOut();
-    setTimeout(() => window.location.href = 'applogin.html', 2000);
+    setTimeout(() => window.location.replace('applogin.html'), 2000);
     return;
   }
 
@@ -444,25 +454,33 @@ async function bootAdmin(user) {
   if (hasLvl(2)) subscribeMessages();
 }
 
-// Primary: parse OAuth redirect hash + existing sessions
-(async () => {
+async function retryBoot() {
+  _booting = false;
   const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) await bootAdmin(session.user);
+  else window.location.replace('adminlogin.html');
+}
+
+// PRIMARY: restore session (including from OAuth ?code= redirect)
+(async () => {
+  const { data: { session }, error } = await sb.auth.getSession();
+  if (error) console.error('[getSession error]', error);
   if (session?.user) {
     await bootAdmin(session.user);
     return;
   }
-  // No session — send to admin login
-  window.location.href = 'adminlogin.html';
+  window.location.replace('adminlogin.html');
 })();
 
-// Secondary: catch future auth events
+// SECONDARY: future auth events
 sb.auth.onAuthStateChange(async (event, session) => {
-  if (event === 'SIGNED_IN' && session?.user) {
+  console.log('[auth event]', event, session?.user?.email);
+  if (event === 'SIGNED_IN' && session?.user && !_booting && !currentUser) {
     await bootAdmin(session.user);
   }
   if (event === 'SIGNED_OUT') {
-    currentUser = null; currentProfile = null;
-    window.location.href = 'adminlogin.html';
+    currentUser = null; currentProfile = null; _booting = false;
+    window.location.replace('adminlogin.html');
   }
   if (event === 'TOKEN_REFRESHED' && session?.user) {
     currentUser = session.user;

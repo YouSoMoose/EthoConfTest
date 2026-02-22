@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Ethos 2026</title>
+<title>Ethos 2025</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,800;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
@@ -242,7 +242,7 @@ textarea.form-input{resize:vertical;min-height:80px}
 <div id="pg-loading" class="page active" style="background:linear-gradient(160deg,#1e3a0a,#2d5016 35%,#1a1814);align-items:center;justify-content:center">
   <div style="text-align:center;color:#fff">
     <div style="font-size:48px;margin-bottom:16px">🌱</div>
-    <div style="font-family:var(--fh);font-weight:800;font-size:24px;margin-bottom:8px">Ethos 2026</div>
+    <div style="font-family:var(--fh);font-weight:800;font-size:24px;margin-bottom:8px">Ethos 2025</div>
     <div style="font-size:14px;color:rgba(255,255,255,.6)">Loading your experience…</div>
   </div>
 </div>
@@ -250,7 +250,7 @@ textarea.form-input{resize:vertical;min-height:80px}
 <!-- DASHBOARD -->
 <div id="pg-dash" class="page">
   <div class="dash-header">
-    <div class="dash-conf">Ethos Conference 2026</div>
+    <div class="dash-conf">Ethos Conference 2025</div>
     <div class="dash-hi" id="dash-hi">Welcome! 🌿</div>
     <div class="dash-date" id="dash-date"></div>
     <div id="dash-lvl-badge"></div>
@@ -380,12 +380,12 @@ textarea.form-input{resize:vertical;min-height:80px}
   <div class="topbar"><button class="topbar-back" onclick="navTo('pg-dash')">←</button><div class="topbar-title">Conference Info</div></div>
   <div class="content">
     <div style="background:var(--g);border-radius:var(--r);padding:18px;color:#fff;margin-bottom:16px">
-      <div style="font-family:var(--fh);font-weight:800;font-size:20px">Ethos Sustainability 2026</div>
+      <div style="font-family:var(--fh);font-weight:800;font-size:20px">Ethos Sustainability 2025</div>
       <div style="font-size:13px;color:rgba(255,255,255,.7);margin-top:4px">Innovation Hall, Building A — Level 3</div>
     </div>
     <div class="sec">WiFi</div>
     <div class="info-group">
-      <div class="info-row"><div class="info-ico">📶</div><div><div class="info-key">Network</div><div class="info-val">Ethos2026</div></div></div>
+      <div class="info-row"><div class="info-ico">📶</div><div><div class="info-key">Network</div><div class="info-val">Ethos2025</div></div></div>
       <div class="info-row"><div class="info-ico">🔑</div><div><div class="info-key">Password</div><div class="info-val">sustainability!</div></div></div>
     </div>
     <div class="sec">Rooms</div>
@@ -398,8 +398,8 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
     <div class="sec">Contact</div>
     <div class="info-group">
-      <div class="info-row"><div class="info-ico">📧</div><div><div class="info-key">General</div><div class="info-val">staff@ethos2026.org</div></div></div>
-      <div class="info-row"><div class="info-ico">🔧</div><div><div class="info-key">Tech Support</div><div class="info-val">staff@ethos2026.org</div></div></div>
+      <div class="info-row"><div class="info-ico">📧</div><div><div class="info-key">General</div><div class="info-val">staff@ethos2025.org</div></div></div>
+      <div class="info-row"><div class="info-ico">🔧</div><div><div class="info-key">Tech Support</div><div class="info-val">staff@ethos2025.org</div></div></div>
     </div>
   </div>
   <div class="bottom-nav" id="info-nav"></div>
@@ -457,7 +457,6 @@ textarea.form-input{resize:vertical;min-height:80px}
 
 <div class="toast" id="toast"></div>
 
-
 <script>
 // ─── SUPABASE ───────────────────────────────────────────
 const SUPABASE_URL  = 'https://qtibzgyaldxcvhnkfxok.supabase.co';
@@ -487,11 +486,14 @@ function hasLvl(n) { return lvl() >= n; }
 // ─── AUTH GUARD ─────────────────────────────────────────
 // app.html never has a login page — redirect to applogin.html if not authenticated
 async function loadProfile(uid) {
-  for (let i = 0; i < 5; i++) {
-    if (i > 0) await new Promise(r => setTimeout(r, 600 * i));
-    const { data } = await sb.from('profiles').select('*').eq('id', uid).single();
+  for (let i = 0; i < 8; i++) {
+    if (i > 0) await new Promise(r => setTimeout(r, 500 + i * 400));
+    const { data, error } = await sb.from('profiles').select('*').eq('id', uid).maybeSingle();
     if (data) return data;
+    // Log errors to help debug — error code 'PGRST116' = 0 rows (maybeSingle won't throw this)
+    if (error) console.warn('[loadProfile] attempt', i, error.code, error.message);
   }
+  console.error('[loadProfile] gave up after 8 attempts for uid:', uid);
   return null;
 }
 
@@ -503,24 +505,26 @@ async function logout() {
   window.location.href = 'applogin.html';
 }
 
-// ─── BOOT ───────────────────────────────────────────────
-// Called once we have a confirmed session
-async function bootApp(user) {
-  // Guard: don't boot twice
-  if (currentUser && currentUser.id === user.id) return;
-  currentUser = user;
+let _booting = false; // prevent double-boot
 
-  // Show a nicer loading state
-  const loadEl = document.getElementById('pg-loading');
-  if (loadEl) {
-    loadEl.querySelector('div div:last-child').textContent = 'Loading your data…';
-  }
+async function bootApp(user) {
+  if (_booting) return;
+  _booting = true;
+  currentUser = user;
 
   currentProfile = await loadProfile(currentUser.id);
   if (!currentProfile) {
-    showToast('Could not load profile — please try signing in again');
-    await sb.auth.signOut();
-    setTimeout(() => window.location.href = 'applogin.html', 1800);
+    // Profile missing — could be RLS, could be trigger lag
+    // Show a helpful message and let them try again rather than hard-looping
+    document.getElementById('pg-loading').innerHTML = `
+      <div style="text-align:center;color:#fff;padding:32px">
+        <div style="font-size:48px;margin-bottom:16px">⚠️</div>
+        <div style="font-family:var(--fh);font-weight:800;font-size:22px;margin-bottom:10px">Couldn't load your profile</div>
+        <div style="font-size:14px;color:rgba(255,255,255,.7);margin-bottom:24px">This can happen on first sign-in.<br/>Please try signing in again.</div>
+        <button onclick="retryBoot()" style="background:#fff;color:#2d5016;border:none;border-radius:12px;padding:14px 28px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:12px;display:block;width:220px;margin:0 auto 12px">Try Again</button>
+        <button onclick="logout()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:12px;padding:12px 28px;font-size:14px;cursor:pointer;display:block;width:220px;margin:0 auto">Sign Out & Restart</button>
+      </div>`;
+    _booting = false;
     return;
   }
 
@@ -529,29 +533,46 @@ async function bootApp(user) {
   navTo('pg-dash');
 }
 
-// Primary: catch OAuth redirect hash AND existing sessions
-(async () => {
-  // getSession() will parse the URL hash (#access_token=...) on first load
+async function retryBoot() {
+  _booting = false;
+  document.getElementById('pg-loading').innerHTML = `
+    <div style="text-align:center;color:#fff">
+      <div style="font-size:48px;margin-bottom:16px">🌱</div>
+      <div style="font-family:var(--fh);font-weight:800;font-size:24px;margin-bottom:8px">Ethos 2025</div>
+      <div style="font-size:14px;color:rgba(255,255,255,.6)">Retrying…</div>
+    </div>`;
   const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) {
+    await bootApp(session.user);
+  } else {
+    window.location.href = 'applogin.html';
+  }
+}
+
+// PRIMARY: parse OAuth ?code= from URL and/or restore existing session
+(async () => {
+  const { data: { session }, error } = await sb.auth.getSession();
+  if (error) console.error('[getSession error]', error);
   if (session?.user) {
     await bootApp(session.user);
     return;
   }
-  // No session found — redirect to login
-  window.location.href = 'applogin.html';
+  // Truly no session — go to login
+  window.location.replace('applogin.html');
 })();
 
-// Secondary: catch future auth events (token refresh, sign out, etc.)
+// SECONDARY: react to future auth changes (token refresh, sign out)
 sb.auth.onAuthStateChange(async (event, session) => {
-  if (event === 'SIGNED_IN' && session?.user) {
+  console.log('[auth event]', event, session?.user?.email);
+  if (event === 'SIGNED_IN' && session?.user && !_booting && !currentUser) {
     await bootApp(session.user);
   }
   if (event === 'SIGNED_OUT') {
-    currentUser = null; currentProfile = null;
-    window.location.href = 'applogin.html';
+    currentUser = null; currentProfile = null; _booting = false;
+    window.location.replace('applogin.html');
   }
   if (event === 'TOKEN_REFRESHED' && session?.user) {
-    currentUser = session.user; // keep user object fresh
+    currentUser = session.user;
   }
 });
 
