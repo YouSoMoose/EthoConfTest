@@ -398,8 +398,8 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
     <div class="sec">Contact</div>
     <div class="info-group">
-      <div class="info-row"><div class="info-ico">📧</div><div><div class="info-key">General</div><div class="info-val"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="036b666f6f6c4366776b6c70313331362d606c6e">[email&#160;protected]</a></div></div></div>
-      <div class="info-row"><div class="info-ico">🔧</div><div><div class="info-key">Tech Support</div><div class="info-val"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1d69787e755d786975726e2f2d2f28337e7270">[email&#160;protected]</a></div></div></div>
+      <div class="info-row"><div class="info-ico">📧</div><div><div class="info-key">General</div><div class="info-val">staff@ethos2025.org</div></div></div>
+      <div class="info-row"><div class="info-ico">🔧</div><div><div class="info-key">Tech Support</div><div class="info-val">staff@ethos2025.org</div></div></div>
     </div>
   </div>
   <div class="bottom-nav" id="info-nav"></div>
@@ -457,7 +457,8 @@ textarea.form-input{resize:vertical;min-height:80px}
 
 <div class="toast" id="toast"></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+
+<script>
 // ─── SUPABASE ───────────────────────────────────────────
 const SUPABASE_URL  = 'https://qtibzgyaldxcvhnkfxok.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0aWJ6Z3lhbGR4Y3ZobmtmeG9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MTE2NzUsImV4cCI6MjA4NzI4NzY3NX0.ovVgmA_GEq2sOWWBo32FX_xmMsSViJvBHMz1hr6Nj7E';
@@ -502,15 +503,55 @@ async function logout() {
   window.location.href = 'applogin.html';
 }
 
-sb.auth.onAuthStateChange(async (event, session) => {
-  if (event === 'SIGNED_OUT') return; // stay on page, applogin handles login
+// ─── BOOT ───────────────────────────────────────────────
+// Called once we have a confirmed session
+async function bootApp(user) {
+  // Guard: don't boot twice
+  if (currentUser && currentUser.id === user.id) return;
+  currentUser = user;
+
+  // Show a nicer loading state
+  const loadEl = document.getElementById('pg-loading');
+  if (loadEl) {
+    loadEl.querySelector('div div:last-child').textContent = 'Loading your data…';
+  }
+
+  currentProfile = await loadProfile(currentUser.id);
+  if (!currentProfile) {
+    showToast('Could not load profile — please try signing in again');
+    await sb.auth.signOut();
+    setTimeout(() => window.location.href = 'applogin.html', 1800);
+    return;
+  }
+
+  await loadUserData();
+  buildUI();
+  navTo('pg-dash');
+}
+
+// Primary: catch OAuth redirect hash AND existing sessions
+(async () => {
+  // getSession() will parse the URL hash (#access_token=...) on first load
+  const { data: { session } } = await sb.auth.getSession();
   if (session?.user) {
-    currentUser = session.user;
-    currentProfile = await loadProfile(currentUser.id);
-    if (!currentProfile) { showToast('Could not load profile, try again'); return; }
-    await loadUserData();
-    buildUI();
-    navTo('pg-dash');
+    await bootApp(session.user);
+    return;
+  }
+  // No session found — redirect to login
+  window.location.href = 'applogin.html';
+})();
+
+// Secondary: catch future auth events (token refresh, sign out, etc.)
+sb.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_IN' && session?.user) {
+    await bootApp(session.user);
+  }
+  if (event === 'SIGNED_OUT') {
+    currentUser = null; currentProfile = null;
+    window.location.href = 'applogin.html';
+  }
+  if (event === 'TOKEN_REFRESHED' && session?.user) {
+    currentUser = session.user; // keep user object fresh
   }
 });
 
@@ -1114,4 +1155,9 @@ async function sendChat() {
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 function showToast(msg) { const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400); }
-function timeAgo(ts)    { if(!ts)return''; const d=Date.now()-new Date(ts).getTime(); if(d<60000)return'just now'; if(d<3600000)return Math.floor(d/60000)+'m ago'; if(d<8640
+function timeAgo(ts)    { if(!ts)return''; const d=Date.now()-new Date(ts).getTime(); if(d<60000)return'just now'; if(d<3600000)return Math.floor(d/60000)+'m ago'; if(d<86400000)return Math.floor(d/3600000)+'h ago'; return Math.floor(d/86400000)+'d ago'; }
+function esc(s)         { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
+</script>
+</body>
+</html>

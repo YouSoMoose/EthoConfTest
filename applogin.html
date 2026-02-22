@@ -57,7 +57,13 @@ const SUPABASE_URL  = 'https://qtibzgyaldxcvhnkfxok.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0aWJ6Z3lhbGR4Y3ZobmtmeG9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MTE2NzUsImV4cCI6MjA4NzI4NzY3NX0.ovVgmA_GEq2sOWWBo32FX_xmMsSViJvBHMz1hr6Nj7E';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-// Don't auto-redirect on load — let user choose to sign in
+// Check if already logged in → skip login screen
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) {
+    window.location.replace('app.html');
+  }
+})();
 
 async function loginGoogle() {
   const btn = document.getElementById('login-btn');

@@ -419,20 +419,53 @@ async function logout() {
   window.location.href = 'adminlogin.html';
 }
 
-sb.auth.onAuthStateChange(async (event, session) => {
-  if (event === 'SIGNED_OUT') return; // stay on page, adminlogin handles login
+// ─── BOOT ───────────────────────────────────────────────
+async function bootAdmin(user) {
+  if (currentUser && currentUser.id === user.id) return;
+  currentUser = user;
+
+  currentProfile = await loadProfile(currentUser.id);
+  if (!currentProfile) {
+    showToast('Could not load profile — please try again');
+    await sb.auth.signOut();
+    setTimeout(() => window.location.href = 'adminlogin.html', 1800);
+    return;
+  }
+
+  if (lvl() === 0) {
+    showToast('This panel is for staff & presenters only. Redirecting…');
+    await sb.auth.signOut();
+    setTimeout(() => window.location.href = 'applogin.html', 2000);
+    return;
+  }
+
+  buildDash();
+  goPage('pg-dash');
+  if (hasLvl(2)) subscribeMessages();
+}
+
+// Primary: parse OAuth redirect hash + existing sessions
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
   if (session?.user) {
+    await bootAdmin(session.user);
+    return;
+  }
+  // No session — send to admin login
+  window.location.href = 'adminlogin.html';
+})();
+
+// Secondary: catch future auth events
+sb.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_IN' && session?.user) {
+    await bootAdmin(session.user);
+  }
+  if (event === 'SIGNED_OUT') {
+    currentUser = null; currentProfile = null;
+    window.location.href = 'adminlogin.html';
+  }
+  if (event === 'TOKEN_REFRESHED' && session?.user) {
     currentUser = session.user;
-    currentProfile = await loadProfile(currentUser.id);
-    if (!currentProfile) { showToast('Could not load profile, try again'); return; }
-    if (lvl() === 0) {
-      showToast('This panel is for staff & presenters only.');
-      await sb.auth.signOut();
-      return;
-    }
-    buildDash();
-    goPage('pg-dash');
-    if (hasLvl(2)) subscribeMessages();
   }
 });
 
