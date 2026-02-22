@@ -422,6 +422,7 @@ async function loadProfile(userId) {
 sb.auth.onAuthStateChange(async (event, session) => {
   if (session?.user) {
     currentUser = session.user;
+    await new Promise(r => setTimeout(r, 500)); // small delay to ensure profile is ready
     currentProfile = await loadProfile(currentUser.id);
     if (!currentProfile) { showToast('Profile not found — try again'); return; }
     if (currentProfile.role === 'attendee') {
