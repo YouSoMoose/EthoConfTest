@@ -1,0 +1,69 @@
+="width:${Math.round(done/Math.max(total,1)*100)}%;height:100%;background:#fff;border-radius:100px;transition:width .5s"></div>
+      </div>
+      <div style="font-size:12px;color:rgba(255,255,255,.6)">${done===total?'🎉 All done! You earned a booth passport stamp!':total-done+' left to vote'}</div>
+    </div>
+
+    ${myVotes.length ? `
+    <div class="sec">Your Votes</div>
+    ${myVotes.map(v=>{
+      const p = pitches.find(p=>p.id===v.pitchId);
+      if(!p) return '';
+      const avg = ((v.sustainability+v.impact+v.feasibility+v.overall)/4).toFixed(1);
+      return `<div style="background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-family:var(--fh);font-weight:700;font-size:15px">${esc(p.name)}</div>
+          <div style="font-family:var(--fh);font-weight:800;font-size:20px;color:var(--g)">${avg}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          ${[['sustainability','🌱'],['impact','💥'],['feasibility','⚙️'],['overall','⭐']].map(([k,ico])=>`
+            <div style="background:var(--s1);border-radius:8px;padding:8px;text-align:center">
+              <div style="font-size:14px">${ico}</div>
+              <div style="font-family:var(--fh);font-weight:700;font-size:16px;color:var(--g)">${v[k]}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+    }).join('')}
+    ` : `<div class="empty"><div class="empty-ico">🗳️</div><div>No votes yet — go rate some startups!</div></div>`}`;
+}
+
+// ─── INTERACTIONS ───
+function togglePitch(id){
+  expandedId = expandedId===id ? null : id;
+  renderView();
+  if(expandedId) setTimeout(()=>document.getElementById('pitch-'+id)?.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+}
+
+function sliderInput(pitchId, key, val){
+  val = parseInt(val);
+  if(!voteStates[pitchId]) voteStates[pitchId]={sustainability:0,impact:0,feasibility:0,overall:0};
+  voteStates[pitchId][key] = val;
+  const disp = document.getElementById(`disp-${pitchId}-${key}`);
+  const fill = document.getElementById(`fill-${pitchId}-${key}`);
+  if(disp){ disp.textContent=val; disp.classList.remove('zero'); }
+  if(fill) fill.style.width = (val*10)+'%';
+}
+
+function submitVote(pitchId){
+  const vs = voteStates[pitchId]||{sustainability:0,impact:0,feasibility:0,overall:0};
+  if(!vs.sustainability||!vs.impact||!vs.feasibility||!vs.overall){
+    showToast('⚠️ Please rate all 4 questions'); return;
+  }
+  const already = DB.getList(DB.K_VOTES).find(v=>v.voterUid===currentUser.uid&&v.pitchId===pitchId);
+  if(already){ showToast('Already voted!'); return; }
+
+  DB.addToList(DB.K_VOTES,{
+    id:`v_${pitchId}_${currentUser.uid}`,pitchId,voterUid:currentUser.uid,
+    sustainability:vs.sustainability,impact:vs.impact,feasibility:vs.feasibility,overall:vs.overall,
+    createdAt:Date.now()
+  });
+  delete voteStates[pitchId];
+  expandedId = pitchId; // keep open to show results
+  renderView();
+  showToast('Vote submitted ✓');
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+</script>
+</body>
+</html>

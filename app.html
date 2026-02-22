@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>Ethos 2025</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#f5f0eb;
+  --white:#ffffff;
+  --s1:#ede8e2;
+  --s2:#e4ddd5;
+  --border:#d5cec6;
+  --accent:#2d5016;
+  --accent-light:#e8f0dc;
+  --accent-border:rgba(45,80,22,.2);
+  --warm:#FCBD9D;
+  --warm-light:rgba(252,189,157,.2);
+  --text:#1a1814;
+  --sub:#6b6560;
+  --muted:#9e9990;
+  --r:14px;
+  --fh:'Fraunces',serif;
+  --fb:'DM Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--fb);overflow-x:hidden}
+body{min-height:100dvh}
+.page{display:none;min-height:100dvh;flex-direction:column;animation:fadeIn .22s ease}
+.page.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* TOPBAR */
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100}
+.topbar-back{background:none;border:none;color:var(--sub);cursor:pointer;padding:4px 6px;border-radius:8px;font-size:18px;transition:all .15s}
+.topbar-title{font-family:var(--fh);font-weight:700;font-size:16px;flex:1}
+.topbar-action{background:none;border:none;color:var(--sub);cursor:pointer;padding:4px 8px;border-radius:8px;font-size:13px;font-weight:500;transition:all .15s}
+.topbar-action:hover{background:var(--s1);color:var(--text)}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:var(--fh);cursor:pointer;overflow:hidden;flex-shrink:0}
+
+/* CONTENT */
+.content{flex:1;overflow-y:auto;padding:16px 16px 110px;-webkit-overflow-scrolling:touch}
+
+/* LOGIN */
+#pg-login{background:linear-gradient(160deg,#1e3a0a 0%,#2d5016 35%,#1a1814 100%);align-items:center;justify-content:flex-end;padding:0;min-height:100dvh}
+.login-hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px 20px;text-align:center}
+.login-leaf{font-size:52px;margin-bottom:16px}
+.login-conf{font-size:11px;font-weight:600;letter-spacing:.15em;color:rgba(255,255,255,.5);text-transform:uppercase;margin-bottom:8px}
+.login-title{font-family:var(--fh);font-size:40px;font-weight:800;color:#fff;line-height:1.1;margin-bottom:6px}
+.login-year{font-family:var(--fh);font-size:40px;font-weight:300;font-style:italic;color:var(--warm)}
+.login-sub{font-size:14px;color:rgba(255,255,255,.6);margin-top:8px;line-height:1.5}
+.login-card{background:var(--white);border-radius:28px 28px 0 0;padding:28px 24px max(28px,env(safe-area-inset-bottom));width:100%;max-width:480px}
+.btn-google{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:14px 20px;font-size:15px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;font-family:var(--fb);color:var(--text);margin-bottom:12px}
+.btn-google:hover{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-border)}
+.dev-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.dev-p{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer;color:var(--sub);transition:all .15s;font-weight:500}
+.dev-p:hover{border-color:var(--accent);color:var(--accent)}
+
+/* DASH */
+.dash-header{background:var(--accent);padding:20px 16px 24px;color:#fff}
+.dash-conf-label{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:4px}
+.dash-hi{font-family:var(--fh);font-weight:800;font-size:26px;line-height:1.2}
+.dash-date{font-size:12px;color:rgba(255,255,255,.6);margin-top:4px}
+.dash-chips{display:flex;gap:8px;margin-top:14px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.dash-chips::-webkit-scrollbar{display:none}
+.dash-chip{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:6px 14px;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;transition:all .15s}
+.dash-chip.hi{background:#fff;color:var(--accent)}
+
+/* CARDS / TILES */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.card.accent-card{background:var(--accent-light);border-color:var(--accent-border)}
+.card-title{font-family:var(--fh);font-weight:700;font-size:16px;margin-bottom:4px}
+.card-sub{font-size:13px;color:var(--sub)}
+
+/* SECTION LABEL */
+.sec{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;margin-top:4px}
+
+/* GRID */
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.quick-tile{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .18s;display:flex;flex-direction:column;gap:6px}
+.quick-tile:active{transform:scale(.97);background:var(--s1)}
+.quick-ico{font-size:24px}
+.quick-name{font-family:var(--fh);font-weight:700;font-size:14px;line-height:1.2}
+.quick-desc{font-size:11px;color:var(--sub)}
+
+/* SCHEDULE */
+.sched-day{font-family:var(--fh);font-weight:700;font-size:17px;margin-bottom:12px;margin-top:20px;padding-bottom:6px;border-bottom:2px solid var(--accent)}
+.sched-item{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:8px;display:flex;gap:12px}
+.sched-time{font-size:12px;font-weight:600;color:var(--accent);white-space:nowrap;min-width:48px}
+.sched-body{flex:1}
+.sched-name{font-family:var(--fh);font-weight:600;font-size:14px;margin-bottom:2px}
+.sched-loc{font-size:12px;color:var(--sub)}
+.sched-spkr{font-size:12px;color:var(--muted);margin-top:2px;font-style:italic}
+
+/* PITCH ROOM */
+.pitch-search{width:100%;background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;font-size:14px;font-family:var(--fb);outline:none;margin-bottom:14px;transition:border-color .2s}
+.pitch-search:focus{border-color:var(--accent)}
+.pitch-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:10px;cursor:pointer;transition:all .18s}
+.pitch-card:active{transform:scale(.98)}
+.pitch-card.voted{border-color:var(--accent-border);background:var(--accent-light)}
+.pitch-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.pitch-logo{width:46px;height:46px;border-radius:11px;background:var(--s1);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;overflow:hidden}
+.pitch-logo img{width:100%;height:100%;object-fit:cover}
+.pitch-info{flex:1;min-width:0}
+.pitch-name{font-family:var(--fh);font-weight:700;font-size:15px}
+.pitch-tag{font-size:12px;color:var(--sub);margin-top:2px}
+.voted-badge{font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-light);border:1px solid var(--accent-border);border-radius:6px;padding:2px 8px;white-space:nowrap}
+
+/* VOTING */
+.rating-group{margin-bottom:20px}
+.rating-q{font-family:var(--fh);font-weight:600;font-size:14px;margin-bottom:8px}
+.rating-desc{font-size:12px;color:var(--sub);margin-bottom:10px}
+.rating-dots{display:flex;gap:6px}
+.rdot{width:32px;height:32px;border-radius:50%;background:var(--s1);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;flex-shrink:0}
+.rdot.sel{background:var(--accent);border-color:var(--accent);color:#fff;transform:scale(1.1)}
+.rdot:hover{border-color:var(--accent)}
+.rating-val{font-family:var(--fh);font-weight:700;font-size:22px;color:var(--accent);margin-left:12px;min-width:30px;text-align:center}
+
+/* PASSPORT */
+.passport-header{background:var(--accent);border-radius:var(--r);padding:20px;color:#fff;margin-bottom:16px;text-align:center}
+.passport-title{font-family:var(--fh);font-weight:800;font-size:22px;margin-bottom:4px}
+.passport-sub{font-size:13px;color:rgba(255,255,255,.7)}
+.room-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.room-name{font-family:var(--fh);font-weight:700;font-size:16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.progress-wrap{background:var(--s1);border-radius:100px;height:10px;overflow:hidden;margin-bottom:8px}
+.progress-bar{height:100%;border-radius:100px;background:var(--accent);transition:width .6s ease}
+.progress-pct{font-size:12px;color:var(--sub);text-align:right}
+.stamp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.stamp{width:100%;aspect-ratio:1;border-radius:10px;background:var(--s1);display:flex;align-items:center;justify-content:center;font-size:18px;border:1.5px solid var(--border);transition:all .2s}
+.stamp.earned{background:var(--accent-light);border-color:var(--accent-border)}
+
+/* NOTES */
+.note-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:8px;cursor:pointer;transition:all .18s}
+.note-card:active{transform:scale(.98)}
+.note-title{font-family:var(--fh);font-weight:700;font-size:14px;margin-bottom:4px}
+.note-preview{font-size:12px;color:var(--sub);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.note-meta{font-size:11px;color:var(--muted);margin-top:6px}
+.note-editor-title{width:100%;background:none;border:none;border-bottom:1.5px solid var(--border);padding:10px 0;font-family:var(--fh);font-weight:700;font-size:20px;color:var(--text);outline:none;margin-bottom:12px}
+.note-editor-body{width:100%;background:none;border:none;font-size:14px;color:var(--text);outline:none;resize:none;font-family:var(--fb);line-height:1.65;min-height:300px}
+
+/* CHAT */
+.chat-fab{position:fixed;bottom:80px;right:16px;z-index:150;width:52px;height:52px;background:var(--accent);border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 16px rgba(45,80,22,.3);transition:all .2s}
+.chat-fab:active{transform:scale(.9)}
+.chat-fab .chat-pip{position:absolute;top:2px;right:2px;width:14px;height:14px;background:#e55;border-radius:50%;border:2px solid var(--bg);font-size:8px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center}
+.chat-drawer{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;background:var(--white);transform:translateY(100%);transition:transform .3s ease}
+.chat-drawer.open{transform:translateY(0)}
+.chat-drawer-header{background:var(--accent);padding:16px;display:flex;align-items:center;gap:12px;padding-top:max(16px,env(safe-area-inset-top))}
+.chat-drawer-title{font-family:var(--fh);font-weight:700;font-size:17px;color:#fff;flex:1}
+.chat-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.chat-bubble-wrap{display:flex;flex-direction:column}
+.chat-bubble-wrap.me{align-items:flex-end}
+.chat-bubble-wrap.them{align-items:flex-start}
+.chat-bubble{max-width:80%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.5}
+.chat-bubble-wrap.me .chat-bubble{background:var(--accent);color:#fff;border-bottom-right-radius:4px}
+.chat-bubble-wrap.them .chat-bubble{background:var(--s1);border:1px solid var(--border);border-bottom-left-radius:4px}
+.chat-bubble-name{font-size:11px;color:var(--muted);margin-bottom:3px}
+.chat-bubble-time{font-size:10px;color:var(--muted);margin-top:3px}
+.chat-input-row{padding:10px 12px max(12px,env(safe-area-inset-bottom));background:var(--white);border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end}
+.chat-input{flex:1;background:var(--s1);border:1.5px solid var(--border);border-radius:20px;padding:10px 16px;font-size:14px;font-family:var(--fb);outline:none;resize:none;max-height:100px;line-height:1.4}
+.chat-input:focus{border-color:var(--accent)}
+.chat-send{width:40px;height:40px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* BUSINESS CARD */
+.bc-card{background:linear-gradient(135deg,var(--accent) 0%,#3d6b22 100%);border-radius:20px;padding:24px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden}
+.bc-card::after{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.07)}
+.bc-name{font-family:var(--fh);font-weight:800;font-size:22px;margin-bottom:4px;position:relative}
+.bc-title{font-size:13px;color:rgba(255,255,255,.8);position:relative}
+.bc-company{font-size:14px;font-weight:600;color:rgba(255,255,255,.9);margin-top:10px;position:relative}
+.bc-contact{display:flex;gap:16px;margin-top:14px;flex-wrap:wrap;position:relative}
+.bc-contact-item{font-size:12px;color:rgba(255,255,255,.7)}
+.qr-box{background:var(--white);border-radius:var(--r);padding:20px;text-align:center;margin-bottom:16px}
+.qr-placeholder{width:160px;height:160px;margin:0 auto 12px;background:var(--s1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:60px;border:1px solid var(--border)}
+.form-group{margin-bottom:14px}
+.form-label{font-size:12px;color:var(--sub);font-weight:500;margin-bottom:5px;display:block}
+.form-input{width:100%;background:var(--white);border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;font-family:var(--fb);transition:border-color .2s;outline:none}
+.form-input:focus{border-color:var(--accent)}
+.form-input::placeholder{color:var(--muted)}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--border);display:flex;padding:6px 0 max(8px,env(safe-area-inset-bottom));z-index:100}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;padding:6px 2px;color:var(--muted);transition:color .2s}
+.nav-btn.active{color:var(--accent)}
+.nav-btn svg{width:20px;height:20px;stroke-width:2}
+.nav-btn span{font-size:10px;font-weight:500}
+
+/* BUTTONS */
+.btn{width:100%;padding:14px;border:none;border-radius:11px;font-size:15px;font-weight:600;font-family:var(--fh);cursor:pointer;transition:all .2s}
+.btn-green{background:var(--accent);color:#fff}
+.btn-green:hover{background:#3d6b22;transform:translateY(-1px)}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
+.btn-sm{width:auto;padding:9px 18px;font-size:13px}
+
+/* TOAST */
+.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--accent);color:#fff;border-radius:12px;padding:10px 20px;font-size:13px;font-weight:500;white-space:nowrap;z-index:400;opacity:0;transition:all .3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* INFO */
+.info-group{background:var(--white);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:12px}
+.info-row{display:flex;align-items:flex-start;gap:12px;padding:14px;border-bottom:1px solid var(--border)}
+.info-row:last-child{border:none}
+.info-ico{font-size:18px;flex-shrink:0;margin-top:1px}
+.info-key{font-size:11px;color:var(--sub);margin-bottom:2px;font-weight:500}
+.info-val{font-size:14px;font-weight:500;word-break:break-all}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--white);border-radius:24px 24px 0 0;padding:24px 20px max(24px,env(safe-area-inset-bottom));width:100%;max-width:500px;transform:translateY(40px);transition:transform .3s;max-height:88dvh;overflow-y:auto}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:4px;margin:0 auto 20px}
+.modal-title{font-family:var(--fh);font-weight:800;font-size:20px;margin-bottom:4px}
+.modal-sub{font-size:13px;color:var(--sub);margin-bottom:20px}
+
+/* EMPTY */
+.empty{text-align:center;padding:44px 20px;color:var(--muted)}
+.empty-ico{font-size:38px;margin-bottom:10px}
+.empty-txt{font-size:14px}
+
+/* COLLECTED CARDS */
+.ccard{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:8px;display:flex;gap:12px;align-items:center;cursor:pointer;transition:all .18s}
+.ccard:active{transform:scale(.98)}
+.ccard-ava{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:700;font-size:16px;flex-shrink:0}
+.ccard-name{font-family:var(--fh);font-weight:700;font-size:14px}
+.ccard-title{font-size:12px;color:var(--sub)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="pg-login" class="page active">
+  <div class="login-hero">
+    <div class="login-leaf">🌱</div>
+    <div class="login-conf">Ethos Conference</div>
+    <div class="login-title">Sustainability</div>
+    <div class="login-year">2025</div>
+    <div class="login-sub">Connect. Vote. Discover.<br/>Your conference companion.</div>
+  </div>
+  <div class="login-card">
+    <button class="btn-google" onclick="loginGoogle()">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.47 2.09 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continue with Google
+    </button>
+    <p style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:10px">— or demo login —</p>
+    <div class="dev-row">
+      <div class="dev-p" onclick="devLogin('attendee1')">👤 Attendee</div>
+      <div class="dev-p" onclick="devLogin('attendee2')">👤 Alex R.</div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="pg-dash" class="page">
+  <div class="dash-header">
+    <div class="dash-conf-label">Ethos Conference 2025</div>
+    <div class="dash-hi" id="dash-hi">Welcome!</div>
+    <div class="dash-date" id="dash-date"></div>
+    <div class="dash-chips">
+      <div class="dash-chip hi" onclick="navTo('pg-schedule')">📅 Schedule</div>
+      <div class="dash-chip" onclick="navTo('pg-pitch')">🚀 Pitches</div>
+      <div class="dash-chip" onclick="navTo('pg-passport')">🗺️ Passport</div>
+      <div class="dash-chip" onclick="navTo('pg-notes')">📝 Notes</div>
+    </div>
+  </div>
+  <div class="content" style="padding-top:12px">
+    <!-- Announcements -->
+    <div id="dash-announcements"></div>
+
+    <div class="sec">Quick Access</div>
+    <div class="quick-grid">
+      <div class="quick-tile" onclick="navTo('pg-schedule')">
+        <div class="quick-ico">📅</div>
+        <div class="quick-name">Schedule</div>
+        <div class="quick-desc">All sessions & events</div>
+      </div>
+      <div class="quick-tile" onclick="navTo('pg-pitch')">
+        <div class="quick-ico">🚀</div>
+        <div class="quick-name">Pitch Room</div>
+        <div class="quick-desc">Vote on startups</div>
+      </div>
+      <div class="quick-tile" onclick="navTo('pg-passport')">
+        <div class="quick-ico">🗺️</div>
+        <div class="quick-name">Booth Passport</div>
+        <div class="quick-desc">Collect stamps</div>
+      </div>
+      <div class="quick-tile" onclick="navTo('pg-notes')">
+        <div class="quick-ico">📝</div>
+        <div class="quick-name">My Notes</div>
+        <div class="quick-desc">Keynote notes</div>
+      </div>
+      <div class="quick-tile" onclick="navTo('pg-card')">
+        <div class="quick-ico">👤</div>
+        <div class="quick-name">My Card</div>
+        <div class="quick-desc">Your digital card</div>
+      </div>
+      <div class="quick-tile" onclick="navTo('pg-info')">
+        <div class="quick-ico">ℹ️</div>
+        <div class="quick-name">Info</div>
+        <div class="quick-desc">WiFi, contacts</div>
+      </div>
+    </div>
+
+    <div class="sec">Today's Pitches</div>
+    <div id="dash-pitches"></div>
+  </div>
+  <div class="bottom-nav" id="main-nav"></div>
+</div>
+
+<!-- SCHEDULE -->
+<div id="pg-schedule" class="page">
+  <div class="topbar">
+    <button class="topbar-back" onclick="navTo('pg-dash')">←</button>
+    <div class="topbar-title">Schedule</div>
+    <button class="topbar-action" onclick="navTo('pg-notes')">+ Note</button>
+  </div>
+  <div class="content" id="schedule-content"></div>
+  <div class="bottom-nav" id="sched-nav"></div>
+</div>
+
+<!-- PITCH ROOM -->
+<div id="pg-pitch" class="page">
+  <div class="topbar">
+    <button class="topbar-back" onclick="navTo('pg-dash')">←</button>
+    <div class="topbar-title">Pitch Room</div>
+  </div>
+  <div class="content">
+    <div class="card accent-card" style="margin-bottom:16px">
+      <div class="card-title">🗳️ Vote on each startup</div>
+      <div class="card-sub">Rate sustainability, impact, feasibility, and overall. Your vote counts for your booth passport too!</div>
+    </div>
+    <input class="pitch-search" id="pitch-search" placeholder="🔍  Search startups…" oninput="renderPitches()"/>
+    <div id="pitches-list"></div>
+  </div>
+  <div class="bottom-nav" id="pitch-nav"></div>
+</div>
+
+<!-- VOTING MODAL -->
+<div class="modal-overlay" id="modal-vote" onclick="closeModal('modal-vote')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="vote-modal-title">Rate this Pitch</div>
+    <div class="modal-sub" id="vote-modal-sub">1 = lowest · 10 = highest</div>
+    <div id="vote-modal-body"></div>
+    <button class="btn btn-green" id="vote-submit-btn" onclick="submitVote()">Submit Vote</button>
+  </div>
+</div>
+
+<!-- BOOTH PASSPORT -->
+<div id="pg-passport" class="page">
+  <div class="topbar">
+    <button class="topbar-back" onclick="navTo('pg-dash')">←</button>
+    <div class="topbar-title">Booth Passport</div>
+  </div>
+  <div class="content" id="passport-content"></div>
+  <div class="bottom-nav" id="passport-nav"></div>
+</div>
+
+<!-- NOTES -->
+<div id="pg-notes" class="page">
+  <div class="topbar">
+    <button class="topbar-back" onclick="navTo('pg-dash')">←</button>
+    <div class="topbar-title">Notes</div>
+    <button class="topbar-action" onclick="newNote()" style="color:var(--accent);font-weight:700">+ New</button>
+  </div>
+  <div class="content" id="notes-list"></div>
+  <div class="bottom-nav" id="notes-nav"></div>
+</div>
+
+<!-- NOTE EDITOR -->
+<div id="pg-note-editor" class="page">
+  <div class="topbar">
+    <button class="topbar-back" onclick="saveNote();navTo('pg-notes')">← Save</button>
+    <div class="topbar-title" id="note-editor-topbar">Note</div>
+    <button class="topbar-action" onclick="deleteNote()" style="color:#c44">Delete</button>
+  </div>
+  <div class="content" style="padding-top:8px">
+    <input class="note-editor-title" id="note-title-input" placeholder="Title…"/>
+    <textarea class="note-editor-body" id="note-body-input" placeholder="Start typing your notes…"></textarea>
+  </div>
+</div>
+
+<!-- MY CARD -->
+<div id="pg-card" class="page">
+  <div class="topbar">
+    <button class="topbar-back" onclick="navTo('pg-dash')">←</button>
+    <div class="topbar-title">My Card</div>
+    <div class="avatar" id="card-avatar" onclick="logout()">?</div>
+  </div>
+  <div class="content">
+    <!-- Preview -->
+    <div class="bc-card" id="bc-preview">
+      <div class="bc-name" id="bc-name">Your Name</div>
+      <div class="bc-title" id="bc-title-display">Title at Company</div>
+      <div class="bc-company" id="bc-company-display"></div>
+      <div class="bc-contact">
+        <div class="bc-contact-item" id="bc-contact-email"></div>
+        <div class="bc-contact-item" id="bc-contact-phone"></div>
+      </div>
+    </div>
+    <!-- QR -->
+    <div class="qr-box">
+      <div class="qr-placeholder" id="qr-display">🔳</div>
+      <div style="font-size:13px;color:var(--sub)">Others scan this to save your contact</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px" id="qr-note"></div>
+    </div>
+    <!-- Edit form -->
+    <div class="sec">Edit Your Card</div>
+    <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="bc-name-input" placeholder="Your name" oninput="liveCard()"/></div>
+    <div class="form-group"><label class="form-label">Title</label><input class="form-input" id="bc-title-input" placeholder="e.g. Environmental Scientist" oninput="liveCard()"/></div>
+    <div class="form-group"><label class="form-label">Company / School</label><input class="form-input" id="bc-company-input" placeholder="e.g. MIT" oninput="liveCard()"/></div>
+    <div class="form-group"><label class="form-label">Phone (optional)</label><input class="form-input" id="bc-phone-input" placeholder="+1 555 000 0000" type="tel" oninput="liveCard()"/></div>
+    <div class="form-group"><label class="form-label">LinkedIn URL</label><input class="form-input" id="bc-linkedin-input" placeholder="linkedin.com/in/yourname" oninput="liveCard()"/></div>
+    <div class="form-group"><label class="form-label">Resume Link</label><input class="form-input" id="bc-resume-input" placeholder="drive.google.com/..."/></div>
+    <button class="btn btn-green" onclick="saveCard()">Save Card</button>
+  </div>
+  <div class="bottom-nav" id="card-nav"></div>
+</div>
+
+<!-- COLLECTED CARDS -->
+<div id="pg-mycards" class="page">
+  <div class="topbar">
+    <button class="topbar-back" onclick="navTo('pg-dash')">←</button>
+    <div class="topbar-title">Collected Cards</div>
+  </div>
+  <div class="content" id="collected-list"></div>
+  <div class="bottom-nav" id="mycards-nav"></div>
+</div>
+
+<!-- SCAN -->
+<div id="pg-scan" class="page">
+  <div class="topbar">
+    <button class="topbar-back" onclick="navTo('pg-dash')">←</button>
+    <div class="topbar-title">Scan QR Code</div>
+  </div>
+  <div class="content" style="text-align:center">
+    <div style="font-size:64px;margin:40px auto 16px">📷</div>
+    <div style="font-family:var(--fh);font-weight:700;font-size:20px;margin-bottom:8px">Scan a Business Card</div>
+    <div style="font-size:14px;color:var(--sub);margin-bottom:32px">Point your camera at another attendee's QR code</div>
+    <div id="qr-reader-wrap" style="max-width:280px;margin:0 auto 24px;background:var(--s1);border-radius:16px;height:240px;display:flex;align-items:center;justify-content:center;border:2px dashed var(--border);font-size:36px">📲</div>
+    <button class="btn btn-green btn-sm" onclick="startScan()" style="margin:0 auto 12px;display:block">Start Camera Scan</button>
+    <div style="font-size:13px;color:var(--muted)">or paste a card payload:</div>
+    <div style="display:flex;gap:8px;margin-top:8px;max-width:360px;margin-left:auto;margin-right:auto">
+      <input class="form-input" id="manual-qr" placeholder='{"name":"..."}' style="flex:1"/>
+      <button class="btn btn-green btn-sm" onclick="manualScan()">Add</button>
+    </div>
+    <div id="scan-result" style="margin-top:16px"></div>
+  </div>
+  <div class="bottom-nav" id="scan-nav"></div>
+</div>
+
+<!-- INFO -->
+<div id="pg-info" class="page">
+  <div class="topbar">
+    <button class="topbar-back" onclick="navTo('pg-dash')">←</button>
+    <div class="topbar-title">Conference Info</div>
+  </div>
+  <div class="content">
+    <div style="background:var(--accent);border-radius:var(--r);padding:18px;color:#fff;margin-bottom:16px">
+      <div style="font-family:var(--fh);font-weight:800;font-size:20px">Ethos Sustainability Conference 2025</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.7);margin-top:4px">Innovation Hall, Building A — Level 3</div>
+    </div>
+    <div class="sec">WiFi</div>
+    <div class="info-group">
+      <div class="info-row"><div class="info-ico">📶</div><div><div class="info-key">Network</div><div class="info-val">Ethos2025</div></div></div>
+      <div class="info-row"><div class="info-ico">🔑</div><div><div class="info-key">Password</div><div class="info-val">sustainability!</div></div></div>
+    </div>
+    <div class="sec">Rooms</div>
+    <div class="info-group">
+      <div class="info-row"><div class="info-ico">🎤</div><div><div class="info-key">Auditorium</div><div class="info-val">Room 301 – Keynotes & Panels</div></div></div>
+      <div class="info-row"><div class="info-ico">🚀</div><div><div class="info-key">Pitch Room</div><div class="info-val">Room 205 – Startup Pitches</div></div></div>
+      <div class="info-row"><div class="info-ico">🖼️</div><div><div class="info-key">Poster Hall</div><div class="info-val">Atrium – Research Posters</div></div></div>
+      <div class="info-row"><div class="info-ico">🏢</div><div><div class="info-key">Conference Room</div><div class="info-val">Room 310 – Company Booths</div></div></div>
+      <div class="info-row"><div class="info-ico">🍽️</div><div><div class="info-key">Catering</div><div class="info-val">Lobby Level – Free all day</div></div></div>
+    </div>
+    <div class="sec">Contact</div>
+    <div class="info-group">
+      <div class="info-row"><div class="info-ico">📧</div><div><div class="info-key">General Inquiries</div><div class="info-val">hello@ethos2025.org</div></div></div>
+      <div class="info-row"><div class="info-ico">🔧</div><div><div class="info-key">Tech Support</div><div class="info-val">tech@ethos2025.org</div></div></div>
+      <div class="info-row"><div class="info-ico">🆘</div><div><div class="info-key">Emergency</div><div class="info-val">Info desk, Lobby – 24hr</div></div></div>
+    </div>
+    <div class="sec">Social</div>
+    <div class="info-group">
+      <div class="info-row"><div class="info-ico">🐦</div><div><div class="info-key">Twitter / X</div><div class="info-val">#Ethos2025</div></div></div>
+      <div class="info-row"><div class="info-ico">📸</div><div><div class="info-key">Instagram</div><div class="info-val">@ethossustainability</div></div></div>
+    </div>
+  </div>
+  <div class="bottom-nav" id="info-nav"></div>
+</div>
+
+<!-- Chat FAB + Drawer -->
+<button class="chat-fab" id="chat-fab" onclick="openChat()" style="display:none">
+  💬
+  <div class="chat-pip" id="chat-pip" style="display:none">!</div>
+</button>
+
+<div class="chat-drawer" id="chat-drawer">
+  <div class="chat-drawer-header">
+    <button class="chat-close" onclick="closeChat()">✕</button>
+    <div class="chat-drawer-title">Chat with Staff</div>
+  </div>
+  <div class="chat-messages" id="chat-messages"></div>
+  <div class="chat-input-row">
+    <textarea class="chat-input" id="chat-input" placeholder="Ask us anything…" rows="1" oninput="autoResize(this)"></textarea>
+    <button class="chat-send" onclick="sendChat()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" width="17" height="17"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════ DB ADAPTER ═══════════════════════
+const DB = {
+  K_USERS:'conf_users', K_MSGS:'conf_messages', K_VOTES:'conf_votes',
+  K_STAMPS:'conf_stamps', K_ENTITIES:'conf_entities', K_SESSION:'conf_session',
+  K_NOTES:'conf_notes', K_CARDS:'conf_collected_cards',
+  get(k){try{return JSON.parse(localStorage.getItem(k))||null}catch{return null}},
+  set(k,v){localStorage.setItem(k,JSON.stringify(v))},
+  getList(k){return this.get(k)||[]},
+  addToList(k,item){const l=this.getList(k);l.push(item);this.set(k,l);return item},
+  updateInList(k,id,patch){const l=this.getList(k);const i=l.findIndex(x=>x.id===id);if(i===-1)return;l[i]={...l[i],...patch};this.set(k,l)},
+  removeFromList(k,id){this.set(k,this.getList(k).filter(x=>x.id!==id))},
+  getSession(){return this.get(K_SESSION)},
+  setSession(u){this.set(this.K_SESSION,u)},
+  clearSession(){localStorage.removeItem(this.K_SESSION)}
+};
+// forward compat
+const K_SESSION = 'conf_session';
+
+// ═══════════════════════ SEED ═══════════════════════
+function seedData(){
+  if(!DB.get(DB.K_ENTITIES)){DB.set(DB.K_ENTITIES,[
+    {id:'e1',type:'pitch',name:'EcoWave Technologies',tagline:'Turning ocean plastic into energy',description:'We convert ocean-bound plastic waste into biofuel using a proprietary microbe-based process.',logoUrl:'',contactEmail:'hello@ecowave.io',website:'https://ecowave.io',boothQrCode:'BOOTH-e1',active:true},
+    {id:'e2',type:'pitch',name:'SolarHive',tagline:'Distributed solar micro-grids',description:'Modular solar panels for off-grid communities in developing nations.',logoUrl:'',contactEmail:'info@solarhive.co',website:'https://solarhive.co',boothQrCode:'BOOTH-e2',active:true},
+    {id:'e3',type:'pitch',name:'AirRoots',tagline:'Vertical farms in shipping containers',description:'Bringing food production close to urban centers using 95% less water.',logoUrl:'',contactEmail:'grow@airroots.com',website:'',boothQrCode:'BOOTH-e3',active:true},
+    {id:'e4',type:'speaker',name:'Dr. Maya Chen',tagline:'Climate Systems Researcher, MIT',description:'Keynote on tipping points in climate systems and actionable pathways forward.',logoUrl:'',contactEmail:'maya@mit.edu',website:'',boothQrCode:null,active:true},
+    {id:'e5',type:'pitch',name:'ReCarbon',tagline:'Direct air capture at scale',description:'Low-cost DAC technology using waste heat from industrial processes.',logoUrl:'',contactEmail:'carbon@recarbon.io',website:'https://recarbon.io',boothQrCode:'BOOTH-e5',active:true},
+  ]);}
+  if(!DB.get(DB.K_MSGS)){DB.set(DB.K_MSGS,[
+    {id:'bc1',fromUid:'system',fromName:'Ethos Team',toUid:'broadcast',body:'Welcome to Ethos 2025! 🌱 The pitch room opens at 10am. Grab your booth passport and start collecting stamps!',read:false,adminReply:null,createdAt:Date.now()-86400000},
+  ]);}
+  if(!DB.get(DB.K_VOTES)) DB.set(DB.K_VOTES,[]);
+  if(!DB.get(DB.K_STAMPS)) DB.set(DB.K_STAMPS,[]);
+  if(!DB.get(DB.K_NOTES)) DB.set(DB.K_NOTES,[]);
+  if(!DB.get(DB.K_CARDS)) DB.set(DB.K_CARDS,[]);
+}
+
+// ═══════════════════════ STATE ═══════════════════════
+let currentUser = null;
+let activeVotePitchId = null;
+let voteState = {};
+let activeNoteId = null;
+
+// ═══════════════════════ AUTH ═══════════════════════
+const DEV_USERS = {
+  attendee1:{uid:'u_att_demo',email:'demo@example.com',name:'Demo Attendee',role:'attendee',businessCard:{},resumeLink:''},
+  attendee2:{uid:'u_att_alex',email:'alex@example.com',name:'Alex Rivera',role:'attendee',businessCard:{},resumeLink:''},
+};
+
+function loginGoogle(){showToast('Google OAuth — use dev login');}
+
+function devLogin(key){
+  currentUser = DEV_USERS[key];
+  DB.setSession(currentUser);
+  afterLogin();
+}
+
+function afterLogin(){
+  seedData();
+  // Load saved card data
+  const users = DB.getList(DB.K_USERS);
+  const saved = users.find(u=>u.uid===currentUser.uid);
+  if(saved) currentUser = {...currentUser,...saved};
+  buildUI();
+  navTo('pg-dash');
+}
+
+function logout(){
+  DB.clearSession();
+  currentUser=null;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pg-login').classList.add('active');
+  document.getElementById('chat-fab').style.display='none';
+}
+
+// ═══════════════════════ NAV ═══════════════════════
+const NAV_PAGES = ['pg-dash','pg-pitch','pg-passport','pg-card','pg-scan'];
+
+function navTo(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+
+  // Refresh content
+  if(id==='pg-dash') buildDash();
+  if(id==='pg-schedule') renderSchedule();
+  if(id==='pg-pitch') renderPitches();
+  if(id==='pg-passport') renderPassport();
+  if(id==='pg-notes') renderNotes();
+  if(id==='pg-card') loadCard();
+  if(id==='pg-mycards') renderCollected();
+
+  // Update nav buttons
+  document.querySelectorAll('.nav-btn[data-page]').forEach(b=>{
+    b.classList.toggle('active', b.dataset.page===id);
+  });
+}
+
+function buildUI(){
+  buildNavs();
+  buildDash();
+  loadCard();
+  document.getElementById('chat-fab').style.display='flex';
+  renderChatMessages();
+
+  // Check announcements
+  const msgs = DB.getList(DB.K_MSGS);
+  const unread = msgs.filter(m=>m.toUid==='broadcast'&&!m.read).length;
+  if(unread>0) document.getElementById('chat-pip').style.display='flex';
+}
+
+const NAV_ITEMS = [
+  {page:'pg-dash',label:'Home',svg:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`},
+  {page:'pg-pitch',label:'Pitch',svg:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`},
+  {page:'pg-passport',label:'Passport',svg:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg>`},
+  {page:'pg-card',label:'My Card',svg:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>`},
+  {page:'pg-scan',label:'Scan',svg:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 7V5a2 2 0 012-2h2"/><path d="M17 3h2a2 2 0 012 2v2"/><path d="M21 17v2a2 2 0 01-2 2h-2"/><path d="M7 21H5a2 2 0 01-2-2v-2"/><rect x="7" y="7" width="4" height="4"/><rect x="13" y="7" width="4" height="4"/><rect x="7" y="13" width="4" height="4"/><rect x="13" y="13" width="4" height="4"/></svg>`},
+];
+
+function buildNavs(){
+  const html = NAV_ITEMS.map((n,i)=>`<button class="nav-btn ${i===0?'active':''}" data-page="${n.page}" onclick="navTo('${n.page}')">${n.svg}<span>${n.label}</span></button>`).join('');
+  ['main-nav','sched-nav','pitch-nav','passport-nav','notes-nav','card-nav','mycards-nav','scan-nav','info-nav'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = html;
+  });
+}
+
+// ═══════════════════════ DASHBOARD ═══════════════════════
+function buildDash(){
+  if(!currentUser) return;
+  document.getElementById('dash-hi').textContent = 'Hi, '+currentUser.name.split(' ')[0]+'! 🌿';
+  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+
+  // Announcements
+  const msgs = DB.getList(DB.K_MSGS).filter(m=>m.toUid==='broadcast');
+  const annoEl = document.getElementById('dash-announcements');
+  if(msgs.length){
+    annoEl.innerHTML = msgs.map(m=>`
+      <div class="card accent-card" style="margin-bottom:12px;cursor:pointer" onclick="openChatForAnnouncement()">
+        <div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:4px">📣 Announcement from staff</div>
+        <div style="font-size:14px;line-height:1.5">${esc(m.body)}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px">${timeAgo(m.createdAt)}</div>
+      </div>`).join('');
+  }
+
+  // Top pitches
+  const pitches = DB.getList(DB.K_ENTITIES).filter(e=>e.type==='pitch'&&e.active).slice(0,3);
+  const myVotes = DB.getList(DB.K_VOTES).filter(v=>v.voterUid===currentUser.uid);
+  const voteMap = new Set(myVotes.map(v=>v.pitchId));
+  document.getElementById('dash-pitches').innerHTML = pitches.map(p=>`
+    <div class="pitch-card ${voteMap.has(p.id)?'voted':''}" onclick="openVote('${p.id}')">
+      <div class="pitch-header">
+        <div class="pitch-logo">${p.logoUrl?`<img src="${esc(p.logoUrl)}" alt="logo">`:'🚀'}</div>
+        <div class="pitch-info">
+          <div class="pitch-name">${esc(p.name)}</div>
+          <div class="pitch-tag">${esc(p.tagline)}</div>
+        </div>
+        ${voteMap.has(p.id)?'<div class="voted-badge">✓ Voted</div>':''}
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════ SCHEDULE ═══════════════════════
+const SCHEDULE_DATA = [
+  { day:'Day 1 – Morning', sessions:[
+    {time:'8:30',name:'Registration & Breakfast',room:'Lobby',speaker:''},
+    {time:'9:00',name:'Opening Ceremony',room:'Auditorium 301',speaker:'Conference Leads'},
+    {time:'9:30',name:'Keynote: Tipping Points in Climate Systems',room:'Auditorium 301',speaker:'Dr. Maya Chen, MIT'},
+    {time:'10:30',name:'Break',room:'Lobby',speaker:''},
+    {time:'10:45',name:'Pitch Room Opens – Session 1',room:'Room 205',speaker:'EcoWave, SolarHive, AirRoots'},
+  ]},
+  { day:'Day 1 – Afternoon', sessions:[
+    {time:'12:00',name:'Lunch Break',room:'Lobby',speaker:''},
+    {time:'13:00',name:'Poster & Booth Hall Opens',room:'Atrium + Room 310',speaker:''},
+    {time:'13:00',name:'Pitch Room – Session 2',room:'Room 205',speaker:'ReCarbon + others'},
+    {time:'15:00',name:'Panel: Sustainable Innovation in Practice',room:'Auditorium 301',speaker:'All keynote speakers'},
+    {time:'16:30',name:'Networking & Booth Passport Wrap-up',room:'Atrium',speaker:''},
+    {time:'17:30',name:'Closing Ceremony & Raffle',room:'Auditorium 301',speaker:'Conference Leads'},
+  ]},
+];
+
+function renderSchedule(){
+  document.getElementById('schedule-content').innerHTML = SCHEDULE_DATA.map(day=>`
+    <div class="sched-day">${day.day}</div>
+    ${day.sessions.map(s=>`
+      <div class="sched-item">
+        <div class="sched-time">${s.time}</div>
+        <div class="sched-body">
+          <div class="sched-name">${esc(s.name)}</div>
+          <div class="sched-loc">${esc(s.room)}</div>
+          ${s.speaker?`<div class="sched-spkr">${esc(s.speaker)}</div>`:''}
+        </div>
+      </div>`).join('')}
+  `).join('');
+}
+
+// ═══════════════════════ PITCHES ═══════════════════════
+function renderPitches(){
+  const q = (document.getElementById('pitch-search')?.value||'').toLowerCase();
+  const pitches = DB.getList(DB.K_ENTITIES).filter(e=>e.type==='pitch'&&e.active&&(e.name.toLowerCase().includes(q)||e.tagline.toLowerCase().includes(q)));
+  const myVotes = DB.getList(DB.K_VOTES).filter(v=>v.voterUid===currentUser?.uid);
+  const voteMap = new Set(myVotes.map(v=>v.pitchId));
+  document.getElementById('pitches-list').innerHTML = pitches.length
+    ? pitches.map(p=>`
+        <div class="pitch-card ${voteMap.has(p.id)?'voted':''}" onclick="openVote('${p.id}')">
+          <div class="pitch-header">
+            <div class="pitch-logo">${p.logoUrl?`<img src="${esc(p.logoUrl)}">`:'🚀'}</div>
+            <div class="pitch-info">
+              <div class="pitch-name">${esc(p.name)}</div>
+              <div class="pitch-tag">${esc(p.tagline)}</div>
+            </div>
+            ${voteMap.has(p.id)?'<div class="voted-badge">✓ Voted</div>':'<div style="font-size:12px;color:var(--sub)">Tap to vote →</div>'}
+          </div>
+          <div style="font-size:13px;color:var(--sub);line-height:1.4">${esc(p.description)}</div>
+        </div>`).join('')
+    : `<div class="empty"><div class="empty-ico">🔍</div><div class="empty-txt">No results</div></div>`;
+}
+
+function openVote(pitchId){
+  const pitch = DB.getList(DB.K_ENTITIES).find(e=>e.id===pitchId);
+  if(!pitch) return;
+  const existing = DB.getList(DB.K_VOTES).find(v=>v.voterUid===currentUser.uid&&v.pitchId===pitchId);
+
+  activeVotePitchId = pitchId;
+  voteState = existing ? {sustainability:existing.sustainability,impact:existing.impact,feasibility:existing.feasibility,overall:existing.overall} : {sustainability:0,impact:0,feasibility:0,overall:0};
+
+  document.getElementById('vote-modal-title').textContent = pitch.name;
+  document.getElementById('vote-modal-sub').textContent = pitch.tagline;
+  document.getElementById('vote-submit-btn').textContent = existing ? '✓ Already Voted' : 'Submit Vote';
+  document.getElementById('vote-submit-btn').disabled = !!existing;
+  document.getElementById('vote-submit-btn').style.opacity = existing ? '.5' : '1';
+
+  const QUESTIONS = [
+    {key:'sustainability',q:'🌱 How sustainable is this company?'},
+    {key:'impact',q:'💥 How impactful is their solution?'},
+    {key:'feasibility',q:'⚙️ How feasible/viable is their model?'},
+    {key:'overall',q:'⭐ Overall impression'},
+  ];
+
+  document.getElementById('vote-modal-body').innerHTML = QUESTIONS.map(({key,q})=>`
+    <div class="rating-group">
+      <div class="rating-q">${q}</div>
+      <div style="display:flex;align-items:center;gap:4px">
+        <div class="rating-dots" id="dots-${key}">
+          ${[1,2,3,4,5,6,7,8,9,10].map(n=>`<div class="rdot ${voteState[key]>=n?'sel':''}" onclick="setRating('${key}',${n})">${n}</div>`).join('')}
+        </div>
+      </div>
+    </div>`).join('');
+
+  openModal('modal-vote');
+}
+
+function setRating(key, val){
+  if(document.getElementById('vote-submit-btn').disabled) return;
+  voteState[key] = val;
+  document.getElementById(`dots-${key}`).querySelectorAll('.rdot').forEach((d,i)=>{
+    d.classList.toggle('sel', i<val);
+  });
+}
+
+function submitVote(){
+  const {sustainability,impact,feasibility,overall} = voteState;
+  if(!sustainability||!impact||!feasibility||!overall){ showToast('Please rate all 4 questions'); return; }
+
+  DB.addToList(DB.K_VOTES,{
+    id:`v_${activeVotePitchId}_${currentUser.uid}`,
+    pitchId:activeVotePitchId,
+    voterUid:currentUser.uid,
+    sustainability,impact,feasibility,overall,
+    createdAt:Date.now()
+  });
+
+  // Also add a pitch room passport stamp
+  const existing = DB.getList(DB.K_STAMPS).find(s=>s.userId===currentUser.uid&&s.boothId===activeVotePitchId);
+  if(!existing){
+    DB.addToList(DB.K_STAMPS,{id:`s_${activeVotePitchId}_${currentUser.uid}`,userId:currentUser.uid,boothId:activeVotePitchId,room:'pitch_room',scannedAt:Date.now()});
+  }
+
+  closeModal('modal-vote');
+  renderPitches();
+  checkRaffle();
+  showToast('Vote submitted ✓');
+}
+
+// ═══════════════════════ PASSPORT ═══════════════════════
+function renderPassport(){
+  const stamps = DB.getList(DB.K_STAMPS).filter(s=>s.userId===currentUser?.uid);
+  const entities = DB.getList(DB.K_ENTITIES).filter(e=>e.active&&e.boothQrCode);
+  const pitches = DB.getList(DB.K_ENTITIES).filter(e=>e.type==='pitch'&&e.active);
+  const votes = DB.getList(DB.K_VOTES).filter(v=>v.voterUid===currentUser?.uid);
+
+  const posterStamps = new Set(stamps.filter(s=>s.room==='poster_room').map(s=>s.boothId));
+  const confStamps = new Set(stamps.filter(s=>s.room==='conference_room').map(s=>s.boothId));
+
+  const totalBooths = Math.max(entities.length,1);
+  const posterPct = Math.min(100,Math.round(posterStamps.size/totalBooths*100));
+  const confPct = Math.min(100,Math.round(confStamps.size/totalBooths*100));
+  const pitchCredit = votes.length;
+
+  document.getElementById('passport-content').innerHTML = `
+    <div class="passport-header">
+      <div class="passport-title">📖 Booth Passport</div>
+      <div class="passport-sub">Scan QR codes at each booth to collect your stamps</div>
+    </div>
+
+    <div class="room-card">
+      <div class="room-name">🖼️ Poster Hall <span style="font-size:13px;font-weight:400;color:var(--sub)">${posterStamps.size}/${totalBooths}</span></div>
+      <div class="progress-wrap"><div class="progress-bar" style="width:${posterPct}%"></div></div>
+      <div class="progress-pct">${posterPct}% complete</div>
+      <div class="stamp-grid">
+        ${entities.map((e,i)=>`<div class="stamp ${posterStamps.has(e.id)?'earned':''}"><span title="${esc(e.name)}">${posterStamps.has(e.id)?'✅':'⬜'}</span></div>`).join('')}
+      </div>
+    </div>
+
+    <div class="room-card">
+      <div class="room-name">🏢 Conference Room <span style="font-size:13px;font-weight:400;color:var(--sub)">${confStamps.size}/${totalBooths}</span></div>
+      <div class="progress-wrap"><div class="progress-bar" style="width:${confPct}%"></div></div>
+      <div class="progress-pct">${confPct}% complete</div>
+      <div class="stamp-grid">
+        ${entities.map((e,i)=>`<div class="stamp ${confStamps.has(e.id)?'earned':''}"><span>${confStamps.has(e.id)?'✅':'⬜'}</span></div>`).join('')}
+      </div>
+    </div>
+
+    <div class="room-card">
+      <div class="room-name">🚀 Pitch Room <span style="font-size:13px;font-weight:400;color:var(--sub)">${pitchCredit}/${pitches.length} voted</span></div>
+      <div style="font-size:13px;color:var(--sub);margin-bottom:8px">Vote on pitches to earn credit (no QR needed)</div>
+      <div class="progress-wrap"><div class="progress-bar" style="width:${Math.min(100,pitchCredit/Math.max(pitches.length,1)*100)}%"></div></div>
+      <div class="progress-pct">${Math.min(100,Math.round(pitchCredit/Math.max(pitches.length,1)*100))}% complete</div>
+    </div>
+
+    <div class="card" style="text-align:center;margin-top:4px">
+      <div style="font-size:24px;margin-bottom:8px">📷</div>
+      <div style="font-family:var(--fh);font-weight:700;font-size:15px;margin-bottom:4px">Scan a Booth QR Code</div>
+      <div style="font-size:13px;color:var(--sub);margin-bottom:12px">Find QR codes on booth desks — scan to stamp your passport!</div>
+      <button class="btn btn-green btn-sm" style="margin:0 auto;display:block" onclick="navTo('pg-scan')">Open Scanner</button>
+    </div>`;
+}
+
+// ═══════════════════════ RAFFLE CHECK ═══════════════════════
+function checkRaffle(){
+  // Silent — user doesn't know
+  const stamps = DB.getList(DB.K_STAMPS).filter(s=>s.userId===currentUser?.uid);
+  const entities = DB.getList(DB.K_ENTITIES).filter(e=>e.active&&e.boothQrCode);
+  const votes = DB.getList(DB.K_VOTES).filter(v=>v.voterUid===currentUser?.uid);
+  const pitches = DB.getList(DB.K_ENTITIES).filter(e=>e.type==='pitch'&&e.active);
+
+  const posterStamps = new Set(stamps.filter(s=>s.room==='poster_room').map(s=>s.boothId));
+  const confStamps = new Set(stamps.filter(s=>s.room==='conference_room').map(s=>s.boothId));
+
+  if(posterStamps.size>=entities.length && confStamps.size>=entities.length && votes.length>=pitches.length){
+    // Mark user card as raffle-eligible silently
+    const users = DB.getList(DB.K_USERS);
+    const idx = users.findIndex(u=>u.uid===currentUser.uid);
+    if(idx!==-1&&!users[idx].raffleEligible){
+      users[idx].raffleEligible = true;
+      DB.set(DB.K_USERS, users);
+    }
+  }
+}
+
+// ═══════════════════════ NOTES ═══════════════════════
+function renderNotes(){
+  const notes = DB.getList(DB.K_NOTES).filter(n=>n.userId===currentUser?.uid);
+  notes.sort((a,b)=>b.updatedAt-a.updatedAt);
+  document.getElementById('notes-list').innerHTML = notes.length
+    ? notes.map(n=>`<div class="note-card" onclick="openNote('${n.id}')"><div class="note-title">${esc(n.title||'Untitled')}</div><div class="note-preview">${esc(n.content||'Empty note')}</div><div class="note-meta">${timeAgo(n.updatedAt)}</div></div>`).join('')
+    : `<div class="empty"><div class="empty-ico">📝</div><div class="empty-txt">No notes yet — tap + to start</div></div>`;
+}
+
+function newNote(){
+  activeNoteId = 'n_'+Date.now();
+  document.getElementById('note-title-input').value='';
+  document.getElementById('note-body-input').value='';
+  document.getElementById('note-editor-topbar').textContent='New Note';
+  navTo('pg-note-editor');
+}
+
+function openNote(id){
+  const note = DB.getList(DB.K_NOTES).find(n=>n.id===id);
+  if(!note) return;
+  activeNoteId = id;
+  document.getElementById('note-title-input').value=note.title||'';
+  document.getElementById('note-body-input').value=note.content||'';
+  document.getElementById('note-editor-topbar').textContent='Edit Note';
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pg-note-editor').classList.add('active');
+}
+
+function saveNote(){
+  if(!activeNoteId) return;
+  const title = document.getElementById('note-title-input').value;
+  const content = document.getElementById('note-body-input').value;
+  if(!title&&!content) return;
+  const notes = DB.getList(DB.K_NOTES);
+  const idx = notes.findIndex(n=>n.id===activeNoteId);
+  if(idx!==-1){
+    notes[idx]={...notes[idx],title,content,updatedAt:Date.now()};
+  } else {
+    notes.push({id:activeNoteId,userId:currentUser.uid,title,content,createdAt:Date.now(),updatedAt:Date.now()});
+  }
+  DB.set(DB.K_NOTES,notes);
+  showToast('Saved ✓');
+}
+
+function deleteNote(){
+  if(!activeNoteId) return;
+  DB.removeFromList(DB.K_NOTES,activeNoteId);
+  activeNoteId=null;
+  navTo('pg-notes');
+  showToast('Note deleted');
+}
+
+// ═══════════════════════ BUSINESS CARD ═══════════════════════
+function loadCard(){
+  if(!currentUser) return;
+  const card = currentUser.businessCard||{};
+  document.getElementById('bc-name-input').value = card.name||currentUser.name||'';
+  document.getElementById('bc-title-input').value = card.title||'';
+  document.getElementById('bc-company-input').value = card.company||'';
+  document.getElementById('bc-phone-input').value = card.phone||'';
+  document.getElementById('bc-linkedin-input').value = card.linkedin||'';
+  document.getElementById('bc-resume-input').value = currentUser.resumeLink||'';
+  const av = document.getElementById('card-avatar');
+  av.textContent = (currentUser.name||'?').charAt(0).toUpperCase();
+  liveCard();
+}
+
+function liveCard(){
+  const name = document.getElementById('bc-name-input').value||currentUser?.name||'Your Name';
+  const title = document.getElementById('bc-title-input').value;
+  const company = document.getElementById('bc-company-input').value;
+  const phone = document.getElementById('bc-phone-input').value;
+  document.getElementById('bc-name').textContent=name;
+  document.getElementById('bc-title-display').textContent=[title,company].filter(Boolean).join(' · ')||'Add your title';
+  document.getElementById('bc-company-display').textContent='';
+  document.getElementById('bc-contact-email').textContent=currentUser?.email||'';
+  document.getElementById('bc-contact-phone').textContent=phone||'';
+
+  // Simple QR placeholder with encoded info
+  const payload = JSON.stringify({name,title,company,phone,email:currentUser?.email,linkedin:document.getElementById('bc-linkedin-input').value});
+  document.getElementById('qr-display').textContent='🔳';
+  document.getElementById('qr-note').textContent='Share this code with others';
+}
+
+function saveCard(){
+  const card = {
+    name:document.getElementById('bc-name-input').value,
+    title:document.getElementById('bc-title-input').value,
+    company:document.getElementById('bc-company-input').value,
+    phone:document.getElementById('bc-phone-input').value,
+    linkedin:document.getElementById('bc-linkedin-input').value,
+  };
+  currentUser.businessCard=card;
+  currentUser.resumeLink=document.getElementById('bc-resume-input').value;
+  DB.setSession(currentUser);
+
+  // Save to users list
+  const users = DB.getList(DB.K_USERS);
+  const idx = users.findIndex(u=>u.uid===currentUser.uid);
+  if(idx!==-1) users[idx]={...users[idx],...currentUser};
+  else users.push(currentUser);
+  DB.set(DB.K_USERS,users);
+
+  showToast('Card saved ✓');
+}
+
+// ═══════════════════════ COLLECTED CARDS ═══════════════════════
+function renderCollected(){
+  const cards = DB.getList(DB.K_CARDS).filter(c=>c.collectedBy===currentUser?.uid);
+  document.getElementById('collected-list').innerHTML = cards.length
+    ? cards.map(c=>`<div class="ccard"><div class="ccard-ava" style="background:${strColor(c.name)};color:#fff">${(c.name||'?').charAt(0)}</div><div><div class="ccard-name">${esc(c.name)}</div><div class="ccard-title">${esc([c.title,c.company].filter(Boolean).join(' · '))}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${esc(c.email||'')}</div></div></div>`).join('')
+    : `<div class="empty"><div class="empty-ico">📇</div><div class="empty-txt">No cards yet — scan someone's QR!</div></div>`;
+}
+
+// ═══════════════════════ SCAN ═══════════════════════
+function startScan(){
+  showToast('Camera scanning requires HTTPS deploy');
+}
+
+function manualScan(){
+  const raw = document.getElementById('manual-qr').value.trim();
+  try {
+    const data = JSON.parse(raw);
+    if(!data.name) throw new Error('invalid');
+    // Check if booth QR
+    if(raw.startsWith('BOOTH-')){
+      stampBooth(raw);
+      return;
+    }
+    // Business card
+    const already = DB.getList(DB.K_CARDS).find(c=>c.email===data.email&&c.collectedBy===currentUser.uid);
+    if(already){ showToast('Card already saved!'); return; }
+    DB.addToList(DB.K_CARDS,{...data, id:'c_'+Date.now(), collectedBy:currentUser.uid, addedAt:Date.now()});
+    document.getElementById('scan-result').innerHTML=`<div class="card accent-card"><div class="card-title">✅ Saved: ${esc(data.name)}</div><div class="card-sub">${esc(data.email||'')}</div></div>`;
+    document.getElementById('manual-qr').value='';
+    showToast('Card saved ✓');
+  } catch(e){
+    // Try booth code
+    if(raw.startsWith('BOOTH-')){
+      stampBooth(raw);
+    } else {
+      document.getElementById('scan-result').innerHTML=`<div class="card" style="border-color:var(--red);color:var(--red)">Invalid QR code</div>`;
+    }
+  }
+}
+
+function stampBooth(code){
+  const boothId = code.replace('BOOTH-','');
+  const room = 'poster_room'; // for demo — in prod, QR encodes the room
+  const existing = DB.getList(DB.K_STAMPS).find(s=>s.userId===currentUser.uid&&s.boothId===boothId&&s.room===room);
+  if(existing){ showToast('Already stamped!'); return; }
+  DB.addToList(DB.K_STAMPS,{id:'s_'+Date.now(),userId:currentUser.uid,boothId,room,scannedAt:Date.now()});
+  document.getElementById('scan-result').innerHTML=`<div class="card accent-card"><div class="card-title">🗺️ Booth Stamped!</div><div class="card-sub">Added to your passport</div></div>`;
+  document.getElementById('manual-qr').value='';
+  checkRaffle();
+  showToast('Stamp collected! ✓');
+}
+
+// ═══════════════════════ CHAT ═══════════════════════
+function openChat(){
+  document.getElementById('chat-drawer').classList.add('open');
+  // Mark broadcasts read
+  const msgs = DB.getList(DB.K_MSGS);
+  msgs.forEach(m=>{ if(m.toUid==='broadcast') m.read=true; });
+  DB.set(DB.K_MSGS,msgs);
+  document.getElementById('chat-pip').style.display='none';
+  renderChatMessages();
+}
+
+function closeChat(){
+  document.getElementById('chat-drawer').classList.remove('open');
+}
+
+function openChatForAnnouncement(){ openChat(); }
+
+function renderChatMessages(){
+  const allMsgs = DB.getList(DB.K_MSGS);
+  const myMsgs = allMsgs.filter(m=>m.fromUid===currentUser?.uid);
+  const broadcasts = allMsgs.filter(m=>m.toUid==='broadcast');
+  const combined = [...broadcasts,...myMsgs].sort((a,b)=>a.createdAt-b.createdAt);
+
+  const container = document.getElementById('chat-messages');
+  if(!combined.length){
+    container.innerHTML=`<div class="empty"><div class="empty-ico">💬</div><div class="empty-txt">Ask us anything! We're here to help.</div></div>`;
+    return;
+  }
+
+  container.innerHTML = combined.map(m=>{
+    const isMe = m.fromUid===currentUser?.uid;
+    const isBroadcast = m.toUid==='broadcast';
+    const html = [];
+    if(isBroadcast){
+      html.push(`<div class="chat-bubble-wrap them">
+        <div class="chat-bubble-name">📣 Ethos Staff</div>
+        <div class="chat-bubble">${esc(m.body)}</div>
+        <div class="chat-bubble-time">${timeAgo(m.createdAt)}</div>
+      </div>`);
+    } else {
+      html.push(`<div class="chat-bubble-wrap ${isMe?'me':'them'}">
+        ${!isMe?`<div class="chat-bubble-name">${esc(m.fromName)}</div>`:''}
+        <div class="chat-bubble">${esc(m.body)}</div>
+        <div class="chat-bubble-time">${timeAgo(m.createdAt)}</div>
+      </div>`);
+      if(m.adminReply){
+        html.push(`<div class="chat-bubble-wrap them">
+          <div class="chat-bubble-name">Staff Reply</div>
+          <div class="chat-bubble">${esc(m.adminReply)}</div>
+          <div class="chat-bubble-time">${timeAgo(m.repliedAt)}</div>
+        </div>`);
+      }
+    }
+    return html.join('');
+  }).join('');
+
+  container.scrollTop = container.scrollHeight;
+}
+
+function sendChat(){
+  const input = document.getElementById('chat-input');
+  const body = input.value.trim();
+  if(!body||!currentUser) return;
+
+  // Rate limiting (simple: max 10 per hour)
+  const recent = DB.getList(DB.K_MSGS).filter(m=>m.fromUid===currentUser.uid&&Date.now()-m.createdAt<3600000);
+  if(recent.length>=10){ showToast('Message limit reached — please wait'); return; }
+
+  // Basic profanity check
+  const BAD = ['fuck','shit','ass','bitch','damn'];
+  const lower = body.toLowerCase();
+  if(BAD.some(w=>lower.includes(w))){ showToast('Please keep messages respectful'); return; }
+
+  DB.addToList(DB.K_MSGS,{
+    id:'m_'+Date.now(),
+    fromUid:currentUser.uid,
+    fromEmail:currentUser.email,
+    fromName:currentUser.name,
+    toUid:'admin',
+    body,read:false,adminReply:null,repliedAt:null,
+    createdAt:Date.now()
+  });
+
+  input.value='';
+  input.style.height='auto';
+  renderChatMessages();
+}
+
+// ═══════════════════════ UTILS ═══════════════════════
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+function timeAgo(ts){const d=Date.now()-ts;if(d<60000)return'just now';if(d<3600000)return Math.floor(d/60000)+'m ago';if(d<86400000)return Math.floor(d/3600000)+'h ago';return Math.floor(d/86400000)+'d ago';}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function strColor(s){let h=0;for(let c of s||'')h=((h<<5)-h)+c.charCodeAt(0);return`hsl(${Math.abs(h)%360},55%,42%)`;}
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';}
+
+// ═══════════════════════ INIT ═══════════════════════
+(function init(){
+  seedData();
+  const session = DB.get(K_SESSION);
+  if(session&&session.role==='attendee'){
+    currentUser=session;
+    afterLogin();
+  }
+})();
+</script>
+</body>
+</html>
