@@ -10,7 +10,7 @@
 :root{
   --bg:#0e0e11;--s1:#17171c;--s2:#1f1f27;--s3:#27272f;--border:#2e2e3a;
   --accent:#FCBD9D;--ad:rgba(252,189,157,.15);--ab:rgba(252,189,157,.3);
-  --green:#52d68a;--red:#f07070;--blue:#6aabf7;--purple:#b987f5;
+  --green:#52d68a;--red:#f07070;--blue:#6aabf7;--purple:#b987f5;--yellow:#f5c842;
   --text:#eeece8;--sub:#9999aa;--muted:#5a5a6a;--r:14px;
   --fh:'Syne',sans-serif;--fb:'DM Sans',sans-serif;
 }
@@ -41,16 +41,30 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .topbar-back:hover{background:var(--s3);color:var(--text)}
 .topbar-title{font-family:var(--fh);font-weight:700;font-size:16px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .topbar-actions{display:flex;gap:8px;align-items:center}
-.role-chip{font-size:10px;font-family:var(--fh);font-weight:700;letter-spacing:.06em;padding:3px 8px;border-radius:6px;text-transform:uppercase;white-space:nowrap}
-.chip-super{background:rgba(185,135,245,.15);color:var(--purple);border:1px solid rgba(185,135,245,.3)}
-.chip-tech{background:rgba(106,171,247,.15);color:var(--blue);border:1px solid rgba(106,171,247,.3)}
-.chip-entity{background:rgba(252,189,157,.15);color:var(--accent);border:1px solid var(--ab)}
 .avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:var(--fh);cursor:pointer;overflow:hidden;flex-shrink:0;background:var(--accent);color:#111}
 .avatar img{width:100%;height:100%;object-fit:cover}
+
+/* LEVEL CHIP */
+.lvl-chip{font-size:10px;font-family:var(--fh);font-weight:700;letter-spacing:.06em;padding:3px 8px;border-radius:6px;text-transform:uppercase;white-space:nowrap}
+.lvl-0{background:rgba(153,153,170,.15);color:var(--sub);border:1px solid rgba(153,153,170,.3)}
+.lvl-1{background:rgba(252,189,157,.15);color:var(--accent);border:1px solid var(--ab)}
+.lvl-2{background:rgba(106,171,247,.15);color:var(--blue);border:1px solid rgba(106,171,247,.3)}
+.lvl-3{background:rgba(185,135,245,.15);color:var(--purple);border:1px solid rgba(185,135,245,.3)}
 
 /* CONTENT */
 .content{flex:1;overflow-y:auto;padding:16px 16px 120px}
 .sec{font-size:10px;font-family:var(--fh);font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;margin-top:4px}
+
+/* ACCESS LEVEL DISPLAY */
+.access-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:20px}
+.access-title{font-family:var(--fh);font-weight:700;font-size:14px;margin-bottom:12px}
+.access-levels{display:flex;flex-direction:column;gap:8px}
+.access-level-row{display:flex;align-items:center;gap:10px}
+.access-checkbox{width:20px;height:20px;border-radius:6px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.access-checkbox.checked{background:var(--green);border-color:var(--green)}
+.access-checkbox.checked::after{content:'✓';font-size:11px;font-weight:700;color:#fff}
+.access-level-label{font-size:13px;color:var(--sub)}
+.access-level-label.active{color:var(--text);font-weight:500}
 
 /* STATS */
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
@@ -81,8 +95,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .nav-btn.active{color:var(--accent)}
 .nav-btn svg{width:20px;height:20px;stroke-width:2}
 .nav-btn span{font-size:10px;font-weight:500}
-.nav-pip{width:6px;height:6px;border-radius:50%;background:var(--red);position:absolute;top:0;right:0}
-.nav-ico-wrap{position:relative;display:inline-flex}
 
 /* FORMS */
 .form-group{margin-bottom:16px}
@@ -91,20 +103,16 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .form-input:focus{border-color:var(--accent)}
 .form-input::placeholder{color:var(--muted)}
 textarea.form-input{resize:vertical;min-height:90px}
-select.form-input{appearance:none;cursor:pointer}
 .btn{width:100%;padding:14px;border:none;border-radius:11px;font-size:15px;font-weight:600;font-family:var(--fh);cursor:pointer;transition:all .2s}
 .btn-accent{background:var(--accent);color:#111}
-.btn-accent:hover{background:#fdd0b5}
 .btn-ghost{background:var(--s2);border:1px solid var(--border);color:var(--text)}
 .btn-danger{background:rgba(240,112,112,.15);border:1px solid rgba(240,112,112,.3);color:var(--red)}
 .btn-sm{width:auto;padding:8px 16px;font-size:13px}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 
 /* MESSAGES */
-.msg-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
-.msg-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .18s}
+.msg-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .18s;margin-bottom:8px}
 .msg-card.unread{border-color:var(--ab);background:rgba(252,189,157,.05)}
-.msg-card:active{transform:scale(.99)}
 .msg-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px}
 .msg-from{font-family:var(--fh);font-weight:700;font-size:14px}
 .msg-time{font-size:11px;color:var(--muted);white-space:nowrap}
@@ -128,8 +136,7 @@ select.form-input{appearance:none;cursor:pointer}
 .reply-bar{padding:12px 16px;background:var(--s1);border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end;position:sticky;bottom:0}
 .reply-input{flex:1;background:var(--s2);border:1px solid var(--border);border-radius:20px;padding:10px 16px;color:var(--text);font-size:14px;font-family:var(--fb);outline:none;resize:none;max-height:100px;line-height:1.4}
 .reply-input:focus{border-color:var(--accent)}
-.send-btn{width:40px;height:40px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
-.send-btn:active{transform:scale(.92)}
+.send-btn{width:40px;height:40px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 
 /* VOTE CARDS */
 .vote-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:10px}
@@ -141,21 +148,20 @@ select.form-input{appearance:none;cursor:pointer}
 .score-bar{height:100%;border-radius:100px;background:var(--accent)}
 .score-num{font-family:var(--fh);font-weight:700;font-size:13px;width:28px;text-align:right;flex-shrink:0}
 
-/* TILE EDITOR */
-.tile-preview{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:20px;display:flex;gap:14px;align-items:flex-start}
-.tile-preview-logo{width:52px;height:52px;border-radius:12px;background:var(--s3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;overflow:hidden}
-.tile-preview-logo img{width:100%;height:100%;object-fit:cover}
-.tile-preview-name{font-family:var(--fh);font-weight:700;font-size:15px;margin-bottom:4px}
-.tile-preview-tag{font-size:12px;color:var(--sub)}
-
 /* USER MANAGEMENT */
 .user-row{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
 .user-ava{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:700;font-size:14px;flex-shrink:0}
 .user-info{flex:1;min-width:0}
 .user-name{font-family:var(--fh);font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .user-email{font-size:11px;color:var(--sub)}
-.user-role-sel{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:5px 8px;color:var(--text);font-size:12px;font-family:var(--fh);font-weight:600;cursor:pointer;outline:none}
-.user-role-sel:focus{border-color:var(--accent)}
+.user-lvl-sel{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:5px 8px;color:var(--text);font-size:12px;font-family:var(--fh);font-weight:600;cursor:pointer;outline:none}
+.user-lvl-sel:focus{border-color:var(--accent)}
+
+/* CHECK-IN */
+.checkin-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.checkin-status{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.checkin-status.in{background:var(--green)}
+.checkin-status.out{background:var(--muted)}
 
 /* MODERATION */
 .mod-card{background:var(--s1);border:1px solid rgba(240,112,112,.3);border-radius:var(--r);padding:14px;margin-bottom:8px}
@@ -165,6 +171,12 @@ select.form-input{appearance:none;cursor:pointer}
 .mod-approve{background:rgba(82,214,138,.15);color:var(--green);border:1px solid rgba(82,214,138,.3)}
 .mod-reject{background:rgba(240,112,112,.15);color:var(--red);border:1px solid rgba(240,112,112,.3)}
 
+/* FILTER TABS */
+.filter-tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.filter-tabs::-webkit-scrollbar{display:none}
+.ftab{background:var(--s2);border:1px solid var(--border);border-radius:100px;padding:6px 14px;font-size:12px;font-family:var(--fh);font-weight:600;cursor:pointer;color:var(--sub);white-space:nowrap;transition:all .15s}
+.ftab.active{background:var(--accent);color:#111;border-color:var(--accent)}
+
 /* MODALS */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
 .modal-overlay.open{opacity:1;pointer-events:all}
@@ -173,12 +185,6 @@ select.form-input{appearance:none;cursor:pointer}
 .modal-handle{width:36px;height:4px;background:var(--border);border-radius:4px;margin:0 auto 20px}
 .modal-title{font-family:var(--fh);font-weight:800;font-size:18px;margin-bottom:4px}
 .modal-sub{font-size:13px;color:var(--sub);margin-bottom:20px}
-
-/* FILTER TABS */
-.filter-tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
-.filter-tabs::-webkit-scrollbar{display:none}
-.ftab{background:var(--s2);border:1px solid var(--border);border-radius:100px;padding:6px 14px;font-size:12px;font-family:var(--fh);font-weight:600;cursor:pointer;color:var(--sub);white-space:nowrap;transition:all .15s}
-.ftab.active{background:var(--accent);color:#111;border-color:var(--accent)}
 
 /* MISC */
 .divline{height:1px;background:var(--border);margin:16px 0}
@@ -204,12 +210,12 @@ select.form-input{appearance:none;cursor:pointer}
       <div class="logo-text">Ethos<span>Admin</span></div>
     </div>
     <h1 class="login-heading">Conference<br/>Command<br/>Center</h1>
-    <p class="login-sub">Sign in with Google. Your access level is tied to your account — attendees will be redirected to the main app.</p>
+    <p class="login-sub">Sign in with Google. Lvl 0 attendees are redirected to the main app.</p>
     <button class="btn-google" id="google-btn" onclick="loginGoogle()">
       <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Continue with Google
     </button>
-    <p class="login-note">Only <span>tech team</span> and <span>admin accounts</span> can access this panel.</p>
+    <p class="login-note">Only <span>Level 1–3</span> accounts can access this panel.</p>
   </div>
 </div>
 
@@ -218,24 +224,32 @@ select.form-input{appearance:none;cursor:pointer}
   <div class="topbar">
     <div class="topbar-title" id="dash-title">Admin</div>
     <div class="topbar-actions">
-      <span class="role-chip" id="dash-chip">—</span>
+      <span class="lvl-chip" id="dash-chip">—</span>
       <div class="avatar" id="dash-avatar" onclick="openModal('modal-profile')">?</div>
     </div>
   </div>
   <div class="content">
-    <div style="margin-bottom:20px">
+    <div style="margin-bottom:16px">
       <div style="font-size:13px;color:var(--sub)">Welcome back,</div>
       <div style="font-family:var(--fh);font-weight:800;font-size:22px;margin-top:2px" id="dash-name">—</div>
     </div>
+
+    <!-- Access level display -->
+    <div class="access-card">
+      <div class="access-title">Your Access Level</div>
+      <div class="access-levels" id="access-levels-display"></div>
+    </div>
+
     <div id="dash-stats" style="display:none">
       <div class="sec">Live Overview</div>
       <div class="stat-grid">
         <div class="stat hi"><div class="stat-n" id="stat-users">—</div><div class="stat-l"><span class="live-dot"></span>Attendees</div></div>
         <div class="stat"><div class="stat-n" id="stat-msgs">—</div><div class="stat-l">Messages</div></div>
         <div class="stat"><div class="stat-n" id="stat-votes">—</div><div class="stat-l">Votes Cast</div></div>
-        <div class="stat"><div class="stat-n" id="stat-stamps">—</div><div class="stat-l">Stamps</div></div>
+        <div class="stat"><div class="stat-n" id="stat-checkins">—</div><div class="stat-l">Checked In</div></div>
       </div>
     </div>
+
     <div id="unread-alert" style="display:none;background:rgba(252,189,157,.08);border:1px solid var(--ab);border-radius:12px;padding:12px 14px;margin-bottom:16px;cursor:pointer" onclick="goPage('pg-inbox')">
       <div style="display:flex;align-items:center;gap:10px">
         <span style="font-size:18px">💬</span>
@@ -245,13 +259,14 @@ select.form-input{appearance:none;cursor:pointer}
         </div>
       </div>
     </div>
+
     <div class="sec">Sections</div>
     <div class="tiles" id="dash-tiles"></div>
   </div>
   <div class="bottom-nav" id="dash-nav"></div>
 </div>
 
-<!-- INBOX -->
+<!-- INBOX (lvl 2+) -->
 <div id="pg-inbox" class="page">
   <div class="topbar">
     <button class="topbar-back" onclick="goPage('pg-dash')">←</button>
@@ -264,30 +279,30 @@ select.form-input{appearance:none;cursor:pointer}
     <div class="filter-tabs">
       <div class="ftab active" onclick="filterMsgs('all',this)">All</div>
       <div class="ftab" onclick="filterMsgs('unread',this)">Unread</div>
-      <div class="ftab" onclick="filterMsgs('unreplied',this)">Needs Reply</div>
+      <div class="ftab" onclick="filterMsgs('unreplied',this)">Unreplied</div>
       <div class="ftab" onclick="filterMsgs('replied',this)">Replied</div>
     </div>
-    <div class="msg-list" id="msg-list"></div>
+    <div id="msg-list"></div>
   </div>
 </div>
 
-<!-- THREAD -->
+<!-- THREAD (lvl 2+) -->
 <div id="pg-thread" class="page">
   <div class="topbar">
     <button class="topbar-back" onclick="goPage('pg-inbox')">←</button>
-    <div class="topbar-title" id="thread-title">Thread</div>
-    <button class="btn btn-danger btn-sm" onclick="deleteThread()">🗑</button>
+    <div class="topbar-title" id="thread-title">Message</div>
+    <button class="btn btn-ghost btn-sm" onclick="deleteThread()" style="color:var(--red);font-size:12px">Delete</button>
   </div>
-  <div class="content" style="padding:0 0 80px" id="thread-content"></div>
+  <div id="thread-content" style="flex:1;overflow-y:auto"></div>
   <div class="reply-bar" id="reply-bar">
-    <textarea class="reply-input" id="reply-input" placeholder="Reply to attendee…" rows="1" oninput="autoResize(this)"></textarea>
+    <textarea class="reply-input" id="reply-input" placeholder="Reply…" rows="1" oninput="autoResize(this)"></textarea>
     <button class="send-btn" onclick="sendReply()">
       <svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" width="17" height="17"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
     </button>
   </div>
 </div>
 
-<!-- VOTES -->
+<!-- PITCH RESULTS (lvl 2+) -->
 <div id="pg-votes" class="page">
   <div class="topbar">
     <button class="topbar-back" onclick="goPage('pg-dash')">←</button>
@@ -295,49 +310,36 @@ select.form-input{appearance:none;cursor:pointer}
   </div>
   <div class="content">
     <div class="filter-tabs">
-      <div class="ftab active" onclick="sortVotes('avg',this)">Top Rated</div>
-      <div class="ftab" onclick="sortVotes('votes',this)">Most Voted</div>
-      <div class="ftab" onclick="sortVotes('sustainability',this)">Sustainability</div>
-      <div class="ftab" onclick="sortVotes('impact',this)">Impact</div>
+      <div class="ftab active" onclick="sortVotes('avg',this)">By Avg</div>
+      <div class="ftab" onclick="sortVotes('overall',this)">Overall</div>
+      <div class="ftab" onclick="sortVotes('votes',this)">Most Votes</div>
     </div>
     <div id="votes-list"></div>
   </div>
 </div>
 
-<!-- MY TILE -->
-<div id="pg-mytile" class="page">
+<!-- CHECK-IN (lvl 2+) -->
+<div id="pg-checkin" class="page">
   <div class="topbar">
     <button class="topbar-back" onclick="goPage('pg-dash')">←</button>
-    <div class="topbar-title">My Tile</div>
-    <span id="tile-live-chip" style="font-size:11px;padding:3px 10px;border-radius:6px;font-family:var(--fh);font-weight:700">● Live</span>
+    <div class="topbar-title">Check-In Scanner</div>
   </div>
   <div class="content">
-    <div class="sec">Preview</div>
-    <div class="tile-preview">
-      <div class="tile-preview-logo" id="preview-logo">🚀</div>
-      <div>
-        <div class="tile-preview-name" id="preview-name">Your Company</div>
-        <div class="tile-preview-tag" id="preview-tag">Tagline</div>
-      </div>
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:20px">
+      <div class="sec">Scan or search attendee</div>
+      <input class="form-input" id="checkin-search" placeholder="Search by name or email…" oninput="searchCheckin()"/>
+      <div id="checkin-results" style="margin-top:12px"></div>
     </div>
-    <div class="sec">Edit</div>
-    <div class="form-group"><label class="form-label">Company / Name</label><input class="form-input" id="tile-name" oninput="livePreview()"/></div>
-    <div class="form-group"><label class="form-label">Tagline</label><input class="form-input" id="tile-tagline" oninput="livePreview()"/></div>
-    <div class="form-group"><label class="form-label">Description</label><textarea class="form-input" id="tile-desc" rows="4"></textarea></div>
-    <div class="form-group"><label class="form-label">Logo URL</label><input class="form-input" id="tile-logo" oninput="livePreview()"/></div>
-    <div class="form-group"><label class="form-label">Contact Email</label><input class="form-input" id="tile-email" type="email"/></div>
-    <div class="form-group"><label class="form-label">Website</label><input class="form-input" id="tile-website"/></div>
-    <div class="form-group"><label class="form-label">Resume / Portfolio Link</label><input class="form-input" id="tile-resume"/></div>
-    <button class="btn btn-accent" onclick="saveTile()" style="margin-bottom:8px">Save Changes</button>
-    <button class="btn btn-ghost" onclick="toggleTileVisible()"><span id="tile-vis-txt">Pause Visibility</span></button>
+    <div class="sec">Checked In (<span id="checkin-count">0</span>)</div>
+    <div id="checkin-list"></div>
   </div>
 </div>
 
-<!-- USERS (super only) -->
+<!-- USERS & ROLES (lvl 3 only) -->
 <div id="pg-users" class="page">
   <div class="topbar">
     <button class="topbar-back" onclick="goPage('pg-dash')">←</button>
-    <div class="topbar-title">Users & Roles</div>
+    <div class="topbar-title">Users & Access Levels</div>
   </div>
   <div class="content">
     <input class="form-input" id="user-search" placeholder="🔍 Search…" oninput="renderUsers()" style="margin-bottom:14px"/>
@@ -346,7 +348,7 @@ select.form-input{appearance:none;cursor:pointer}
   </div>
 </div>
 
-<!-- MOD -->
+<!-- MOD QUEUE (lvl 3 only) -->
 <div id="pg-mod" class="page">
   <div class="topbar">
     <button class="topbar-back" onclick="goPage('pg-dash')">←</button>
@@ -379,21 +381,34 @@ select.form-input{appearance:none;cursor:pointer}
 <div class="toast" id="toast"></div>
 
 <script>
-// ═══════════════════ SUPABASE INIT ═══════════════════
-const SUPABASE_URL = 'https://qtibzgyaldxcvhnkfxok.supabase.co';
+// ─── SUPABASE ───────────────────────────────────────────
+const SUPABASE_URL  = 'https://qtibzgyaldxcvhnkfxok.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0aWJ6Z3lhbGR4Y3ZobmtmeG9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MTE2NzUsImV4cCI6MjA4NzI4NzY3NX0.ovVgmA_GEq2sOWWBo32FX_xmMsSViJvBHMz1hr6Nj7E';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-// ═══════════════════ STATE ═══════════════════
-let currentUser = null;
+// ─── STATE ──────────────────────────────────────────────
+let currentUser    = null;
 let currentProfile = null;
-let msgFilter = 'all';
-let voteSort = 'avg';
-let activeMsgId = null;
-let allMessages = [];
-let msgChannel = null;
+let allMessages    = [];
+let allUsers       = [];
+let msgFilter      = 'all';
+let voteSort       = 'avg';
+let activeMsgId    = null;
+let msgChannel     = null;
 
-// ═══════════════════ AUTH ═══════════════════
+// ─── ACCESS LEVEL HELPERS ───────────────────────────────
+const LVL_LABELS = ['Attendee', 'Presenter', 'Staff', 'Super Admin'];
+const LVL_ICONS  = ['🎫', '🎤', '🛡️', '⭐'];
+const LVL_DESCS  = [
+  'View schedule, vote on pitches, collect passport stamps',
+  'All of Lvl 0 + manage your listing, view your reviews',
+  'All of Lvl 1 + check-in attendees, view messages, scan RFID',
+  'All of Lvl 2 + manage all users, access levels, moderation'
+];
+function lvl() { return currentProfile?.access_level ?? 0; }
+function hasLvl(n) { return lvl() >= n; }
+
+// ─── AUTH ───────────────────────────────────────────────
 async function loginGoogle() {
   const btn = document.getElementById('google-btn');
   btn.disabled = true;
@@ -412,164 +427,150 @@ async function logout() {
   goPage('pg-login');
 }
 
-async function loadProfile(userId) {
-  // Retry up to 5 times with increasing delay — fixes RLS timing issue after OAuth redirect
+async function loadProfile(uid) {
   for (let i = 0; i < 5; i++) {
     if (i > 0) await new Promise(r => setTimeout(r, 600 * i));
-    const { data, error } = await sb.from('profiles').select('*').eq('id', userId).single();
+    const { data } = await sb.from('profiles').select('*').eq('id', uid).single();
     if (data) return data;
-    console.warn(`Profile load attempt ${i+1} failed:`, error?.message);
   }
   return null;
 }
 
-// ═══════════════════ INIT ═══════════════════
 sb.auth.onAuthStateChange(async (event, session) => {
-  console.log('Auth event:', event, session?.user?.email);
   if (session?.user) {
     currentUser = session.user;
     currentProfile = await loadProfile(currentUser.id);
-    if (!currentProfile) {
-      showToast('Profile not found — please try signing in again');
-      await sb.auth.signOut();
-      return;
-    }
-    console.log('Profile loaded, role:', currentProfile.role);
-    if (currentProfile.role === 'attendee') {
-      showToast('Attendee accounts use the main app');
-      await sb.auth.signOut();
+    if (!currentProfile) { showToast('Profile not found — try again'); return; }
+    if (lvl() === 0) {
+      showToast('This panel is for staff & presenters. Redirecting to app…');
+      setTimeout(() => { window.location.href = 'app.html'; }, 2000);
       return;
     }
     buildDash();
     goPage('pg-dash');
-    subscribeMessages();
+    if (hasLvl(2)) subscribeMessages();
   } else {
     if (msgChannel) { sb.removeChannel(msgChannel); msgChannel = null; }
     goPage('pg-login');
   }
 });
 
-// ═══════════════════ NAV ═══════════════════
-function goPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0, 0);
-}
-
-// ═══════════════════ DASHBOARD ═══════════════════
-const ROLE_LABELS = { super: 'Super Admin', tech: 'Tech Team', entity: 'Tile Admin' };
-const ROLE_CHIPS  = { super: 'chip-super', tech: 'chip-tech', entity: 'chip-entity' };
-
-async function buildDash() {
+// ─── DASHBOARD ──────────────────────────────────────────
+function buildDash() {
   const p = currentProfile;
-  document.getElementById('dash-title').textContent = ROLE_LABELS[p.role] || p.role;
+  const l = lvl();
+  document.getElementById('dash-title').textContent = LVL_LABELS[l];
   document.getElementById('dash-name').textContent = p.name || currentUser.email;
+
+  // Chip
   const chip = document.getElementById('dash-chip');
-  chip.textContent = ROLE_LABELS[p.role] || p.role;
-  chip.className = 'role-chip ' + (ROLE_CHIPS[p.role] || 'chip-entity');
+  chip.textContent = 'Lvl ' + l + ' · ' + LVL_LABELS[l];
+  chip.className = 'lvl-chip lvl-' + l;
+
+  // Avatar
   const av = document.getElementById('dash-avatar');
   if (p.photo_url) av.innerHTML = `<img src="${esc(p.photo_url)}" referrerpolicy="no-referrer"/>`;
   else av.textContent = (p.name||'?').charAt(0).toUpperCase();
 
-  if (p.role === 'tech' || p.role === 'super') {
+  // Access level checklist
+  document.getElementById('access-levels-display').innerHTML = [0,1,2,3].map(i => `
+    <div class="access-level-row">
+      <div class="access-checkbox ${i <= l ? 'checked' : ''}"></div>
+      <div>
+        <div class="access-level-label ${i <= l ? 'active' : ''}">${LVL_ICONS[i]} Level ${i} — ${LVL_LABELS[i]}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:1px">${LVL_DESCS[i]}</div>
+      </div>
+    </div>`
+  ).join('');
+
+  // Stats (lvl 2+)
+  if (hasLvl(2)) {
     document.getElementById('dash-stats').style.display = 'block';
     loadStats();
   }
 
-  buildDashTiles();
-  buildBottomNav();
-}
-
-async function loadStats() {
-  const [users, msgs, votes, stamps] = await Promise.all([
-    sb.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'attendee'),
-    sb.from('messages').select('id', { count: 'exact', head: true }).neq('to_uid', 'broadcast'),
-    sb.from('votes').select('id', { count: 'exact', head: true }),
-    sb.from('stamps').select('id', { count: 'exact', head: true }),
-  ]);
-  document.getElementById('stat-users').textContent = users.count ?? '—';
-  document.getElementById('stat-msgs').textContent = msgs.count ?? '—';
-  document.getElementById('stat-votes').textContent = votes.count ?? '—';
-  document.getElementById('stat-stamps').textContent = stamps.count ?? '—';
-
-  const { count: unread } = await sb.from('messages').select('id', { count: 'exact', head: true }).eq('read', false).neq('to_uid', 'broadcast');
-  if (unread > 0) {
-    document.getElementById('unread-alert').style.display = 'block';
-    document.getElementById('unread-txt').textContent = unread + ' unread message' + (unread > 1 ? 's' : '');
-  }
-}
-
-function buildDashTiles() {
-  const p = currentProfile;
+  // Tiles
   const allTiles = [
-    { label: 'Messages', desc: 'Chat inbox', ico: '💬', cls: 'ico-o', roles: ['tech','super'], page: 'pg-inbox', action: () => { loadInbox(); goPage('pg-inbox'); } },
-    { label: 'Pitch Results', desc: 'Vote analytics', ico: '📊', cls: 'ico-b', roles: ['tech','super'], action: () => { loadVotes(); goPage('pg-votes'); } },
-    { label: 'Users & Roles', desc: 'Manage access', ico: '👥', cls: 'ico-p', roles: ['super'], action: () => { loadUsers(); goPage('pg-users'); } },
-    { label: 'Moderation', desc: 'Flagged content', ico: '🛡️', cls: 'ico-r', roles: ['tech','super'], action: () => { loadMod(); goPage('pg-mod'); } },
-    { label: 'My Tile', desc: 'Edit your profile', ico: '✏️', cls: 'ico-y', roles: ['entity'], action: () => { loadMyTile(); goPage('pg-mytile'); } },
+    { label:'Messages',       desc:'Attendee chat inbox',    ico:'💬', cls:'ico-o', minLvl:2, action:()=>{ loadInbox(); goPage('pg-inbox'); } },
+    { label:'Pitch Results',  desc:'Vote analytics',         ico:'📊', cls:'ico-b', minLvl:2, action:()=>{ loadVotes(); goPage('pg-votes'); } },
+    { label:'Check-In',       desc:'Scan attendees in',      ico:'✅', cls:'ico-g', minLvl:2, action:()=>{ loadCheckin(); goPage('pg-checkin'); } },
+    { label:'Users & Levels', desc:'Manage access',          ico:'👥', cls:'ico-p', minLvl:3, action:()=>{ loadUsers(); goPage('pg-users'); } },
+    { label:'Moderation',     desc:'Flagged content',        ico:'🛡️', cls:'ico-r', minLvl:3, action:()=>{ loadMod(); goPage('pg-mod'); } },
   ];
   const container = document.getElementById('dash-tiles');
   container.innerHTML = '';
-  allTiles.filter(t => t.roles.includes(p.role)).forEach(t => {
+  allTiles.filter(t => l >= t.minLvl).forEach(t => {
     const d = document.createElement('div');
     d.className = 'tile';
     d.innerHTML = `<div class="tile-ico ${t.cls}">${t.ico}</div><div class="tile-body"><div class="tile-name">${t.label}</div><div class="tile-desc">${t.desc}</div></div><div class="chevron">›</div>`;
     d.onclick = t.action;
     container.appendChild(d);
   });
+
+  // Bottom nav
+  buildBottomNav();
 }
 
-// ═══════════════════ BOTTOM NAV ═══════════════════
-const homeSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`;
-const msgSVG  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>`;
-const chartSVG= `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`;
-const usersSVG= `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>`;
-const editSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
-
 function buildBottomNav() {
-  const p = currentProfile;
-  const items = [{ svg: homeSVG, label: 'Home', action: () => goPage('pg-dash') }];
-  if (p.role === 'tech' || p.role === 'super') {
-    items.push({ svg: msgSVG, label: 'Messages', action: () => { loadInbox(); goPage('pg-inbox'); } });
-    items.push({ svg: chartSVG, label: 'Votes', action: () => { loadVotes(); goPage('pg-votes'); } });
+  const homeSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`;
+  const msgSVG  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>`;
+  const scanSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2"/></svg>`;
+  const usersSVG= `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>`;
+  const items = [{ svg:homeSVG, label:'Home', action:()=>goPage('pg-dash') }];
+  if (hasLvl(2)) {
+    items.push({ svg:msgSVG,  label:'Messages', action:()=>{ loadInbox(); goPage('pg-inbox'); } });
+    items.push({ svg:scanSVG, label:'Check-In',  action:()=>{ loadCheckin(); goPage('pg-checkin'); } });
   }
-  if (p.role === 'super') items.push({ svg: usersSVG, label: 'Users', action: () => { loadUsers(); goPage('pg-users'); } });
-  if (p.role === 'entity') items.push({ svg: editSVG, label: 'My Tile', action: () => { loadMyTile(); goPage('pg-mytile'); } });
-  document.getElementById('dash-nav').innerHTML = items.map((item, i) =>
+  if (hasLvl(3)) {
+    items.push({ svg:usersSVG, label:'Users', action:()=>{ loadUsers(); goPage('pg-users'); } });
+  }
+  document.getElementById('dash-nav').innerHTML = items.map((item,i) =>
     `<button class="nav-btn ${i===0?'active':''}" onclick="(${item.action.toString()})()">${item.svg}<span>${item.label}</span></button>`
   ).join('');
 }
 
-// ═══════════════════ REAL-TIME MESSAGES ═══════════════════
+async function loadStats() {
+  const [users, msgs, votes, checkins] = await Promise.all([
+    sb.from('profiles').select('id',{count:'exact',head:true}).eq('access_level',0),
+    sb.from('messages').select('id',{count:'exact',head:true}).neq('to_uid','broadcast'),
+    sb.from('votes').select('id',{count:'exact',head:true}),
+    sb.from('checkins').select('id',{count:'exact',head:true}),
+  ]);
+  document.getElementById('stat-users').textContent    = users.count ?? '—';
+  document.getElementById('stat-msgs').textContent     = msgs.count ?? '—';
+  document.getElementById('stat-votes').textContent    = votes.count ?? '—';
+  document.getElementById('stat-checkins').textContent = checkins.count ?? '—';
+  const { count: unread } = await sb.from('messages').select('id',{count:'exact',head:true}).eq('read',false).neq('to_uid','broadcast');
+  if (unread > 0) {
+    document.getElementById('unread-alert').style.display = 'block';
+    document.getElementById('unread-txt').textContent = unread + ' unread message' + (unread>1?'s':'');
+  }
+}
+
+// ─── REAL-TIME ──────────────────────────────────────────
 function subscribeMessages() {
   msgChannel = sb.channel('messages-changes')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => {
+    .on('postgres_changes',{event:'*',schema:'public',table:'messages'},()=>{
       if (document.getElementById('pg-inbox').classList.contains('active')) loadInbox();
       loadStats();
     }).subscribe();
 }
 
-// ═══════════════════ INBOX ═══════════════════
+// ─── INBOX ──────────────────────────────────────────────
 async function loadInbox() {
-  if (currentProfile.role === 'tech' || currentProfile.role === 'super') {
-    document.getElementById('broadcast-btn').style.display = 'inline-flex';
-  }
-  let query = sb.from('messages').select('*').neq('to_uid', 'broadcast').order('created_at', { ascending: false });
-  const { data, error } = await query;
-  if (error) { showToast('Error loading messages'); return; }
-  allMessages = data || [];
-  renderInbox();
+  document.getElementById('broadcast-btn').style.display = 'inline-flex';
+  const { data } = await sb.from('messages').select('*').neq('to_uid','broadcast').order('created_at',{ascending:false});
+  allMessages = data || []; renderInbox();
 }
-
 function renderInbox() {
-  let filtered = allMessages;
-  if (msgFilter === 'unread') filtered = allMessages.filter(m => !m.read);
-  if (msgFilter === 'unreplied') filtered = allMessages.filter(m => !m.admin_reply);
-  if (msgFilter === 'replied') filtered = allMessages.filter(m => m.admin_reply);
-  const container = document.getElementById('msg-list');
-  if (!filtered.length) { container.innerHTML = `<div class="empty"><div class="empty-ico">✅</div><div>Nothing here!</div></div>`; return; }
-  container.innerHTML = filtered.map(m => `
-    <div class="msg-card ${m.read?'':'unread'}" onclick="openThread('${m.id}')">
+  let f = allMessages;
+  if (msgFilter==='unread')    f = f.filter(m=>!m.read);
+  if (msgFilter==='unreplied') f = f.filter(m=>!m.admin_reply);
+  if (msgFilter==='replied')   f = f.filter(m=>m.admin_reply);
+  const c = document.getElementById('msg-list');
+  if (!f.length) { c.innerHTML=`<div class="empty"><div class="empty-ico">✅</div><div>Nothing here!</div></div>`; return; }
+  c.innerHTML = f.map(m =>
+    `<div class="msg-card ${m.read?'':'unread'}" onclick="openThread('${m.id}')">
       <div class="msg-header"><div class="msg-from">${esc(m.from_name||'Unknown')}</div><div class="msg-time">${timeAgo(m.created_at)}</div></div>
       <div class="msg-preview">${esc(m.body)}</div>
       <div class="msg-tags">
@@ -577,237 +578,213 @@ function renderInbox() {
         ${m.admin_reply?'<span class="tag tag-replied">Replied</span>':''}
         <span class="tag" style="background:var(--s3);color:var(--muted)">${esc(m.from_email||'')}</span>
       </div>
-    </div>`).join('');
+    </div>`
+  ).join('');
 }
-
-function filterMsgs(f, btn) {
-  msgFilter = f;
-  document.querySelectorAll('.filter-tabs .ftab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderInbox();
+function filterMsgs(f,btn) {
+  msgFilter=f;
+  document.querySelectorAll('.filter-tabs .ftab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); renderInbox();
 }
-
 async function openThread(id) {
   activeMsgId = id;
-  const msg = allMessages.find(m => m.id === id);
+  const msg = allMessages.find(m=>m.id===id);
   if (!msg) return;
-  await sb.from('messages').update({ read: true }).eq('id', id);
-  msg.read = true;
-  document.getElementById('thread-title').textContent = msg.from_name || 'Message';
+  await sb.from('messages').update({read:true}).eq('id',id); msg.read=true;
+  document.getElementById('thread-title').textContent = msg.from_name||'Message';
   const bubbles = [`<div class="bubble-wrap from-user"><div class="bubble-name">${esc(msg.from_name)}</div><div class="bubble">${esc(msg.body)}</div><div class="bubble-time">${timeAgo(msg.created_at)}</div></div>`];
   if (msg.admin_reply) bubbles.push(`<div class="bubble-wrap from-admin"><div class="bubble-name">You (Admin)</div><div class="bubble">${esc(msg.admin_reply)}</div><div class="bubble-time">${timeAgo(msg.replied_at)}</div></div>`);
   document.getElementById('thread-content').innerHTML = `<div class="thread-msgs">${bubbles.join('')}</div>`;
-  document.getElementById('reply-bar').style.display = currentProfile.role === 'entity' ? 'none' : 'flex';
   goPage('pg-thread');
 }
-
 async function sendReply() {
   const text = document.getElementById('reply-input').value.trim();
   if (!text || !activeMsgId) return;
-  const { error } = await sb.from('messages').update({ admin_reply: text, replied_at: new Date().toISOString(), read: true }).eq('id', activeMsgId);
-  if (error) { showToast('Error sending reply'); return; }
-  document.getElementById('reply-input').value = '';
-  const msg = allMessages.find(m => m.id === activeMsgId);
-  if (msg) { msg.admin_reply = text; msg.replied_at = new Date().toISOString(); }
-  openThread(activeMsgId);
-  showToast('Reply sent ✓');
+  await sb.from('messages').update({admin_reply:text, replied_at:new Date().toISOString(), read:true}).eq('id',activeMsgId);
+  document.getElementById('reply-input').value='';
+  const msg = allMessages.find(m=>m.id===activeMsgId);
+  if (msg) { msg.admin_reply=text; msg.replied_at=new Date().toISOString(); }
+  openThread(activeMsgId); showToast('Reply sent ✓');
 }
-
 async function deleteThread() {
   if (!activeMsgId) return;
-  await sb.from('messages').delete().eq('id', activeMsgId);
-  allMessages = allMessages.filter(m => m.id !== activeMsgId);
-  goPage('pg-inbox');
-  renderInbox();
-  showToast('Deleted');
+  await sb.from('messages').delete().eq('id',activeMsgId);
+  allMessages = allMessages.filter(m=>m.id!==activeMsgId);
+  goPage('pg-inbox'); renderInbox(); showToast('Deleted');
 }
 
-// ═══════════════════ VOTES ═══════════════════
+// ─── VOTES ──────────────────────────────────────────────
 async function loadVotes() {
-  const [{ data: entities }, { data: votes }] = await Promise.all([
-    sb.from('entities').select('*').eq('type', 'pitch').eq('active', true),
+  const [{data:ents},{data:votes}] = await Promise.all([
+    sb.from('entities').select('*').eq('type','pitch').eq('active',true),
     sb.from('votes').select('*'),
   ]);
-  renderVotes(entities || [], votes || []);
+  renderVotes(ents||[], votes||[]);
 }
-
-function renderVotes(entities, votes) {
-  const summaries = entities.map(e => {
-    const ev = votes.filter(v => v.pitch_id === e.id);
-    if (!ev.length) return { entity: e, count: 0, sustainability: 0, impact: 0, feasibility: 0, overall: 0, avg: 0 };
-    const avg = k => ev.reduce((s, v) => s + v[k], 0) / ev.length;
-    const s = avg('sustainability'), im = avg('impact'), f = avg('feasibility'), o = avg('overall');
-    return { entity: e, count: ev.length, sustainability: s, impact: im, feasibility: f, overall: o, avg: (s+im+f+o)/4 };
+function renderVotes(ents, votes) {
+  const summaries = ents.map(e => {
+    const ev = votes.filter(v=>v.entity_id===e.id);
+    if (!ev.length) return {entity:e,count:0,sustainability:0,impact:0,feasibility:0,overall:0,avg:0};
+    const avg = k => ev.reduce((s,v)=>s+v[k],0)/ev.length;
+    const s=avg('sustainability'),im=avg('impact'),f=avg('feasibility'),o=avg('overall');
+    return {entity:e,count:ev.length,sustainability:s,impact:im,feasibility:f,overall:o,avg:(s+im+f+o)/4};
   });
-  const sorted = [...summaries].sort((a, b) => {
-    const k = voteSort === 'avg' ? 'avg' : voteSort === 'votes' ? 'count' : voteSort;
-    return b[k] - a[k];
+  const sorted = [...summaries].sort((a,b) => {
+    const k = voteSort==='avg'?'avg':voteSort==='votes'?'count':voteSort;
+    return b[k]-a[k];
   });
-  document.getElementById('votes-list').innerHTML = sorted.map(s => `
-    <div class="vote-card">
+  document.getElementById('votes-list').innerHTML = sorted.map(s =>
+    `<div class="vote-card">
       <div class="vote-company">${esc(s.entity.name)}<span class="vote-total">${s.count} votes · ${s.avg.toFixed(1)} avg</span></div>
-      ${[['sustainability','🌱'],['impact','💥'],['feasibility','⚙️'],['overall','⭐']].map(([k, ico]) => `
+      ${[['sustainability','🌱'],['impact','💥'],['feasibility','⚙️'],['overall','⭐']].map(([k,ico])=>`
         <div class="score-row">
           <div class="score-label">${ico} ${k}</div>
           <div class="score-bar-wrap"><div class="score-bar" style="width:${s[k]*10}%"></div></div>
           <div class="score-num">${s[k].toFixed(1)}</div>
         </div>`).join('')}
-    </div>`).join('');
+    </div>`
+  ).join('');
+}
+function sortVotes(by,btn) {
+  voteSort=by;
+  document.querySelectorAll('#pg-votes .ftab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); loadVotes();
 }
 
-function sortVotes(by, btn) {
-  voteSort = by;
-  document.querySelectorAll('#pg-votes .ftab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  loadVotes();
+// ─── CHECK-IN ───────────────────────────────────────────
+let allAttendees = [];
+let checkedInIds = new Set();
+
+async function loadCheckin() {
+  const [{ data: users }, { data: checkins }] = await Promise.all([
+    sb.from('profiles').select('*').order('name'),
+    sb.from('checkins').select('*'),
+  ]);
+  allAttendees = users || [];
+  checkedInIds = new Set((checkins||[]).map(c => c.user_id));
+  document.getElementById('checkin-count').textContent = checkedInIds.size;
+  renderCheckinList();
 }
 
-// ═══════════════════ MY TILE ═══════════════════
-let myEntity = null;
-async function loadMyTile() {
-  const p = currentProfile;
-  if (!p.entity_id) { showToast('No entity assigned to your account'); return; }
-  const { data } = await sb.from('entities').select('*').eq('id', p.entity_id).single();
-  myEntity = data;
-  if (!myEntity) return;
-  document.getElementById('tile-name').value = myEntity.name || '';
-  document.getElementById('tile-tagline').value = myEntity.tagline || '';
-  document.getElementById('tile-desc').value = myEntity.description || '';
-  document.getElementById('tile-logo').value = myEntity.logo_url || '';
-  document.getElementById('tile-email').value = myEntity.contact_email || '';
-  document.getElementById('tile-website').value = myEntity.website || '';
-  document.getElementById('tile-resume').value = p.resume_link || '';
-  updateTileLiveChip(myEntity.active);
-  livePreview();
+function renderCheckinList() {
+  const checked = allAttendees.filter(u => checkedInIds.has(u.id));
+  document.getElementById('checkin-list').innerHTML = checked.length
+    ? checked.map(u => `
+        <div class="checkin-card">
+          <div class="checkin-status in"></div>
+          <div class="user-ava" style="background:${strColor(u.name||u.email)};color:#fff">${(u.name||u.email||'?').charAt(0).toUpperCase()}</div>
+          <div class="user-info"><div class="user-name">${esc(u.name||'—')}</div><div class="user-email">${esc(u.email)}</div></div>
+          <span class="lvl-chip lvl-${u.access_level}">Lvl ${u.access_level}</span>
+        </div>`
+    ).join('')
+    : `<div class="empty"><div class="empty-ico">👋</div><div>No one checked in yet</div></div>`;
 }
 
-function livePreview() {
-  const name = document.getElementById('tile-name').value || 'Your Company';
-  const tag = document.getElementById('tile-tagline').value || 'Tagline';
-  const logo = document.getElementById('tile-logo').value;
-  document.getElementById('preview-name').textContent = name;
-  document.getElementById('preview-tag').textContent = tag;
-  const el = document.getElementById('preview-logo');
-  el.innerHTML = logo ? `<img src="${esc(logo)}" style="width:100%;height:100%;object-fit:cover;border-radius:11px" onerror="this.parentElement.textContent='🚀'"/>` : '🚀';
+function searchCheckin() {
+  const q = document.getElementById('checkin-search').value.toLowerCase();
+  if (!q) { document.getElementById('checkin-results').innerHTML = ''; return; }
+  const matches = allAttendees.filter(u =>
+    (u.name||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q)
+  ).slice(0, 5);
+  document.getElementById('checkin-results').innerHTML = matches.map(u => {
+    const isIn = checkedInIds.has(u.id);
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--s2);border-radius:10px;margin-bottom:6px">
+      <div class="checkin-status ${isIn?'in':'out'}"></div>
+      <div style="flex:1"><div style="font-family:var(--fh);font-weight:600;font-size:13px">${esc(u.name||'—')}</div><div style="font-size:11px;color:var(--sub)">${esc(u.email)}</div></div>
+      <span class="lvl-chip lvl-${u.access_level}">Lvl ${u.access_level}</span>
+      ${!isIn ? `<button class="btn btn-accent btn-sm" onclick="checkIn('${u.id}')">Check In</button>` : `<span style="font-size:12px;color:var(--green)">✓ In</span>`}
+    </div>`;
+  }).join('') || '<div style="font-size:13px;color:var(--muted)">No matches</div>';
 }
 
-function updateTileLiveChip(active) {
-  const chip = document.getElementById('tile-live-chip');
-  chip.style.cssText = active
-    ? 'font-size:11px;padding:3px 10px;border-radius:6px;font-family:var(--fh);font-weight:700;background:rgba(82,214,138,.15);color:#52d68a;border:1px solid rgba(82,214,138,.3)'
-    : 'font-size:11px;padding:3px 10px;border-radius:6px;font-family:var(--fh);font-weight:700;background:rgba(240,112,112,.15);color:#f07070;border:1px solid rgba(240,112,112,.3)';
-  chip.textContent = active ? '● Live' : '● Hidden';
-  document.getElementById('tile-vis-txt').textContent = active ? 'Pause Visibility' : 'Make Visible';
+async function checkIn(uid) {
+  const { error } = await sb.from('checkins').insert({ user_id: uid, checked_in_by: currentUser.id });
+  if (error) { showToast('Error or already checked in'); return; }
+  checkedInIds.add(uid);
+  document.getElementById('checkin-count').textContent = checkedInIds.size;
+  searchCheckin(); renderCheckinList();
+  showToast('Checked in ✓');
 }
 
-async function saveTile() {
-  if (!myEntity) return;
-  const { error } = await sb.from('entities').update({
-    name: document.getElementById('tile-name').value,
-    tagline: document.getElementById('tile-tagline').value,
-    description: document.getElementById('tile-desc').value,
-    logo_url: document.getElementById('tile-logo').value,
-    contact_email: document.getElementById('tile-email').value,
-    website: document.getElementById('tile-website').value,
-  }).eq('id', myEntity.id);
-  await sb.from('profiles').update({ resume_link: document.getElementById('tile-resume').value }).eq('id', currentUser.id);
-  if (error) { showToast('Error saving'); return; }
-  showToast('Saved ✓');
-}
-
-async function toggleTileVisible() {
-  if (!myEntity) return;
-  const newVal = !myEntity.active;
-  await sb.from('entities').update({ active: newVal }).eq('id', myEntity.id);
-  myEntity.active = newVal;
-  updateTileLiveChip(newVal);
-  showToast(newVal ? 'Tile visible ✓' : 'Tile hidden');
-}
-
-// ═══════════════════ USERS ═══════════════════
-let allUsers = [];
+// ─── USERS & LEVELS ─────────────────────────────────────
 async function loadUsers() {
-  const { data } = await sb.from('profiles').select('*').order('created_at', { ascending: false });
-  allUsers = data || [];
-  renderUsers();
+  const { data } = await sb.from('profiles').select('*').order('created_at',{ascending:false});
+  allUsers = data || []; renderUsers();
 }
-
 function renderUsers() {
-  const q = (document.getElementById('user-search')?.value || '').toLowerCase();
-  const filtered = allUsers.filter(u => (u.name||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q));
-  document.getElementById('user-count').textContent = filtered.length;
-  document.getElementById('users-list').innerHTML = filtered.map(u => `
+  const q = (document.getElementById('user-search')?.value||'').toLowerCase();
+  const f = allUsers.filter(u => (u.name||'').toLowerCase().includes(q)||(u.email||'').toLowerCase().includes(q));
+  document.getElementById('user-count').textContent = f.length;
+  document.getElementById('users-list').innerHTML = f.map(u => `
     <div class="user-row">
       <div class="user-ava" style="background:${strColor(u.name||u.email)};color:#fff">${(u.name||u.email||'?').charAt(0).toUpperCase()}</div>
       <div class="user-info"><div class="user-name">${esc(u.name||'—')}</div><div class="user-email">${esc(u.email)}</div></div>
-      <select class="user-role-sel" onchange="changeRole('${u.id}',this.value)">
-        ${['attendee','entity','tech','super'].map(r => `<option value="${r}" ${u.role===r?'selected':''}>${r}</option>`).join('')}
+      <select class="user-lvl-sel" onchange="changeLevel('${u.id}',this.value)">
+        ${[0,1,2,3].map(l=>`<option value="${l}" ${u.access_level===l?'selected':''}>Lvl ${l} · ${LVL_LABELS[l]}</option>`).join('')}
       </select>
-    </div>`).join('');
+    </div>`
+  ).join('');
+}
+async function changeLevel(uid, level) {
+  level = parseInt(level);
+  await sb.from('profiles').update({access_level:level}).eq('id',uid);
+  const u = allUsers.find(u=>u.id===uid); if(u) u.access_level=level;
+  showToast('Access level updated ✓');
 }
 
-async function changeRole(uid, role) {
-  await sb.from('profiles').update({ role }).eq('id', uid);
-  const u = allUsers.find(u => u.id === uid);
-  if (u) u.role = role;
-  showToast('Role updated ✓');
-}
-
-// ═══════════════════ MODERATION ═══════════════════
+// ─── MODERATION ─────────────────────────────────────────
 async function loadMod() {
-  const { data } = await sb.from('mod_queue').select('*').eq('status', 'pending').order('created_at', { ascending: false });
-  const container = document.getElementById('mod-list');
-  if (!data?.length) { container.innerHTML = `<div class="empty"><div class="empty-ico">✅</div><div>Queue is clear!</div></div>`; return; }
-  container.innerHTML = data.map(m => `
-    <div class="mod-card">
+  const { data } = await sb.from('mod_queue').select('*').eq('status','pending').order('created_at',{ascending:false});
+  const c = document.getElementById('mod-list');
+  if (!data?.length) { c.innerHTML=`<div class="empty"><div class="empty-ico">✅</div><div>Queue is clear!</div></div>`; return; }
+  c.innerHTML = data.map(m =>
+    `<div class="mod-card">
       <div style="display:flex;justify-content:space-between"><div style="font-family:var(--fh);font-weight:700;font-size:14px">${esc(m.from_name||'User')}</div><div style="font-size:11px;color:var(--red)">${esc(m.reason)}</div></div>
       <div class="mod-content">"${esc(m.content)}"</div>
       <div class="mod-actions">
         <button class="mod-btn mod-approve" onclick="modAction('${m.id}','approved')">✓ Approve</button>
-        <button class="mod-btn mod-reject" onclick="modAction('${m.id}','rejected')">✗ Remove</button>
+        <button class="mod-btn mod-reject"  onclick="modAction('${m.id}','rejected')">✗ Remove</button>
       </div>
-    </div>`).join('');
+    </div>`
+  ).join('');
 }
-
 async function modAction(id, status) {
-  await sb.from('mod_queue').update({ status }).eq('id', id);
-  loadMod();
-  showToast(status === 'approved' ? 'Approved' : 'Removed');
+  await sb.from('mod_queue').update({status}).eq('id',id); loadMod();
+  showToast(status==='approved'?'Approved':'Removed');
 }
 
-// ═══════════════════ BROADCAST ═══════════════════
+// ─── BROADCAST ──────────────────────────────────────────
 async function sendBroadcast() {
   const body = document.getElementById('broadcast-msg').value.trim();
   if (!body) return;
   await sb.from('messages').insert({
-    from_uid: currentUser.id, from_email: currentUser.email,
-    from_name: (currentProfile.name || 'Admin') + ' (Staff)',
-    to_uid: 'broadcast', body, read: true
+    from_uid:currentUser.id, from_email:currentUser.email,
+    from_name:(currentProfile.name||'Admin')+' (Staff)',
+    to_uid:'broadcast', body, read:true
   });
-  document.getElementById('broadcast-msg').value = '';
-  closeModal('modal-broadcast');
+  document.getElementById('broadcast-msg').value=''; closeModal('modal-broadcast');
   showToast('Broadcast sent ✓');
 }
 
-// ═══════════════════ PROFILE MODAL ═══════════════════
+// ─── PROFILE MODAL ──────────────────────────────────────
 function showProfile() {
   const p = currentProfile;
-  document.getElementById('profile-name').textContent = p.name || 'Profile';
+  document.getElementById('profile-name').textContent = p.name||'Profile';
   document.getElementById('profile-email').textContent = currentUser.email;
-  document.getElementById('profile-body').innerHTML = `
-    <div class="info-row"><span class="info-key">Role</span><span class="info-val">${ROLE_LABELS[p.role]||p.role}</span></div>
-    ${p.entity_id?`<div class="info-row"><span class="info-key">Entity</span><span class="info-val">${p.entity_id}</span></div>`:''}`;
+  document.getElementById('profile-body').innerHTML =
+    `<div class="info-row"><span class="info-key">Access Level</span><span class="info-val">${LVL_ICONS[lvl()]} Lvl ${lvl()} — ${LVL_LABELS[lvl()]}</span></div>
+     ${p.entity_id?`<div class="info-row"><span class="info-key">Entity</span><span class="info-val">${p.entity_id}</span></div>`:''}`;
   openModal('modal-profile');
 }
 
-// ═══════════════════ UTILS ═══════════════════
-function openModal(id) { document.getElementById(id).classList.add('open'); }
+// ─── UTILS ──────────────────────────────────────────────
+function goPage(id) { document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id)?.classList.add('active'); window.scrollTo(0,0); }
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-function goPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0,0); }
-function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2400); }
-function timeAgo(ts) { if(!ts) return ''; const d = Date.now()-new Date(ts).getTime(); if(d<60000)return'just now'; if(d<3600000)return Math.floor(d/60000)+'m ago'; if(d<86400000)return Math.floor(d/3600000)+'h ago'; return Math.floor(d/86400000)+'d ago'; }
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function strColor(s) { let h=0; for(let c of s||'') h=((h<<5)-h)+c.charCodeAt(0); return `hsl(${Math.abs(h)%360},55%,38%)`; }
+function showToast(msg) { const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400); }
+function timeAgo(ts)    { if(!ts)return''; const d=Date.now()-new Date(ts).getTime(); if(d<60000)return'just now'; if(d<3600000)return Math.floor(d/60000)+'m ago'; if(d<86400000)return Math.floor(d/3600000)+'h ago'; return Math.floor(d/86400000)+'d ago'; }
+function esc(s)         { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function strColor(s)    { let h=0; for(let c of s||'') h=((h<<5)-h)+c.charCodeAt(0); return `hsl(${Math.abs(h)%360},55%,38%)`; }
 function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,100)+'px'; }
 </script>
 </body>
