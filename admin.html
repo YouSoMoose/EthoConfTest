@@ -400,7 +400,7 @@ async function loginGoogle() {
   btn.innerHTML = '<span class="spinner"></span>Redirecting…';
   const { error } = await sb.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: window.location.href }
+    options: { redirectTo: 'https://yousomoose.github.io/admin.html' }
   });
   if (error) { showToast('Login error: ' + error.message); btn.disabled = false; btn.innerHTML = 'Continue with Google'; }
 }
@@ -413,18 +413,28 @@ async function logout() {
 }
 
 async function loadProfile(userId) {
-  const { data, error } = await sb.from('profiles').select('*').eq('id', userId).single();
-  if (error || !data) return null;
-  return data;
+  // Retry up to 5 times with increasing delay — fixes RLS timing issue after OAuth redirect
+  for (let i = 0; i < 5; i++) {
+    if (i > 0) await new Promise(r => setTimeout(r, 600 * i));
+    const { data, error } = await sb.from('profiles').select('*').eq('id', userId).single();
+    if (data) return data;
+    console.warn(`Profile load attempt ${i+1} failed:`, error?.message);
+  }
+  return null;
 }
 
 // ═══════════════════ INIT ═══════════════════
 sb.auth.onAuthStateChange(async (event, session) => {
+  console.log('Auth event:', event, session?.user?.email);
   if (session?.user) {
     currentUser = session.user;
-    await new Promise(r => setTimeout(r, 500)); // small delay to ensure profile is ready
     currentProfile = await loadProfile(currentUser.id);
-    if (!currentProfile) { showToast('Profile not found — try again'); return; }
+    if (!currentProfile) {
+      showToast('Profile not found — please try signing in again');
+      await sb.auth.signOut();
+      return;
+    }
+    console.log('Profile loaded, role:', currentProfile.role);
     if (currentProfile.role === 'attendee') {
       showToast('Attendee accounts use the main app');
       await sb.auth.signOut();
