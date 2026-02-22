@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Ethos 2025 — Sign In</title>
+<title>Ethos 2026 — Sign In</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,800;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
@@ -38,7 +38,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif}
     <div class="leaf">🌱</div>
     <div class="conf">Ethos Conference</div>
     <div class="title">Sustainability</div>
-    <div class="year">2025</div>
+    <div class="year">2026</div>
     <div class="sub">Connect · Vote · Discover<br/>Your conference companion</div>
   </div>
   <div class="card">
@@ -47,6 +47,23 @@ html,body{height:100%;font-family:'DM Sans',sans-serif}
       Sign in with Google
     </button>
     <p class="fine">By signing in you agree to your info being used for conference networking. Your notes are private and never shared.</p>
+    
+    <div style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <div style="flex:1;height:1px;background:#d5cec6"></div>
+        <div style="font-size:11px;color:#9e9990;white-space:nowrap">or try demo mode</div>
+        <div style="flex:1;height:1px;background:#d5cec6"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="demo-btn" onclick="demoLogin(0)" style="background:#f5f0eb;border:1.5px solid #d5cec6;border-radius:12px;padding:11px 8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:#1a1814;transition:all .2s">
+          🎫 Attendee<div style="font-size:10px;font-weight:400;color:#9e9990;margin-top:2px">Level 0</div>
+        </button>
+        <button class="demo-btn" onclick="demoLogin(1)" style="background:#f5f0eb;border:1.5px solid #d5cec6;border-radius:12px;padding:11px 8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:#1a1814;transition:all .2s">
+          🎤 Presenter<div style="font-size:10px;font-weight:400;color:#9e9990;margin-top:2px">Level 1</div>
+        </button>
+      </div>
+      <p style="font-size:10px;color:#9e9990;text-align:center;margin-top:8px;line-height:1.4">Demo mode stores nothing. For testing only.</p>
+    </div>
     <div class="divider"><div class="divider-line"></div><div class="divider-txt">are you staff or a presenter?</div><div class="divider-line"></div></div>
     <button class="link-btn" onclick="window.location.href='adminlogin.html'">🛡️ Go to Staff & Presenter Portal →</button>
   </div>
@@ -87,6 +104,16 @@ async function loginGoogle() {
 }
 
 function showToast(msg) { const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400); }
+
+function demoLogin(level) {
+  const profiles = {
+    0: { id:'demo-attendee', email:'attendee@demo.ethos', name:'Demo Attendee', access_level:0, photo_url:null, business_card:{}, entity_id:null },
+    1: { id:'demo-presenter', email:'presenter@demo.ethos', name:'Demo Presenter', access_level:1, photo_url:null, business_card:{}, entity_id:'e1' },
+  };
+  const p = profiles[level];
+  sessionStorage.setItem('demoProfile', JSON.stringify(p));
+  window.location.href = 'app.html?demo=1';
+}
 </script>
 </body>
 </html>

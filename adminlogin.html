@@ -47,6 +47,23 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:#0e0e11;color:
       Continue with Google
     </button>
     <p class="note">Only <span>Level 1–3</span> accounts can access this portal. Lvl 0 attendees will be redirected.</p>
+    
+    <div style="margin-bottom:24px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <div style="flex:1;height:1px;background:#2e2e3a"></div>
+        <div style="font-size:11px;color:#5a5a6a;white-space:nowrap">or try demo mode</div>
+        <div style="flex:1;height:1px;background:#2e2e3a"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button onclick="demoLogin(2)" style="background:#17171c;border:1px solid #2e2e3a;border-radius:12px;padding:11px 8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:#eeece8;transition:all .2s">
+          🛡️ Staff<div style="font-size:10px;font-weight:400;color:#5a5a6a;margin-top:2px">Level 2</div>
+        </button>
+        <button onclick="demoLogin(3)" style="background:#17171c;border:1px solid #2e2e3a;border-radius:12px;padding:11px 8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:#FCBD9D;transition:all .2s">
+          ⭐ Super Admin<div style="font-size:10px;font-weight:400;color:#5a5a6a;margin-top:2px">Level 3</div>
+        </button>
+      </div>
+      <p style="font-size:10px;color:#5a5a6a;text-align:center;margin-top:8px;line-height:1.4">Demo mode stores nothing. For testing only.</p>
+    </div>
     <div class="divider"><div class="divider-line"></div><div class="divider-txt">here by accident?</div><div class="divider-line"></div></div>
     <button class="link-btn" onclick="window.location.href='applogin.html'">🌱 Go to Attendee App →</button>
   </div>
@@ -86,6 +103,16 @@ async function loginGoogle() {
 }
 
 function showToast(msg) { const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400); }
+
+function demoLogin(level) {
+  const profiles = {
+    2: { id:'demo-staff', email:'staff@demo.ethos', name:'Demo Staff', access_level:2, photo_url:null, entity_id:null },
+    3: { id:'demo-admin', email:'admin@demo.ethos', name:'Demo Admin', access_level:3, photo_url:null, entity_id:null },
+  };
+  const p = profiles[level];
+  sessionStorage.setItem('demoProfile', JSON.stringify(p));
+  window.location.href = 'admin.html?demo=1';
+}
 </script>
 </body>
 </html>

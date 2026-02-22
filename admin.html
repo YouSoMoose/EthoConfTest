@@ -370,6 +370,11 @@ textarea.form-input{resize:vertical;min-height:90px}
   </div>
 </div>
 
+<!-- DEMO BANNER -->
+<div id="demo-banner" style="display:none;position:fixed;top:0;left:0;right:0;background:#FCBD9D;color:#111;text-align:center;font-size:12px;font-weight:700;padding:6px;z-index:9999;letter-spacing:.05em">
+  🎭 DEMO MODE — data is not saved
+  <button onclick="exitDemo()" style="background:rgba(0,0,0,.15);border:none;color:#111;border-radius:6px;padding:2px 10px;margin-left:10px;cursor:pointer;font-size:11px;font-weight:700">Exit</button>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -461,8 +466,25 @@ async function retryBoot() {
   else window.location.replace('adminlogin.html');
 }
 
-// PRIMARY: restore session (including from OAuth ?code= redirect)
+// PRIMARY: check for demo mode first, then real session
 (async () => {
+  // Demo mode
+  const isDemo = new URLSearchParams(window.location.search).get('demo');
+  const demoRaw = sessionStorage.getItem('demoProfile');
+  if (isDemo && demoRaw) {
+    const demo = JSON.parse(demoRaw);
+    currentUser = { id: demo.id, email: demo.email };
+    currentProfile = demo;
+    buildDash();
+    goPage('pg-dash');
+    if (hasLvl(2)) {
+      // Load real data for demo
+      loadStats();
+    }
+    return;
+  }
+
+  // Real auth
   const { data: { session }, error } = await sb.auth.getSession();
   if (error) console.error('[getSession error]', error);
   if (session?.user) {
@@ -811,6 +833,19 @@ function showProfile() {
 
 // ─── UTILS ──────────────────────────────────────────────
 function goPage(id) { document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id)?.classList.add('active'); window.scrollTo(0,0); }
+
+function exitDemo() {
+  sessionStorage.removeItem('demoProfile');
+  window.location.replace('adminlogin.html');
+}
+
+if (new URLSearchParams(window.location.search).get('demo')) {
+  document.addEventListener('DOMContentLoaded', () => {
+    const b = document.getElementById('demo-banner');
+    if (b) b.style.display = 'block';
+    document.querySelectorAll('.topbar').forEach(el => el.style.marginTop = '28px');
+  });
+}
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 function showToast(msg) { const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400); }

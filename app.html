@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Ethos 2025</title>
+<title>Ethos 2026</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,800;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
@@ -242,7 +242,7 @@ textarea.form-input{resize:vertical;min-height:80px}
 <div id="pg-loading" class="page active" style="background:linear-gradient(160deg,#1e3a0a,#2d5016 35%,#1a1814);align-items:center;justify-content:center">
   <div style="text-align:center;color:#fff">
     <div style="font-size:48px;margin-bottom:16px">🌱</div>
-    <div style="font-family:var(--fh);font-weight:800;font-size:24px;margin-bottom:8px">Ethos 2025</div>
+    <div style="font-family:var(--fh);font-weight:800;font-size:24px;margin-bottom:8px">Ethos 2026</div>
     <div style="font-size:14px;color:rgba(255,255,255,.6)">Loading your experience…</div>
   </div>
 </div>
@@ -250,7 +250,7 @@ textarea.form-input{resize:vertical;min-height:80px}
 <!-- DASHBOARD -->
 <div id="pg-dash" class="page">
   <div class="dash-header">
-    <div class="dash-conf">Ethos Conference 2025</div>
+    <div class="dash-conf">Ethos Conference 2026</div>
     <div class="dash-hi" id="dash-hi">Welcome! 🌿</div>
     <div class="dash-date" id="dash-date"></div>
     <div id="dash-lvl-badge"></div>
@@ -380,12 +380,12 @@ textarea.form-input{resize:vertical;min-height:80px}
   <div class="topbar"><button class="topbar-back" onclick="navTo('pg-dash')">←</button><div class="topbar-title">Conference Info</div></div>
   <div class="content">
     <div style="background:var(--g);border-radius:var(--r);padding:18px;color:#fff;margin-bottom:16px">
-      <div style="font-family:var(--fh);font-weight:800;font-size:20px">Ethos Sustainability 2025</div>
+      <div style="font-family:var(--fh);font-weight:800;font-size:20px">Ethos Sustainability 2026</div>
       <div style="font-size:13px;color:rgba(255,255,255,.7);margin-top:4px">Innovation Hall, Building A — Level 3</div>
     </div>
     <div class="sec">WiFi</div>
     <div class="info-group">
-      <div class="info-row"><div class="info-ico">📶</div><div><div class="info-key">Network</div><div class="info-val">Ethos2025</div></div></div>
+      <div class="info-row"><div class="info-ico">📶</div><div><div class="info-key">Network</div><div class="info-val">Ethos2026</div></div></div>
       <div class="info-row"><div class="info-ico">🔑</div><div><div class="info-key">Password</div><div class="info-val">sustainability!</div></div></div>
     </div>
     <div class="sec">Rooms</div>
@@ -398,8 +398,8 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
     <div class="sec">Contact</div>
     <div class="info-group">
-      <div class="info-row"><div class="info-ico">📧</div><div><div class="info-key">General</div><div class="info-val">staff@ethos2025.org</div></div></div>
-      <div class="info-row"><div class="info-ico">🔧</div><div><div class="info-key">Tech Support</div><div class="info-val">staff@ethos2025.org</div></div></div>
+      <div class="info-row"><div class="info-ico">📧</div><div><div class="info-key">General</div><div class="info-val"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c8bbbca9aeae88adbca0a7bbfaf8fafde6a7baaf">[email&#160;protected]</a></div></div></div>
+      <div class="info-row"><div class="info-ico">🔧</div><div><div class="info-key">Tech Support</div><div class="info-val"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="92e1e6f3f4f4d2f7e6fafde1a0a2a0a7bcfde0f5">[email&#160;protected]</a></div></div></div>
     </div>
   </div>
   <div class="bottom-nav" id="info-nav"></div>
@@ -455,9 +455,14 @@ textarea.form-input{resize:vertical;min-height:80px}
   </div>
 </div>
 
+<!-- DEMO BANNER -->
+<div id="demo-banner" style="display:none;position:fixed;top:0;left:0;right:0;background:#f0a000;color:#fff;text-align:center;font-size:12px;font-weight:700;padding:6px;z-index:9999;letter-spacing:.05em">
+  🎭 DEMO MODE — data is not saved
+  <button onclick="exitDemo()" style="background:rgba(0,0,0,.2);border:none;color:#fff;border-radius:6px;padding:2px 10px;margin-left:10px;cursor:pointer;font-size:11px;font-weight:700">Exit</button>
+</div>
 <div class="toast" id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ─── SUPABASE ───────────────────────────────────────────
 const SUPABASE_URL  = 'https://qtibzgyaldxcvhnkfxok.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0aWJ6Z3lhbGR4Y3ZobmtmeG9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MTE2NzUsImV4cCI6MjA4NzI4NzY3NX0.ovVgmA_GEq2sOWWBo32FX_xmMsSViJvBHMz1hr6Nj7E';
@@ -538,7 +543,7 @@ async function retryBoot() {
   document.getElementById('pg-loading').innerHTML = `
     <div style="text-align:center;color:#fff">
       <div style="font-size:48px;margin-bottom:16px">🌱</div>
-      <div style="font-family:var(--fh);font-weight:800;font-size:24px;margin-bottom:8px">Ethos 2025</div>
+      <div style="font-family:var(--fh);font-weight:800;font-size:24px;margin-bottom:8px">Ethos 2026</div>
       <div style="font-size:14px;color:rgba(255,255,255,.6)">Retrying…</div>
     </div>`;
   const { data: { session } } = await sb.auth.getSession();
@@ -549,15 +554,31 @@ async function retryBoot() {
   }
 }
 
-// PRIMARY: parse OAuth ?code= from URL and/or restore existing session
+// PRIMARY: check for demo mode first, then real session
 (async () => {
+  // Demo mode
+  const isDemo = new URLSearchParams(window.location.search).get('demo');
+  const demoRaw = sessionStorage.getItem('demoProfile');
+  if (isDemo && demoRaw) {
+    const demo = JSON.parse(demoRaw);
+    currentUser = { id: demo.id, email: demo.email };
+    currentProfile = demo;
+    // Load real entities from Supabase (public read, no auth needed via RLS)
+    const { data: ents } = await sb.from('entities').select('*').eq('active', true);
+    entities = ents || [];
+    myVotes = new Set(); myFeedback = new Set(); myStamps = new Set();
+    buildUI();
+    navTo('pg-dash');
+    return;
+  }
+
+  // Real auth
   const { data: { session }, error } = await sb.auth.getSession();
   if (error) console.error('[getSession error]', error);
   if (session?.user) {
     await bootApp(session.user);
     return;
   }
-  // Truly no session — go to login
   window.location.replace('applogin.html');
 })();
 
@@ -1174,11 +1195,23 @@ async function sendChat() {
 
 // ─── UTILS ──────────────────────────────────────────────
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
+
+function exitDemo() {
+  sessionStorage.removeItem('demoProfile');
+  window.location.replace('applogin.html');
+}
+
+// Show demo banner if in demo mode
+if (new URLSearchParams(window.location.search).get('demo')) {
+  document.addEventListener('DOMContentLoaded', () => {
+    const b = document.getElementById('demo-banner');
+    if (b) b.style.display = 'block';
+  });
+  // Also shift the topbar down slightly so banner doesn't cover it
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.topbar,.dash-header').forEach(el => el.style.marginTop = '28px');
+  });
+}
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 function showToast(msg) { const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400); }
-function timeAgo(ts)    { if(!ts)return''; const d=Date.now()-new Date(ts).getTime(); if(d<60000)return'just now'; if(d<3600000)return Math.floor(d/60000)+'m ago'; if(d<86400000)return Math.floor(d/3600000)+'h ago'; return Math.floor(d/86400000)+'d ago'; }
-function esc(s)         { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
-</script>
-</body>
-</html>
+function timeAgo(ts)    { if(!ts)return''; const d=Date.now()-new Date(ts).getTime(); if(d<60000)return'just now'; if(d<3600000)return Math.floor(d/60000)+'m ago'; if(d<86
