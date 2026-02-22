@@ -423,9 +423,12 @@ sb.auth.onAuthStateChange(async (event, session) => {
   if (session?.user) {
     currentUser = session.user;
     currentProfile = await loadProfile(currentUser.id);
-    if (!currentProfile) { window.location.href = 'adminlogin.html'; return; }
+    if (!currentProfile) {
+      showToast('Could not load profile — try signing in again');
+      setTimeout(() => sb.auth.signOut(), 2000);
+      return;
+    }
     if (lvl() === 0) {
-      // Attendee — send to app
       window.location.href = 'applogin.html';
       return;
     }
@@ -433,7 +436,10 @@ sb.auth.onAuthStateChange(async (event, session) => {
     goPage('pg-dash');
     if (hasLvl(2)) subscribeMessages();
   } else {
-    window.location.href = 'adminlogin.html';
+    // Only redirect to login if we're not on a page that's already shown
+    if (!document.getElementById('pg-dash').classList.contains('active')) {
+      window.location.href = 'adminlogin.html';
+    }
   }
 });
 

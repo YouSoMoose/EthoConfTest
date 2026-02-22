@@ -60,9 +60,15 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 // If already logged in with lvl 1+, go straight to admin
 sb.auth.getSession().then(async ({ data: { session } }) => {
   if (session?.user) {
-    const { data } = await sb.from('profiles').select('access_level').eq('id', session.user.id).single();
-    if (data?.access_level >= 1) window.location.href = 'admin.html';
-    else if (data?.access_level === 0) window.location.href = 'applogin.html';
+    for (let i = 0; i < 5; i++) {
+      if (i > 0) await new Promise(r => setTimeout(r, 600 * i));
+      const { data } = await sb.from('profiles').select('access_level').eq('id', session.user.id).single();
+      if (data) {
+        if (data.access_level >= 1) window.location.href = 'admin.html';
+        else window.location.href = 'applogin.html';
+        return;
+      }
+    }
   }
 });
 
