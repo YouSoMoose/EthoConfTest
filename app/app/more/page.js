@@ -1,4 +1,5 @@
 'use client'
+export const dynamic = 'force-dynamic'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/providers/AuthProvider'
 import Topbar from '@/components/Topbar'
