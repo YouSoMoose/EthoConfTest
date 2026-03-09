@@ -18,7 +18,7 @@ export default function ProfilePage() {
 
     async function saveResume() {
         setSaving(true)
-        await supabase.from('profiles').update({ resume_url: resumeUrl }).eq('id', profile.id)
+        await supabase.from('profiles').update({ resume_url: resumeUrl }).eq('id', profile?.id)
         setProfile(p => ({ ...p, resume_url: resumeUrl }))
         setSaving(false)
         showToast('Resume link saved ✓')

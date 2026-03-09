@@ -16,12 +16,12 @@ export default function PassportPage() {
     const [stamps, setStamps] = useState([])
     const [loading, setLoading] = useState(true)
 
-    useEffect(() => { load() }, [profile.id])
+    useEffect(() => { load() }, [profile?.id])
 
     async function load() {
         const [{ data: companies }, { data: myStamps }] = await Promise.all([
             supabase.from('companies').select('id,name,room_type,emoji').in('room_type', ['poster_room', 'conference_room']),
-            supabase.from('passport_stamps').select('company_id,room_type').eq('user_id', profile.id),
+            supabase.from('passport_stamps').select('company_id,room_type').eq('user_id', profile?.id),
         ])
         const roomMap = Object.entries(ROOM_TYPES).map(([key, meta]) => ({
             id: key, ...meta,

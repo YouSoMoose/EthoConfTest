@@ -46,7 +46,7 @@ export default function AdminDash() {
         <div className="anim-fade">
             <div className="dash-hero" style={{ margin: '-16px -16px 16px', borderRadius: '0 0 var(--r) var(--r)' }}>
                 <div className="dash-label">Admin Dashboard</div>
-                <div className="dash-hi">EthoConf<br />Control Center</div>
+                <div className="dash-hi">Ethos 2026<br />Control Center</div>
                 <div className="dash-date">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>

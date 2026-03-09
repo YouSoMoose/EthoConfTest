@@ -26,13 +26,13 @@ export default function PitchVotePage() {
     useEffect(() => {
         Promise.all([
             supabase.from('companies').select('*').eq('id', id).single(),
-            supabase.from('votes').select('*').eq('company_id', id).eq('voter_id', profile.id).maybeSingle(),
+            supabase.from('votes').select('*').eq('company_id', id).eq('voter_id', profile?.id).maybeSingle(),
         ]).then(([{ data: c }, { data: v }]) => {
             setCompany(c)
             if (v) { setExistingVote(v); setRatings(v.ratings || {}) }
             setLoading(false)
         })
-    }, [id, profile.id])
+    }, [id, profile?.id])
 
     async function submit() {
         if (RATING_QUESTIONS.some(q => !ratings[q.key])) {
@@ -40,7 +40,7 @@ export default function PitchVotePage() {
             return
         }
         setSaving(true)
-        const payload = { company_id: id, voter_id: profile.id, ratings }
+        const payload = { company_id: id, voter_id: profile?.id, ratings }
         if (existingVote) {
             await supabase.from('votes').update({ ratings }).eq('id', existingVote.id)
         } else {

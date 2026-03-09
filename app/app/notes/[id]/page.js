@@ -39,7 +39,7 @@ export default function NoteEditorPage() {
         if (noteId) {
             await supabase.from('notes').update({ title, body, updated_at: now }).eq('id', noteId)
         } else {
-            const { data } = await supabase.from('notes').insert({ user_id: profile.id, title, body, created_at: now, updated_at: now }).select().single()
+            const { data } = await supabase.from('notes').insert({ user_id: profile?.id, title, body, created_at: now, updated_at: now }).select().single()
             if (data) setNoteId(data.id)
         }
         setSaving(false)

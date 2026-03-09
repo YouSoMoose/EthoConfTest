@@ -24,13 +24,13 @@ export default function PitchesPage() {
     useEffect(() => {
         Promise.all([
             supabase.from('companies').select('*').eq('type', 'pitch').order('name'),
-            supabase.from('votes').select('company_id').eq('voter_id', profile.id),
+            supabase.from('votes').select('company_id').eq('voter_id', profile?.id),
         ]).then(([{ data: c }, { data: v }]) => {
             setCompanies(c || [])
             setMyVotes((v || []).map(x => x.company_id))
             setLoading(false)
         })
-    }, [profile.id])
+    }, [profile?.id])
 
     const filtered = companies.filter(c =>
         c.name?.toLowerCase().includes(search.toLowerCase()) ||

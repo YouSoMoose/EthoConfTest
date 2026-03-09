@@ -18,9 +18,9 @@ export default function NotesPage() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        supabase.from('notes').select('*').eq('user_id', profile.id).order('updated_at', { ascending: false })
+        supabase.from('notes').select('*').eq('user_id', profile?.id).order('updated_at', { ascending: false })
             .then(({ data }) => { setNotes(data || []); setLoading(false) })
-    }, [profile.id])
+    }, [profile?.id])
 
     async function deleteNote(id, e) {
         e.stopPropagation()

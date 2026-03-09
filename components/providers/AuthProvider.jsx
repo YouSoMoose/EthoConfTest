@@ -3,7 +3,15 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
-const AuthCtx = createContext(null)
+const AuthCtx = createContext({
+    session: undefined,
+    profile: null,
+    loading: true,
+    signOut: () => { },
+    refreshProfile: () => { },
+    setProfile: () => { },
+    supabase: null,
+})
 
 export function AuthProvider({ children }) {
     const [session, setSession] = useState(undefined)

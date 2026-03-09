@@ -14,9 +14,9 @@ export default function WalletPage() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        supabase.from('collected_cards').select('*').eq('collected_by', profile.id).order('created_at', { ascending: false })
+        supabase.from('collected_cards').select('*').eq('collected_by', profile?.id).order('created_at', { ascending: false })
             .then(({ data }) => { setCards(data || []); setLoading(false) })
-    }, [profile.id])
+    }, [profile?.id])
 
     return (
         <>

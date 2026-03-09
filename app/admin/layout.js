@@ -1,7 +1,10 @@
 'use client'
+export const dynamic = 'force-dynamic'
+
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/components/providers/AuthProvider'
 import Avatar from '@/components/Avatar'
+import Loader from '@/components/Loader'
 
 const TABS = [
     { path: '/admin', label: 'Dashboard' },
@@ -14,17 +17,19 @@ const TABS = [
 ]
 
 export default function AdminLayout({ children }) {
-    const { profile, signOut } = useAuth()
+    const { profile, loading, signOut } = useAuth()
     const pathname = usePathname()
     const router = useRouter()
-    const isSuper = profile?.access_level >= 3
 
+    if (loading || !profile) return <Loader fullPage />
+
+    const isSuper = profile?.access_level >= 3
     const visibleTabs = isSuper ? TABS : TABS.filter(t => !['/admin/users', '/admin/raffle'].includes(t.path))
 
     return (
         <div className="page-wrap">
             <div className="admin-topbar">
-                <div className="admin-brand">⚡ EthoConf Admin</div>
+                <div className="admin-brand">⚡ Ethos 2026 Admin</div>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                     <Avatar profile={profile} size={28} />
                     <button className="topbar-action" style={{ fontSize: 11 }} onClick={signOut}>Logout</button>
