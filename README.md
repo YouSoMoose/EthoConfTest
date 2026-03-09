@@ -1,131 +1,36 @@
-# Ethos 2025 — React App
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Full-featured student entrepreneurship conference app built with React + Vite + Supabase.
+## Getting Started
 
-## File Structure
+First, run the development server:
 
-```
-ethos-app/
-├── index.html
-├── vite.config.js
-├── package.json
-├── .env.example              ← copy to .env and fill in keys
-│
-└── src/
-    ├── main.jsx              ← React entry point
-    ├── App.jsx               ← Router + auth gating
-    │
-    ├── lib/
-    │   ├── supabase.js       ← Supabase client
-    │   ├── constants.js      ← ACCESS_LEVELS, RATING_QUESTIONS, etc.
-    │   └── utils.js          ← timeAgo, strColor, hasBadWords, etc.
-    │
-    ├── hooks/
-    │   ├── useAuth.jsx       ← Auth context + Google OAuth
-    │   └── useToast.jsx      ← Global toast notifications
-    │
-    ├── styles/
-    │   └── globals.css       ← All global styles + CSS variables
-    │
-    ├── components/           ← Reusable UI pieces
-    │   ├── Avatar.jsx
-    │   ├── BottomNav.jsx
-    │   ├── Loader.jsx
-    │   ├── Modal.jsx
-    │   ├── QRCode.jsx
-    │   ├── RoleChip.jsx
-    │   └── Topbar.jsx
-    │
-    ├── pages/
-    │   ├── DemoLanding.jsx   ← Pre-login marketing page
-    │   ├── LoginPage.jsx     ← Google OAuth login
-    │   │
-    │   ├── attendee/         ← L0 + L1 app
-    │   │   ├── AttendeeLayout.jsx
-    │   │   ├── HomePage.jsx
-    │   │   ├── SchedulePage.jsx
-    │   │   ├── ScheduleDetail.jsx
-    │   │   ├── PitchesPage.jsx
-    │   │   ├── PitchVotePage.jsx
-    │   │   ├── PassportPage.jsx
-    │   │   ├── MorePage.jsx
-    │   │   ├── NotesPage.jsx
-    │   │   ├── NoteEditorPage.jsx
-    │   │   ├── ChatPage.jsx
-    │   │   ├── MyCardPage.jsx
-    │   │   ├── WalletPage.jsx
-    │   │   ├── ScanPage.jsx
-    │   │   └── ProfilePage.jsx
-    │   │
-    │   └── admin/            ← L2 + L3 admin panel
-    │       ├── AdminLayout.jsx
-    │       ├── AdminDash.jsx
-    │       ├── AdminCheckin.jsx
-    │       ├── AdminMessages.jsx
-    │       ├── AdminCompanies.jsx
-    │       ├── AdminUsers.jsx
-    │       ├── AdminSchedule.jsx
-    │       └── AdminRaffle.jsx
-```
-
-## Setup
-
-### 1. Install dependencies
-```bash
-npm install
-```
-
-### 2. Add environment variables
-```bash
-cp .env.example .env
-# Fill in your Supabase URL and anon key
-```
-
-### 3. Run the Supabase SQL schema
-- Go to your Supabase Dashboard → SQL Editor
-- Run the contents of `supabase-setup.sql` (from previous output)
-
-### 4. Configure Google OAuth
-- Supabase Dashboard → Authentication → Providers → Google → Enable
-- Add your domain to Redirect URLs in Auth settings
-
-### 5. Run locally
 ```bash
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-### 6. Build for GitHub Pages
-```bash
-npm run build
-# Deploy the dist/ folder to GitHub Pages
-```
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Access Levels
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-| Level | Role        | Access |
-|-------|-------------|--------|
-| 0     | Attendee    | Full attendee app |
-| 1     | Presenter   | Attendee app + can create company card |
-| 2     | Staff       | Admin panel: check-in + messages |
-| 3     | Super Admin | Full admin: companies, users, schedule, raffle |
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-**To set yourself as Super Admin:**
-1. Sign in with Google (creates your profile automatically)
-2. Supabase Dashboard → Table Editor → `profiles` → find your row → set `access_level = 3`
-3. After that, manage all users from Admin → Users
+## Learn More
 
-## Key Features
+To learn more about Next.js, take a look at the following resources:
 
-- 🔐 Google OAuth with automatic profile creation
-- 📊 Access-level routing (attendee/admin views auto-determined by level)
-- 🗓️ Schedule with room filter + detail view
-- 🏆 Pitch room with 4-question 1–10 rating system
-- 🗺️ Passport system with stamp grid + progress bars
-- 🎟️ Silent raffle entry (no UI hint to attendees)
-- 📝 Personal notes with create/edit/delete
-- 💬 Attendee↔Staff chat with rate limiting + content filter
-- 💼 Booth wallet for saved business cards
-- 🪪 Personal QR card with resume link
-- 📷 QR scan page (manual paste; camera requires HTTPS + html5-qrcode)
-- 📣 Admin broadcast messages
-- ✅ Staff check-in panel
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
