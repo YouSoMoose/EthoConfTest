@@ -50,11 +50,24 @@ export default function LandingPage() {
   useEffect(() => {
     if (session?.profile) {
       const level = session.profile.access_level ?? 0;
-      if (level >= 2) router.replace('/admin');
-      else if (level === 1) router.replace('/company');
-      else router.replace('/app');
+      if (level >= 2) return router.replace('/admin');
+      else if (level === 1) return router.replace('/company');
+      else return router.replace('/app');
     }
-  }, [session, router]);
+
+    if (!isLoading && !session?.profile) {
+      const isForced = new URLSearchParams(window.location.search).get('carousel') === '1';
+      const hasSeen = localStorage.getItem('ethos_seen_carousel');
+      if (hasSeen && !isForced) {
+        router.replace('/login');
+      }
+    }
+  }, [session, router, isLoading]);
+
+  const finishCarousel = () => {
+    localStorage.setItem('ethos_seen_carousel', '1');
+    router.push('/login');
+  };
 
   const goTo = (i) => setCurrent(i);
   const next = () => setCurrent(c => Math.min(c + 1, slides.length - 1));
@@ -77,7 +90,7 @@ export default function LandingPage() {
   if (isLoading || isAuthenticated) {
     return (
       <div style={{
-        minHeight: '100vh',
+        minHeight: '100dvh',
         background: 'linear-gradient(160deg, #2d5016 0%, #1a4a3c 40%, #1a3a5b 100%)',
         display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
@@ -104,7 +117,7 @@ export default function LandingPage() {
 
   return (
     <div style={{
-      minHeight: '100vh',
+      minHeight: '100dvh',
       background: slide.gradient,
       transition: 'background 0.6s ease',
       display: 'flex',
@@ -204,7 +217,7 @@ export default function LandingPage() {
         maxWidth: 360, width: '100%', margin: '0 auto',
       }}>
         {isLast ? (
-          <Link href="/login" style={{
+          <button onClick={finishCarousel} style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             width: '100%', padding: '16px 24px',
             background: '#fff', color: '#1a1814',
@@ -213,17 +226,17 @@ export default function LandingPage() {
             border: 'none', transition: 'transform 0.1s',
           }}>
             Get Started 🚀
-          </Link>
+          </button>
         ) : (
           <div style={{ display: 'flex', gap: 12 }}>
-            <Link href="/login" style={{
+            <button onClick={finishCarousel} style={{
               flex: 1, padding: '14px 20px', textAlign: 'center',
               background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,.7)',
               borderRadius: 14, fontFamily: 'var(--fb)',
-              fontSize: 14, fontWeight: 600, border: '1px solid rgba(255,255,255,.15)',
+              fontSize: 14, fontWeight: 600, border: '1px solid rgba(255,255,255,.15)', cursor: 'pointer',
             }}>
               Skip
-            </Link>
+            </button>
             <button onClick={next} style={{
               flex: 2, padding: '14px 20px',
               background: 'rgba(255,255,255,0.2)', color: '#fff',

@@ -2,6 +2,7 @@
 
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -13,11 +14,24 @@ export default function LoginPage() {
 
   return (
     <div style={{
-      minHeight: '100vh',
+      minHeight: '100dvh',
       background: 'linear-gradient(160deg, #2d5016 0%, #1a4a3c 40%, #1a3a5b 100%)',
       display: 'flex',
       flexDirection: 'column',
+      position: 'relative',
     }}>
+      {/* Info button to see carousel */}
+      <Link href="/?carousel=1" style={{
+        position: 'absolute', top: 'max(24px, env(safe-area-inset-top))', right: 24,
+        width: 32, height: 32, borderRadius: 16,
+        background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: 'rgba(255,255,255,0.7)', fontSize: 16, fontFamily: 'var(--fb)',
+        textDecoration: 'none', transition: 'all 0.2s', cursor: 'pointer',
+      }}>
+        ℹ
+      </Link>
+
       {/* Hero branding — centered in the remaining space */}
       <div style={{
         flex: 1, display: 'flex', flexDirection: 'column',

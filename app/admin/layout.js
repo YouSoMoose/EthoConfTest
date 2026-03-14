@@ -72,7 +72,7 @@ export default function AdminLayout({ children }) {
           }}>
             <span style={{ fontSize: 16 }}>👤</span> Attendee View
           </Link>
-          <button onClick={() => signOut({ callbackUrl: '/' })} style={{
+          <button onClick={() => signOut({ callbackUrl: '/login' })} style={{
             background: 'none', border: 'none', color: 'var(--amuted)',
             fontFamily: 'var(--fb)', fontSize: 13, cursor: 'pointer',
             padding: '8px 12px', width: '100%', textAlign: 'left',
@@ -109,7 +109,7 @@ export default function AdminLayout({ children }) {
           }}>
             👤 Attendee
           </Link>
-          <button onClick={() => signOut({ callbackUrl: '/' })} style={{
+          <button onClick={() => signOut({ callbackUrl: '/login' })} style={{
             background: 'none', border: 'none', color: 'var(--asub)',
             fontFamily: 'var(--fb)', fontSize: 12, cursor: 'pointer',
           }}>Sign Out</button>
@@ -166,7 +166,7 @@ export default function AdminLayout({ children }) {
             </nav>
 
             <div style={{ padding: '16px', borderTop: '1px solid var(--aborder)' }}>
-              <button onClick={() => signOut({ callbackUrl: '/' })} style={{
+              <button onClick={() => signOut({ callbackUrl: '/login' })} style={{
                 background: 'none', border: 'none', color: 'var(--amuted)',
                 fontFamily: 'var(--fb)', fontSize: 13, cursor: 'pointer',
                 padding: '8px 0', width: '100%', textAlign: 'left',

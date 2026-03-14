@@ -7,6 +7,13 @@ export const metadata = {
   description: 'The official app for Ethos 2026, a sustainability and innovation conference.',
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">

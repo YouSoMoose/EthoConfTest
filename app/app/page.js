@@ -134,21 +134,18 @@ export default function AttendeeDashboard() {
                   🏢 Portal
                 </Link>
               )}
-              <button
-                onClick={() => signOut({ callbackUrl: '/' })}
-                style={{
-                  background: 'rgba(255,255,255,0.12)',
-                  border: 'none',
-                  color: 'rgba(255,255,255,0.8)',
-                  fontSize: 12,
-                  fontFamily: 'var(--fb)',
-                  padding: '6px 12px',
-                  borderRadius: 10,
-                  cursor: 'pointer',
-                  transition: 'background 0.2s',
-                  flexShrink: 0,
-                }}
-              >
+              <button onClick={() => signOut({ callbackUrl: '/login' })} style={{
+                background: 'rgba(255,255,255,0.12)',
+                border: 'none',
+                color: 'rgba(255,255,255,0.8)',
+                fontSize: 12,
+                fontFamily: 'var(--fb)',
+                padding: '6px 12px',
+                borderRadius: 10,
+                cursor: 'pointer',
+                transition: 'background 0.2s',
+                flexShrink: 0,
+              }}>
                 Sign Out
               </button>
             </div>

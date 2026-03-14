@@ -59,7 +59,7 @@ export default function CompanyLayout({ children }) {
             }}>
               👤 Attendee View
             </Link>
-            <button onClick={() => signOut({ callbackUrl: '/' })} style={{
+            <button onClick={() => signOut({ callbackUrl: '/login' })} style={{
               background: 'none', border: 'none', color: 'rgba(255,255,255,.6)', fontFamily: 'var(--fb)', fontSize: 13, cursor: 'pointer',
             }}>
               Sign Out
