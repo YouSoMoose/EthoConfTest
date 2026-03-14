@@ -7,13 +7,11 @@ import { useState } from 'react';
 import PageTransition from '@/components/PageTransition';
 
 const tabs = [
-  { label: 'Dashboard', href: '/admin', icon: '📊', minLevel: 2 },
-  { label: 'Check-in', href: '/admin/checkin', icon: '✅', minLevel: 2 },
-  { label: 'Messages', href: '/admin/messages', icon: '💬', minLevel: 2 },
-  { label: 'Companies', href: '/admin/companies', icon: '🏢', minLevel: 2 },
-  { label: 'Schedule', href: '/admin/schedule', icon: '📅', minLevel: 2 },
-  { label: 'Users', href: '/admin/users', icon: '👥', minLevel: 3 },
-  { label: 'Raffle', href: '/admin/raffle', icon: '🎰', minLevel: 3 },
+  { label: 'Dashboard', href: '/admin', icon: '📊', show: (level) => level >= 2 },
+  { label: 'Check-in', href: '/admin/checkin', icon: '✅', show: (level) => level >= 2 },
+  { label: 'Messages', href: '/admin/messages', icon: '💬', show: (level) => level >= 3 },
+  { label: 'Schedule', href: '/admin/schedule', icon: '📅', show: (level) => level >= 3 },
+  { label: 'Users', href: '/admin/users', icon: '👥', show: (level) => level >= 3 },
 ];
 
 export default function AdminLayout({ children }) {
@@ -21,9 +19,43 @@ export default function AdminLayout({ children }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const level = session?.profile?.access_level || 0;
-  const visibleTabs = tabs.filter(t => level >= t.minLevel);
+  const visibleTabs = tabs.filter(t => t.show(level));
 
   const isActive = (href) => href === '/admin' ? pathname === '/admin' : pathname.startsWith(href);
+
+  if (level === 2) {
+    return (
+      <div style={{ minHeight: '100vh', background: 'var(--abg)', color: 'var(--atext)', display: 'flex', flexDirection: 'column' }}>
+        <header style={{
+          background: 'var(--as1)',
+          borderBottom: '1px solid var(--aborder)',
+          padding: '12px 16px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          position: 'sticky', top: 0, zIndex: 60,
+        }}>
+          <h1 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 16, color: 'var(--atext)' }}>Staff Scanner</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Link href="/app" style={{
+              background: 'var(--ad)', border: '1px solid var(--ab)', borderRadius: 8,
+              padding: '6px 12px', fontFamily: 'var(--fb)', fontSize: 12,
+              fontWeight: 600, color: 'var(--accent)', textDecoration: 'none'
+            }}>
+              👤 Attendee View
+            </Link>
+            <button onClick={() => signOut({ callbackUrl: '/login' })} style={{
+              background: 'none', border: 'none', color: 'var(--asub)',
+              fontFamily: 'var(--fb)', fontSize: 12, cursor: 'pointer',
+            }}>Sign Out</button>
+          </div>
+        </header>
+        <main style={{ flex: 1, paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
+          <PageTransition>{children}</PageTransition>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--abg)', color: 'var(--atext)' }}>

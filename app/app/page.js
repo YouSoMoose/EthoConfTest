@@ -75,8 +75,6 @@ export default function AttendeeDashboard() {
 
   const quickLinks = [
     { icon: '📅', label: 'Schedule', href: '/app/schedule?anim=scale' },
-    { icon: '🏢', label: 'Companies', href: '/app/pitches?anim=scale' },
-    { icon: '🛂', label: 'Passport', href: '/app/passport?anim=scale' },
     { icon: '💬', label: 'Chat', href: '/app/chat?anim=scale' },
     { icon: '📝', label: 'Notes', href: '/app/notes?anim=scale' },
     { icon: '💼', label: 'Wallet', href: '/app/wallet?anim=scale' },

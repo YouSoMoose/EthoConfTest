@@ -18,7 +18,6 @@ export async function middleware(request) {
   if (token && (pathname === '/' || pathname === '/login')) {
     const accessLevel = token.profile?.access_level ?? 0;
     if (accessLevel >= 2) return NextResponse.redirect(new URL('/admin', request.url));
-    if (accessLevel === 1) return NextResponse.redirect(new URL('/company', request.url));
     return NextResponse.redirect(new URL('/app', request.url));
   }
 
@@ -41,12 +40,7 @@ export async function middleware(request) {
     }
   }
 
-  // Protect /company — requires level >= 1
-  if (pathname.startsWith('/company')) {
-    if (accessLevel < 1) {
-      return NextResponse.redirect(new URL('/app', request.url));
-    }
-  }
+
 
   return NextResponse.next();
 }

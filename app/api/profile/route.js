@@ -27,10 +27,13 @@ export async function PUT(request) {
 
   const body = await request.json();
 
-  // Only resume_link is editable by the user
   const { data, error } = await supabaseAdmin
     .from('profiles')
-    .update({ resume_link: body.resume_link })
+    .update({ 
+      resume_link: body.resume_link,
+      phone: body.phone,
+      bio: body.bio
+    })
     .eq('id', session.profile.id)
     .select()
     .single();

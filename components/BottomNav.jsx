@@ -8,8 +8,8 @@ import { useSession } from 'next-auth/react';
 const attendeeTabs = [
   { label: 'Home', href: '/app', icon: '🏠' },
   { label: 'Schedule', href: '/app/schedule', icon: '📅' },
-  { label: 'Companies', href: '/app/pitches', icon: '🏢' },
-  { label: 'Passport', href: '/app/passport', icon: '🛂' },
+  { label: 'Scanner', href: '/app/scan', icon: '🔍' },
+  { label: 'My Card', href: '/app/my-card', icon: '🎫' },
   { label: 'Chat', href: '/app/chat', icon: '💬' },
 ];
 

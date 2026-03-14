@@ -108,7 +108,7 @@ export default function LoginPage() {
           fontSize: 12, color: 'var(--muted)', textAlign: 'center',
           lineHeight: 1.6, fontFamily: 'var(--fb)',
         }}>
-          Sign in to access schedules, company ratings, and your conference passport.
+          Sign in to access schedules, your QR scanner, and your connection wallet.
           Staff & admin access requires an approved account.
         </p>
       </div>

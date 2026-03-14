@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Loader from '@/components/Loader';
 import toast from 'react-hot-toast';
 import Modal from '@/components/Modal';
+import QRScanner from '@/components/QRScanner';
 
 export default function AdminDashboard() {
   const { data: session } = useSession();
@@ -19,6 +20,7 @@ export default function AdminDashboard() {
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
+    if (level === 2) { setLoading(false); return; }
     Promise.all([
       fetch('/api/users').then(r => r.json()),
       fetch('/api/companies').then(r => r.json()),
@@ -78,10 +80,17 @@ export default function AdminDashboard() {
 
   if (loading) return <Loader admin />;
 
+  if (level === 2) {
+    return (
+      <div className="page-enter">
+        <QRScanner />
+      </div>
+    );
+  }
+
   const cards = [
     { label: 'Total Users', value: stats?.totalUsers || 0, icon: '👥', href: '/admin/users', minLevel: 3 },
     { label: 'Checked In', value: stats?.checkedIn || 0, icon: '✅', href: '/admin/checkin', minLevel: 2 },
-    { label: 'Companies', value: stats?.companies || 0, icon: '🏢', href: '/admin/companies', minLevel: 2 },
     { label: 'Total Votes', value: stats?.totalVotes || 0, icon: '🗳️' },
     { label: 'Unread Messages', value: stats?.unreadMessages || 0, icon: '💬', href: '/admin/messages', minLevel: 2 },
     { label: 'Raffle Entries', value: stats?.raffleEntries || 0, icon: '🎰', href: '/admin/raffle', minLevel: 3 },

@@ -11,17 +11,23 @@ import Modal from '@/components/Modal';
 
 export default function MyCardPage() {
   const { data: session } = useSession();
-  const [resumeLink, setResumeLink] = useState(session?.profile?.resume_link || '');
+  const profile = session?.profile;
+  const [resumeLink, setResumeLink] = useState(profile?.resume_link || '');
+  const [phone, setPhone] = useState(profile?.phone || '');
+  const [bio, setBio] = useState(profile?.bio || '');
   const [saving, setSaving] = useState(false);
   const [qrExpanded, setQrExpanded] = useState(false);
-  const profile = session?.profile;
 
-  const saveResume = async () => {
+  const saveProfile = async () => {
     setSaving(true);
     try {
-      const res = await fetch('/api/profile', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ resume_link: resumeLink }) });
-      if (res.ok) toast.success('Resume link saved');
-      else toast.error('Failed');
+      const res = await fetch('/api/profile', { 
+        method: 'PUT', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ resume_link: resumeLink, phone, bio }) 
+      });
+      if (res.ok) toast.success('Profile saved successfully');
+      else toast.error('Failed to save');
     } catch { toast.error('Network error'); }
     setSaving(false);
   };
@@ -59,29 +65,64 @@ export default function MyCardPage() {
           </p>
         </div>
 
-        {/* Resume link */}
+        {/* Edit Form */}
         <div style={{
           background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 'var(--r)',
           padding: 20, animation: 'fadeUp 0.22s ease 0.1s both',
+          display: 'flex', flexDirection: 'column', gap: 16,
         }}>
-          <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 16, color: 'var(--text)', marginBottom: 4 }}>
-            📄 Resume Link
-          </h3>
-          <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--muted)', marginBottom: 16 }}>
-            Add a link to your resume so companies can view it
-          </p>
-          <input
-            type="url"
-            value={resumeLink}
-            onChange={e => setResumeLink(e.target.value)}
-            placeholder="https://your-resume-link.com"
-            style={{
-              width: '100%', background: 'var(--white)', border: '1.5px solid var(--border)',
-              borderRadius: 10, padding: '11px 14px', fontSize: 14,
-              fontFamily: 'var(--fb)', color: 'var(--text)', outline: 'none', marginBottom: 12,
-            }}
-          />
-          <Btn onClick={saveResume} disabled={saving}>{saving ? 'Saving…' : 'Save Resume Link'}</Btn>
+          <div>
+            <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 15, color: 'var(--text)', marginBottom: 6 }}>
+              📞 Phone Number
+            </h3>
+            <input
+              type="tel"
+              value={phone}
+              onChange={e => setPhone(e.target.value)}
+              placeholder="(555) 123-4567"
+              style={{
+                width: '100%', background: 'var(--white)', border: '1.5px solid var(--border)',
+                borderRadius: 10, padding: '11px 14px', fontSize: 14,
+                fontFamily: 'var(--fb)', color: 'var(--text)', outline: 'none',
+              }}
+            />
+          </div>
+
+          <div>
+            <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 15, color: 'var(--text)', marginBottom: 6 }}>
+              📝 Bio / Description
+            </h3>
+            <textarea
+              value={bio}
+              onChange={e => setBio(e.target.value)}
+              placeholder="Tell others a bit about yourself..."
+              rows={3}
+              style={{
+                width: '100%', background: 'var(--white)', border: '1.5px solid var(--border)',
+                borderRadius: 10, padding: '11px 14px', fontSize: 14,
+                fontFamily: 'var(--fb)', color: 'var(--text)', outline: 'none', resize: 'none'
+              }}
+            />
+          </div>
+
+          <div>
+            <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 15, color: 'var(--text)', marginBottom: 6 }}>
+              📄 Resume Link
+            </h3>
+            <input
+              type="url"
+              value={resumeLink}
+              onChange={e => setResumeLink(e.target.value)}
+              placeholder="https://your-resume-link.com"
+              style={{
+                width: '100%', background: 'var(--white)', border: '1.5px solid var(--border)',
+                borderRadius: 10, padding: '11px 14px', fontSize: 14,
+                fontFamily: 'var(--fb)', color: 'var(--text)', outline: 'none',
+              }}
+            />
+          </div>
+
+          <Btn onClick={saveProfile} disabled={saving}>{saving ? 'Saving…' : 'Save Profile'}</Btn>
         </div>
       </div>
 
