@@ -30,7 +30,7 @@ export default function Modal({ open, onClose, title, subtitle, admin, children 
           background: bg,
           borderTop: `1px solid ${border}`,
           padding: '16px 20px 32px',
-          transform: visible ? 'translateY(0)' : 'translateY(40px)',
+          transform: visible ? 'translateY(0)' : 'translateY(100%)',
           paddingBottom: 'max(32px, env(safe-area-inset-bottom))',
         }}
       >

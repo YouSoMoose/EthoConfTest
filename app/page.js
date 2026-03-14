@@ -1,20 +1,51 @@
 'use client';
 
-import { signIn, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import Btn from '@/components/Btn';
+import { useEffect, useState, useRef } from 'react';
+import Link from 'next/link';
 
-const features = [
-  { icon: '📅', title: 'Live Schedule', desc: 'Real-time event timeline' },
-  { icon: '🎤', title: 'Pitch Voting', desc: 'Rate company presentations' },
-  { icon: '🛂', title: 'Passport', desc: 'Collect booth stamps' },
-  { icon: '💬', title: 'Live Chat', desc: 'Message event staff' },
+const slides = [
+  {
+    icon: '📅',
+    title: 'Live Schedule',
+    desc: 'Stay on track with the real-time event timeline. Never miss a session, workshop, or keynote.',
+    gradient: 'linear-gradient(135deg, #2d5016 0%, #1a6b3c 100%)',
+  },
+  {
+    icon: '🏢',
+    title: 'Explore Companies',
+    desc: 'Browse and rate participating companies. Discover innovative startups and sustainability leaders.',
+    gradient: 'linear-gradient(135deg, #1a6b3c 0%, #0e5c52 100%)',
+  },
+  {
+    icon: '🛂',
+    title: 'Passport Stamps',
+    desc: 'Visit booths and collect stamps on your digital passport. Complete your journey through Ethos.',
+    gradient: 'linear-gradient(135deg, #0e5c52 0%, #1a4a6b 100%)',
+  },
+  {
+    icon: '💬',
+    title: 'Live Chat',
+    desc: 'Message event staff in real-time. Get answers, share feedback, and stay connected.',
+    gradient: 'linear-gradient(135deg, #1a4a6b 0%, #3a3a6b 100%)',
+  },
+  {
+    icon: '📝',
+    title: 'Smart Notes',
+    desc: 'Take notes during sessions and save them to your account. Access them anytime, anywhere.',
+    gradient: 'linear-gradient(135deg, #3a3a6b 0%, #5a2a5b 100%)',
+  },
 ];
 
 export default function LandingPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [current, setCurrent] = useState(0);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+  const isLoading = status === 'loading';
+  const isAuthenticated = !!session?.profile;
 
   useEffect(() => {
     if (session?.profile) {
@@ -25,90 +56,184 @@ export default function LandingPage() {
     }
   }, [session, router]);
 
-  return (
-    <div className="page-enter" style={{ minHeight: '100vh', background: 'var(--bg)' }}>
-      {/* Hero */}
-      <div style={{
-        background: 'var(--g)',
-        color: '#fff',
-        textAlign: 'center',
-        padding: 'max(40px, env(safe-area-inset-top)) 24px 56px',
-        position: 'relative',
-        overflow: 'hidden',
-      }}>
-        <span style={{ fontSize: 56, display: 'block', marginBottom: 12 }}>🌿</span>
-        <h1 style={{ fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 38, marginBottom: 8, color: '#fff' }}>
-          Ethos 2026
-        </h1>
-        <p style={{ fontFamily: 'var(--fb)', fontSize: 16, opacity: 0.8, marginBottom: 4 }}>
-          Sustainability &amp; Innovation Conference
-        </p>
-        <p style={{ fontFamily: 'var(--fb)', fontSize: 13, opacity: 0.55 }}>
-          March 21, 2026 • Building a Sustainable Future
-        </p>
+  const goTo = (i) => setCurrent(i);
+  const next = () => setCurrent(c => Math.min(c + 1, slides.length - 1));
+  const prev = () => setCurrent(c => Math.max(c - 1, 0));
 
-        <div style={{ marginTop: 32, maxWidth: 320, marginLeft: 'auto', marginRight: 'auto' }}>
-          <button
-            onClick={() => signIn('google', { callbackUrl: '/' })}
-            disabled={status === 'loading'}
-            style={{
-              background: 'var(--white)',
-              color: 'var(--text)',
-              border: 'none',
-              borderRadius: 12,
-              padding: '14px 28px',
-              fontSize: 15,
-              fontWeight: 600,
-              fontFamily: 'var(--fb)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 10,
-              width: '100%',
-              transition: 'transform .1s',
-            }}
-          >
-            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.01 24.01 0 0 0 0 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-            Sign in with Google
-          </button>
+  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchEnd = (e) => {
+    touchEndX.current = e.changedTouches[0].clientX;
+    const diff = touchStartX.current - touchEndX.current;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) next();
+      else prev();
+    }
+  };
+
+  const slide = slides[current];
+  const isLast = current === slides.length - 1;
+
+  // Show a branded loading screen while session loads or user is authenticated
+  if (isLoading || isAuthenticated) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(160deg, #2d5016 0%, #1a4a3c 40%, #1a3a5b 100%)',
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+      }}>
+        <div style={{
+          width: 56, height: 56, borderRadius: 16,
+          background: 'rgba(255,255,255,0.12)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          margin: '0 auto 20px',
+          fontSize: 28, fontFamily: 'var(--fh)', fontWeight: 800, color: '#fff',
+        }}>E</div>
+        <div style={{
+          width: 24, height: 24, border: '3px solid rgba(255,255,255,.2)',
+          borderTopColor: '#fff', borderRadius: '50%',
+          animation: 'spin 0.8s linear infinite',
+          margin: '0 auto 16px',
+        }} />
+        <p style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'rgba(255,255,255,.5)' }}>
+          Please wait…
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: slide.gradient,
+      transition: 'background 0.6s ease',
+      display: 'flex',
+      flexDirection: 'column',
+    }}>
+      {/* Top branding */}
+      <div style={{
+        padding: 'max(20px, env(safe-area-inset-top)) 24px 0',
+        textAlign: 'center',
+      }}>
+        <div style={{
+          width: 56, height: 56, borderRadius: 16,
+          background: 'rgba(255,255,255,0.12)',
+          backdropFilter: 'blur(10px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          margin: '0 auto 16px',
+          fontSize: 28, fontFamily: 'var(--fh)', fontWeight: 800, color: '#fff',
+        }}>E</div>
+        <p style={{
+          fontSize: 11, fontWeight: 700, letterSpacing: '.2em',
+          color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', marginBottom: 8,
+        }}>
+          Annual Conference · 2026
+        </p>
+        <h1 style={{
+          fontFamily: 'var(--fh)', fontSize: 42, fontWeight: 800,
+          color: '#fff', lineHeight: 1.05, marginBottom: 6,
+        }}>
+          Ethos<br />
+          <span style={{ color: 'var(--warm)', fontWeight: 300 }}>2026</span>
+        </h1>
+        <p style={{
+          fontSize: 14, color: 'rgba(255,255,255,.5)', marginTop: 8, lineHeight: 1.6,
+          fontFamily: 'var(--fb)',
+        }}>
+          Where student entrepreneurs shape the future
+        </p>
+      </div>
+
+      {/* Feature slider */}
+      <div style={{
+        flex: 1, display: 'flex', flexDirection: 'column',
+        justifyContent: 'center', alignItems: 'center',
+        padding: '32px 24px 0',
+      }}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        <div style={{
+          background: 'rgba(255,255,255,0.08)',
+          backdropFilter: 'blur(20px)',
+          borderRadius: 24,
+          border: '1px solid rgba(255,255,255,0.1)',
+          padding: '40px 28px 36px',
+          maxWidth: 360,
+          width: '100%',
+          textAlign: 'center',
+          minHeight: 220,
+          transition: 'all 0.3s ease',
+        }}>
+          <span style={{
+            fontSize: 52, display: 'block', marginBottom: 16,
+            animation: 'scaleIn 0.3s ease both',
+          }} key={current + 'icon'}>{slide.icon}</span>
+          <h2 style={{
+            fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 24,
+            color: '#fff', marginBottom: 10,
+            animation: 'fadeUp 0.3s ease both',
+          }} key={current + 'title'}>{slide.title}</h2>
+          <p style={{
+            fontFamily: 'var(--fb)', fontSize: 14, color: 'rgba(255,255,255,.65)',
+            lineHeight: 1.6,
+            animation: 'fadeUp 0.3s ease 0.05s both',
+          }} key={current + 'desc'}>{slide.desc}</p>
+        </div>
+
+        {/* Dots */}
+        <div style={{
+          display: 'flex', gap: 8, justifyContent: 'center',
+          marginTop: 24,
+        }}>
+          {slides.map((_, i) => (
+            <button key={i} onClick={() => goTo(i)} style={{
+              width: current === i ? 24 : 8, height: 8,
+              borderRadius: 4,
+              background: current === i ? '#fff' : 'rgba(255,255,255,.3)',
+              border: 'none', cursor: 'pointer', padding: 0,
+              transition: 'all 0.3s ease',
+            }} />
+          ))}
         </div>
       </div>
 
-      {/* Features */}
-      <div style={{ maxWidth: 500, margin: '0 auto', padding: '40px 20px 60px' }}>
-        <h2 style={{
-          fontFamily: 'var(--fh)',
-          fontWeight: 700,
-          fontSize: 22,
-          color: 'var(--g)',
-          textAlign: 'center',
-          marginBottom: 24,
-        }}>
-          Event Features
-        </h2>
-
-        <div className="stagger" style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 12,
-        }}>
-          {features.map((f) => (
-            <div key={f.title} style={{
-              background: 'var(--white)',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--r)',
-              padding: '20px 16px',
-              textAlign: 'center',
+      {/* Bottom CTA */}
+      <div style={{
+        padding: '24px 24px max(24px, env(safe-area-inset-bottom))',
+        maxWidth: 360, width: '100%', margin: '0 auto',
+      }}>
+        {isLast ? (
+          <Link href="/login" style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            width: '100%', padding: '16px 24px',
+            background: '#fff', color: '#1a1814',
+            borderRadius: 14, fontFamily: 'var(--fb)',
+            fontSize: 16, fontWeight: 700, cursor: 'pointer',
+            border: 'none', transition: 'transform 0.1s',
+          }}>
+            Get Started 🚀
+          </Link>
+        ) : (
+          <div style={{ display: 'flex', gap: 12 }}>
+            <Link href="/login" style={{
+              flex: 1, padding: '14px 20px', textAlign: 'center',
+              background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,.7)',
+              borderRadius: 14, fontFamily: 'var(--fb)',
+              fontSize: 14, fontWeight: 600, border: '1px solid rgba(255,255,255,.15)',
             }}>
-              <span style={{ fontSize: 28, display: 'block', marginBottom: 8 }}>{f.icon}</span>
-              <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 14, color: 'var(--text)', marginBottom: 4 }}>
-                {f.title}
-              </h3>
-              <p style={{ fontFamily: 'var(--fb)', fontSize: 12, color: 'var(--muted)' }}>{f.desc}</p>
-            </div>
-          ))}
-        </div>
+              Skip
+            </Link>
+            <button onClick={next} style={{
+              flex: 2, padding: '14px 20px',
+              background: 'rgba(255,255,255,0.2)', color: '#fff',
+              borderRadius: 14, fontFamily: 'var(--fb)',
+              fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer',
+            }}>
+              Next →
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

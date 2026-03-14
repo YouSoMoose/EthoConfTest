@@ -5,14 +5,25 @@ export async function middleware(request) {
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
   const { pathname } = request.nextUrl;
 
-  // Public routes
+  // Always allow auth API, static files
   if (
-    pathname === '/' ||
-    pathname === '/login' ||
     pathname.startsWith('/api/auth') ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon')
   ) {
+    return NextResponse.next();
+  }
+
+  // If logged in and visiting landing or login → redirect to their dashboard
+  if (token && (pathname === '/' || pathname === '/login')) {
+    const accessLevel = token.profile?.access_level ?? 0;
+    if (accessLevel >= 2) return NextResponse.redirect(new URL('/admin', request.url));
+    if (accessLevel === 1) return NextResponse.redirect(new URL('/company', request.url));
+    return NextResponse.redirect(new URL('/app', request.url));
+  }
+
+  // Public routes (landing + login) for non-authenticated users
+  if (pathname === '/' || pathname === '/login') {
     return NextResponse.next();
   }
 
@@ -30,18 +41,11 @@ export async function middleware(request) {
     }
   }
 
-  // Protect /company — requires level === 1 or level >= 2
+  // Protect /company — requires level >= 1
   if (pathname.startsWith('/company')) {
     if (accessLevel < 1) {
       return NextResponse.redirect(new URL('/app', request.url));
     }
-  }
-
-  // Redirect root-level authenticated users based on access level
-  if (pathname === '/login') {
-    if (accessLevel >= 2) return NextResponse.redirect(new URL('/admin', request.url));
-    if (accessLevel === 1) return NextResponse.redirect(new URL('/company', request.url));
-    return NextResponse.redirect(new URL('/app', request.url));
   }
 
   return NextResponse.next();

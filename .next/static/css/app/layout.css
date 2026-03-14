@@ -5,19 +5,20 @@
 
 :root {
   /* Attendee / Light Theme */
-  --bg: #f5f0eb;
+  --bg: #f3f0ec;
   --white: #ffffff;
-  --s1: #ede8e2;
-  --s2: #e4ddd5;
-  --border: #d5cec6;
-  --g: #2d5016;
-  --gl: rgba(45,80,22,.12);
-  --gb: rgba(45,80,22,.25);
+  --s1: #ebe7e1;
+  --s2: #e2dcd5;
+  --border: #d3ccc4;
+  --g: #1e4a2f;
+  --gl: rgba(30,74,47,.10);
+  --gb: rgba(30,74,47,.22);
+  --hero: linear-gradient(135deg, #2d5016 0%, #1a4a3c 60%, #1a3a5b 100%);
   --warm: #FCBD9D;
   --warm-dim: rgba(252,189,157,.18);
   --warm-border: rgba(252,189,157,.35);
   --text: #1a1814;
-  --sub: #6b6560;
+  --sub: #5e5952;
   --muted: #9e9990;
   --r: 14px;
   --fh: 'Fraunces', Georgia, serif;
@@ -54,13 +55,15 @@ html, body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+  overscroll-behavior: none;
 }
 
 body {
   font-family: var(--fb);
   background: var(--bg);
   color: var(--text);
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* ── Scrollbar hidden ──────────────────────────────────── */
@@ -98,6 +101,21 @@ a { color: inherit; text-decoration: none; }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-100%); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes notifEnter {
+  0%   { opacity: 0; transform: translateY(-120%) scale(0.9); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes notifExit {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-80%) scale(0.85); }
 }
 
 @keyframes stampBounce {

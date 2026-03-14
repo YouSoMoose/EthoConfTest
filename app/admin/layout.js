@@ -4,6 +4,7 @@ import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import PageTransition from '@/components/PageTransition';
 
 const tabs = [
   { label: 'Dashboard', href: '/admin', icon: '📊', minLevel: 2 },
@@ -179,7 +180,7 @@ export default function AdminLayout({ children }) {
 
       {/* Main content */}
       <main className="admin-main">
-        {children}
+        <PageTransition>{children}</PageTransition>
       </main>
     </div>
   );

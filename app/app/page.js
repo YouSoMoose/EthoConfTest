@@ -6,6 +6,50 @@ import Link from 'next/link';
 import Avatar from '@/components/Avatar';
 import Loader from '@/components/Loader';
 
+function AnnouncementCard({ a }) {
+  const [expanded, setExpanded] = useState(false);
+  const timeSince = Math.round((Date.now() - new Date(a.created_at).getTime()) / 60000);
+  const timeLabel = timeSince < 1 ? 'just now' : timeSince < 60 ? `${timeSince}m ago` : `${Math.round(timeSince / 60)}h ago`;
+
+  return (
+    <div onClick={() => a.content && setExpanded(!expanded)} style={{
+      background: 'var(--white)',
+      border: '1px solid var(--border)',
+      borderRadius: 'var(--r)',
+      padding: '16px',
+      cursor: a.content ? 'pointer' : 'default',
+      transition: 'all 0.2s',
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+        <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 15, color: 'var(--text)', margin: 0 }}>
+          {a.title}
+        </h3>
+        <span style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--muted)', flexShrink: 0 }}>
+          {timeLabel}
+        </span>
+      </div>
+      {a.content && (
+        <div style={{
+          overflow: 'hidden',
+          transition: 'max-height 0.3s ease, margin 0.3s ease, opacity 0.3s ease',
+          maxHeight: expanded ? 500 : 0,
+          marginTop: expanded ? 8 : 0,
+          opacity: expanded ? 1 : 0,
+        }}>
+          <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--sub)', lineHeight: 1.4 }}>
+            {a.content}
+          </p>
+        </div>
+      )}
+      {a.content && !expanded && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 8 }}>
+          <div style={{ width: 32, height: 4, background: 'var(--s1)', borderRadius: 2 }} />
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AttendeeDashboard() {
   const { data: session } = useSession();
   const [schedule, setSchedule] = useState([]);
@@ -42,9 +86,9 @@ export default function AttendeeDashboard() {
 
   return (
     <div className="page-enter">
-      {/* Green header hero */}
+      {/* Gradient header hero */}
       <div style={{
-        background: 'var(--g)',
+        background: 'var(--hero)',
         color: '#fff',
         padding: 'max(16px, env(safe-area-inset-top)) 16px 24px',
       }}>
@@ -187,24 +231,7 @@ export default function AttendeeDashboard() {
           <div>
             <p className="section-label">📢 ANNOUNCEMENTS</p>
             <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {announcements.map((a) => (
-                <div key={a.id} style={{
-                  background: 'var(--white)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--r)',
-                  padding: 16,
-                }}>
-                  <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 15, color: 'var(--text)' }}>
-                    {a.title}
-                  </h3>
-                  <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--sub)', marginTop: 4 }}>
-                    {a.content}
-                  </p>
-                  <p style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--muted)', marginTop: 8 }}>
-                    {new Date(a.created_at).toLocaleDateString()}
-                  </p>
-                </div>
-              ))}
+              {announcements.map((a) => <AnnouncementCard key={a.id} a={a} />)}
             </div>
           </div>
         )}
