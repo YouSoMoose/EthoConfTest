@@ -25,29 +25,29 @@ export default function LoginPage() {
         padding: '0 24px',
       }}>
         <div style={{
-          width: 64, height: 64, borderRadius: 18,
+          width: 'clamp(52px, 12vh, 64px)', height: 'clamp(52px, 12vh, 64px)', borderRadius: 18,
           background: 'rgba(255,255,255,0.12)',
           backdropFilter: 'blur(10px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          margin: '0 auto 20px',
-          fontSize: 32, fontFamily: 'var(--fh)', fontWeight: 800, color: '#fff',
+          margin: '0 auto clamp(12px, 3vh, 20px)',
+          fontSize: 'clamp(28px, 6vh, 32px)', fontFamily: 'var(--fh)', fontWeight: 800, color: '#fff',
         }}>E</div>
         <p style={{
-          fontSize: 11, fontWeight: 700, letterSpacing: '.2em',
+          fontSize: 'clamp(10px, 2.5vh, 11px)', fontWeight: 700, letterSpacing: '.2em',
           color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', marginBottom: 8,
           textAlign: 'center',
         }}>
           Annual Conference · 2026
         </p>
         <h1 style={{
-          fontFamily: 'var(--fh)', fontSize: 44, fontWeight: 800,
+          fontFamily: 'var(--fh)', fontSize: 'clamp(36px, 8vh, 44px)', fontWeight: 800,
           color: '#fff', lineHeight: 1.05, marginBottom: 6, textAlign: 'center',
         }}>
           Ethos<br />
           <span style={{ color: 'var(--warm)', fontWeight: 300 }}>2026</span>
         </h1>
         <p style={{
-          fontSize: 14, color: 'rgba(255,255,255,.5)', marginTop: 10, lineHeight: 1.6,
+          fontSize: 'clamp(13px, 3vh, 14px)', color: 'rgba(255,255,255,.5)', marginTop: 10, lineHeight: 1.6,
           fontFamily: 'var(--fb)', textAlign: 'center',
         }}>
           Where student entrepreneurs shape the future

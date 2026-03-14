@@ -116,28 +116,28 @@ export default function LandingPage() {
         textAlign: 'center',
       }}>
         <div style={{
-          width: 56, height: 56, borderRadius: 16,
+          width: 'clamp(48px, 10vh, 56px)', height: 'clamp(48px, 10vh, 56px)', borderRadius: 16,
           background: 'rgba(255,255,255,0.12)',
           backdropFilter: 'blur(10px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          margin: '0 auto 16px',
-          fontSize: 28, fontFamily: 'var(--fh)', fontWeight: 800, color: '#fff',
+          margin: '0 auto clamp(10px, 2vh, 16px)',
+          fontSize: 'clamp(24px, 5vh, 28px)', fontFamily: 'var(--fh)', fontWeight: 800, color: '#fff',
         }}>E</div>
         <p style={{
-          fontSize: 11, fontWeight: 700, letterSpacing: '.2em',
+          fontSize: 'clamp(10px, 2vh, 11px)', fontWeight: 700, letterSpacing: '.2em',
           color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', marginBottom: 8,
         }}>
           Annual Conference · 2026
         </p>
         <h1 style={{
-          fontFamily: 'var(--fh)', fontSize: 42, fontWeight: 800,
+          fontFamily: 'var(--fh)', fontSize: 'clamp(32px, 8vh, 42px)', fontWeight: 800,
           color: '#fff', lineHeight: 1.05, marginBottom: 6,
         }}>
           Ethos<br />
           <span style={{ color: 'var(--warm)', fontWeight: 300 }}>2026</span>
         </h1>
         <p style={{
-          fontSize: 14, color: 'rgba(255,255,255,.5)', marginTop: 8, lineHeight: 1.6,
+          fontSize: 'clamp(12px, 2.5vh, 14px)', color: 'rgba(255,255,255,.5)', marginTop: 8, lineHeight: 1.6,
           fontFamily: 'var(--fb)',
         }}>
           Where student entrepreneurs shape the future
@@ -148,7 +148,7 @@ export default function LandingPage() {
       <div style={{
         flex: 1, display: 'flex', flexDirection: 'column',
         justifyContent: 'center', alignItems: 'center',
-        padding: '32px 24px 0',
+        padding: 'clamp(16px, 4vh, 32px) 24px 0',
       }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
@@ -158,24 +158,24 @@ export default function LandingPage() {
           backdropFilter: 'blur(20px)',
           borderRadius: 24,
           border: '1px solid rgba(255,255,255,0.1)',
-          padding: '40px 28px 36px',
+          padding: 'clamp(20px, 5vh, 40px) 24px clamp(20px, 4vh, 36px)',
           maxWidth: 360,
           width: '100%',
           textAlign: 'center',
-          minHeight: 220,
+          minHeight: 'clamp(180px, 30vh, 220px)',
           transition: 'all 0.3s ease',
         }}>
           <span style={{
-            fontSize: 52, display: 'block', marginBottom: 16,
+            fontSize: 'clamp(40px, 8vh, 52px)', display: 'block', marginBottom: 'clamp(10px, 2vh, 16px)',
             animation: 'scaleIn 0.3s ease both',
           }} key={current + 'icon'}>{slide.icon}</span>
           <h2 style={{
-            fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 24,
+            fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 'clamp(20px, 4vh, 24px)',
             color: '#fff', marginBottom: 10,
             animation: 'fadeUp 0.3s ease both',
           }} key={current + 'title'}>{slide.title}</h2>
           <p style={{
-            fontFamily: 'var(--fb)', fontSize: 14, color: 'rgba(255,255,255,.65)',
+            fontFamily: 'var(--fb)', fontSize: 'clamp(13px, 2.5vh, 14px)', color: 'rgba(255,255,255,.65)',
             lineHeight: 1.6,
             animation: 'fadeUp 0.3s ease 0.05s both',
           }} key={current + 'desc'}>{slide.desc}</p>
