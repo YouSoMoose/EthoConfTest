@@ -1,15 +1,10 @@
 {
   "/page": "app/page.js",
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/api/announcements/route": "app/api/announcements/route.js",
   "/login/page": "app/login/page.js",
-  "/api/raffle/route": "app/api/raffle/route.js",
   "/api/messages/route": "app/api/messages/route.js",
-  "/api/users/route": "app/api/users/route.js",
-  "/api/companies/route": "app/api/companies/route.js",
-  "/api/schedule/route": "app/api/schedule/route.js",
+  "/api/announcements/route": "app/api/announcements/route.js",
   "/admin/page": "app/admin/page.js",
-  "/app/page": "app/app/page.js",
   "/app/chat/page": "app/app/chat/page.js",
   "/admin/messages/page": "app/admin/messages/page.js"
 }
