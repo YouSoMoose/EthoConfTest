@@ -10,31 +10,31 @@ const slides = [
     icon: '📅',
     title: 'Live Schedule',
     desc: 'Stay on track with the real-time event timeline. Never miss a session, workshop, or keynote.',
-    gradient: 'linear-gradient(135deg, #2d5016 0%, #1a6b3c 100%)',
+    gradient: 'linear-gradient(135deg, #A89E94 0%, #7D6F63 100%)',
   },
   {
     icon: '🏢',
     title: 'Explore Companies',
     desc: 'Browse and rate participating companies. Discover innovative startups and sustainability leaders.',
-    gradient: 'linear-gradient(135deg, #1a6b3c 0%, #0e5c52 100%)',
+    gradient: 'linear-gradient(135deg, #7D6F63 0%, #514033 100%)',
   },
   {
     icon: '🛂',
     title: 'Passport Stamps',
     desc: 'Visit booths and collect stamps on your digital passport. Complete your journey through Ethos.',
-    gradient: 'linear-gradient(135deg, #0e5c52 0%, #1a4a6b 100%)',
+    gradient: 'linear-gradient(135deg, #514033 0%, #413429 100%)',
   },
   {
     icon: '💬',
     title: 'Live Chat',
     desc: 'Message event staff in real-time. Get answers, share feedback, and stay connected.',
-    gradient: 'linear-gradient(135deg, #1a4a6b 0%, #3a3a6b 100%)',
+    gradient: 'linear-gradient(135deg, #413429 0%, #7D6F63 100%)',
   },
   {
     icon: '📝',
     title: 'Smart Notes',
     desc: 'Take notes during sessions and save them to your account. Access them anytime, anywhere.',
-    gradient: 'linear-gradient(135deg, #3a3a6b 0%, #5a2a5b 100%)',
+    gradient: 'linear-gradient(135deg, #7D6F63 0%, #A89E94 100%)',
   },
 ];
 
@@ -91,7 +91,7 @@ export default function LandingPage() {
     return (
       <div style={{
         minHeight: '100dvh',
-        background: 'linear-gradient(160deg, #2d5016 0%, #1a4a3c 40%, #1a3a5b 100%)',
+        background: 'var(--hero)',
         display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
       }}>

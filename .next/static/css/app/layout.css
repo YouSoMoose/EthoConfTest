@@ -5,21 +5,21 @@
 
 :root {
   /* Attendee / Light Theme */
-  --bg: #f3f0ec;
-  --white: #ffffff;
-  --s1: #ebe7e1;
-  --s2: #e2dcd5;
-  --border: #d3ccc4;
-  --g: #1e4a2f;
-  --gl: rgba(30,74,47,.10);
-  --gb: rgba(30,74,47,.22);
-  --hero: linear-gradient(135deg, #2d5016 0%, #1a4a3c 60%, #1a3a5b 100%);
+  --bg: #FFFBF4;
+  --white: #FFFBF4;
+  --s1: #D4CCC4;
+  --s2: #A89E94;
+  --border: #A89E94;
+  --g: #FCBD9D;
+  --gl: #FFE2D6;
+  --gb: rgba(252, 189, 157, 0.4);
+  --hero: linear-gradient(135deg, #FCBD9D 0%, #A89E94 100%);
   --warm: #FCBD9D;
-  --warm-dim: rgba(252,189,157,.18);
-  --warm-border: rgba(252,189,157,.35);
-  --text: #1a1814;
-  --sub: #5e5952;
-  --muted: #9e9990;
+  --warm-dim: #FFE2D6;
+  --warm-border: #D4CCC4;
+  --text: #413429;
+  --sub: #514033;
+  --muted: #7D6F63;
   --r: 14px;
   --fh: 'Fraunces', Georgia, serif;
   --fb: 'DM Sans', system-ui, sans-serif;
