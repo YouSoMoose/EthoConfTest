@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ethos 2026
+
+🌿 A comprehensive event management web app built with Next.js 14, designed for the Ethos 2026 sustainability conference.
+
+## Tech Stack
+
+- **Next.js 14** (App Router)
+- **NextAuth v4** with Google OAuth
+- **Supabase** (database only — no Supabase Auth)
+- **Tailwind CSS v3**
+- **qrcode.react** for QR generation
+- **jsqr** for QR scanning via camera
+- **react-hot-toast** for notifications
 
 ## Getting Started
 
-First, run the development server:
+### 1. Set up Supabase
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+1. Create a new Supabase project.
+2. Run the contents of `schema.sql` in the Supabase SQL Editor.
+3. Copy your project URL, anon key, and service role key.
+
+### 2. Set up Google OAuth
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
+2. Create OAuth 2.0 credentials.
+3. Add these to **Authorized Redirect URIs**:
+   - `http://localhost:3000/api/auth/callback/google`
+   - `https://YOUR_VERCEL_URL/api/auth/callback/google`
+
+### 3. Configure Environment Variables
+
+Update `.env.local` with your credentials:
+
+```
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-secret-key
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 4. Install & Run
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Open [http://localhost:3000](http://localhost:3000).
 
-## Learn More
+## Access Levels
 
-To learn more about Next.js, take a look at the following resources:
+| Level | Role           | Dashboard |
+|-------|----------------|-----------|
+| 0     | Attendee       | `/app`    |
+| 1     | Company        | `/company`|
+| 2     | Staff          | `/admin`  |
+| 3     | Super Admin    | `/admin`  |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Admins can change user access levels via the admin portal or directly in Supabase.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Features
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Attendee Dashboard**: Schedule, company pitches with voting, passport stamps, chat with staff, personal notes, digital wallet
+- **Company Portal**: Edit company profile, view pitch ratings
+- **Admin Panel**: Check-in scanner, message management, schedule editor, user management, raffle system
+- **Passport System**: QR-based booth stamps with progress tracking
+- **Voting System**: 4-category star ratings with admin lock capability
+- **Silent Raffle**: Auto-entry when all booths stamped and all companies voted

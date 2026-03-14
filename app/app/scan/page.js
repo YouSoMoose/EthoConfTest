@@ -1,94 +1,167 @@
-'use client'
-export const dynamic = 'force-dynamic'
-import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { useAuth } from '@/components/providers/AuthProvider'
-import { useToast } from '@/components/providers/ToastProvider'
-import Topbar from '@/components/Topbar'
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
+import jsQR from 'jsqr';
 
 export default function ScanPage() {
-    const { profile } = useAuth()
-    const { showToast } = useToast()
-    const supabase = createClient()
-    const [code, setCode] = useState('')
-    const [result, setResult] = useState(null)
-    const [scanning, setScanning] = useState(false)
+  const { data: session } = useSession();
+  const router = useRouter();
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const [scanning, setScanning] = useState(true);
+  const [result, setResult] = useState(null);
+  const animationRef = useRef(null);
+  const streamRef = useRef(null);
 
-    async function process() {
-        const raw = code.trim()
-        if (!raw) return
-        setScanning(true)
-        setResult(null)
-        try {
-            if (raw.startsWith('BOOTH-')) { await handleBooth(raw.replace('BOOTH-', '')) }
-            else if (raw.startsWith('PITCH-')) { setResult({ info: '🏆 Navigate to the Pitch Room and find this company to vote!' }) }
-            else { await handleBusinessCard(JSON.parse(raw)) }
-        } catch { setResult({ error: '❌ Invalid QR code — try again.' }) }
-        setScanning(false)
-        setCode('')
+  useEffect(() => {
+    startCamera();
+    return () => stopCamera();
+  }, []);
+
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' },
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+        requestAnimationFrame(scan);
+      }
+    } catch (err) {
+      toast.error('Camera access denied');
+    }
+  };
+
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(t => t.stop());
+    }
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
+  };
+
+  const scan = () => {
+    if (!videoRef.current || !canvasRef.current || !scanning) return;
+
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+      if (code) {
+        handleQRResult(code.data);
+        return;
+      }
     }
 
-    async function handleBooth(companyId) {
-        const { data: company } = await supabase.from('companies').select('*').eq('id', companyId).single()
-        if (!company) { setResult({ error: '❌ Unknown booth QR code.' }); return }
-        const { data: existing } = await supabase.from('passport_stamps').select('id').eq('user_id', profile?.id).eq('company_id', companyId).maybeSingle()
-        if (existing) { setResult({ info: `Already stamped: ${company.name} ✓` }); return }
-        await supabase.from('passport_stamps').insert({ user_id: profile?.id, company_id: companyId, room_type: company.room_type, scanned_at: new Date().toISOString() })
-        setResult({ success: `🗺️ Stamped: ${company.name}!` })
-        showToast('Stamp collected! ✓')
-        await checkRaffle()
-    }
+    animationRef.current = requestAnimationFrame(scan);
+  };
 
-    async function handleBusinessCard(data) {
-        if (!data?.name || !data?.email) throw new Error('invalid')
-        const { data: existing } = await supabase.from('collected_cards').select('id').eq('collected_by', profile?.id).eq('email', data.email).maybeSingle()
-        if (existing) { setResult({ info: `Card already saved: ${data.name}` }); return }
-        await supabase.from('collected_cards').insert({ collected_by: profile?.id, name: data.name, email: data.email, role: data.role || '', resume: data.resume || '', created_at: new Date().toISOString() })
-        setResult({ success: `✅ Card saved: ${data.name}` })
-        showToast('Card saved ✓')
-    }
+  const handleQRResult = async (data) => {
+    setScanning(false);
+    stopCamera();
 
-    async function checkRaffle() {
-        const [{ data: stamps }, { data: votes }, { data: rooms }] = await Promise.all([
-            supabase.from('passport_stamps').select('company_id,room_type').eq('user_id', profile?.id),
-            supabase.from('votes').select('id').eq('voter_id', profile?.id).limit(1),
-            supabase.from('companies').select('id,room_type').in('room_type', ['poster_room', 'conference_room']),
-        ])
-        const posterTotal = (rooms || []).filter(r => r.room_type === 'poster_room').length
-        const confTotal = (rooms || []).filter(r => r.room_type === 'conference_room').length
-        const posterDone = (stamps || []).filter(s => s.room_type === 'poster_room').length
-        const confDone = (stamps || []).filter(s => s.room_type === 'conference_room').length
-        const voted = (votes || []).length > 0
-        if (posterTotal > 0 && posterDone >= posterTotal && confDone >= confTotal && voted) {
-            await supabase.from('raffle_entries').upsert({ user_id: profile?.id, email: profile.email, name: profile.full_name, entered_at: new Date().toISOString() }, { onConflict: 'user_id' })
+    // The QR data should be a booth UUID
+    try {
+      const res = await fetch('/api/stamp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ booth_id: data }),
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        // Store stamp locally for passport page
+        const stampKey = `stamps_${session?.profile?.id}`;
+        const stored = JSON.parse(localStorage.getItem(stampKey) || '[]');
+        if (!stored.includes(data)) {
+          stored.push(data);
+          localStorage.setItem(stampKey, JSON.stringify(stored));
         }
+        setResult({ success: true, message: `Stamped: ${result.booth_name || 'Booth'}` });
+        toast.success(`Stamped: ${result.booth_name || 'Booth'}!`);
+      } else {
+        setResult({ success: false, message: result.error || 'Failed to stamp' });
+        if (result.error === 'Already stamped') {
+          toast.error(`Already stamped: ${result.booth_name || 'this booth'}`);
+        } else {
+          toast.error(result.error || 'Failed to stamp');
+        }
+      }
+    } catch {
+      setResult({ success: false, message: 'Network error' });
+      toast.error('Network error');
     }
+  };
 
-    const resultColor = result?.error ? 'var(--red)' : result?.success ? 'var(--green)' : 'var(--text)'
-    const resultBorder = result?.error ? 'var(--red)' : result?.success ? 'var(--green)' : 'var(--border)'
+  return (
+    <div className="page-enter">
+      <div className="page-header">
+        <div className="max-w-lg mx-auto flex items-center gap-3">
+          <button onClick={() => router.back()} className="text-white text-xl hover:opacity-80 transition-opacity">
+            ←
+          </button>
+          <h1 className="font-heading text-xl font-bold">📷 Scan QR</h1>
+        </div>
+      </div>
 
-    return (
-        <>
-            <Topbar title="Scan QR Code" onBack={() => window.history.back()} />
-            <div className="content">
-                <div className="card accent" style={{ marginBottom: 16, textAlign: 'center' }}>
-                    <div style={{ fontSize: 36, marginBottom: 8 }}>📷</div>
-                    <div style={{ fontSize: 14, fontFamily: 'var(--fh)', fontWeight: 700, marginBottom: 4 }}>Camera Scan</div>
-                    <div style={{ fontSize: 13, color: 'var(--sub)', lineHeight: 1.5 }}>Camera scanning requires HTTPS deployment.<br />Use manual paste below during development.</div>
+      <div className="max-w-lg mx-auto px-4 py-6">
+        {scanning ? (
+          <div className="animate-fade-up">
+            <div className="relative rounded-2xl overflow-hidden bg-black aspect-square">
+              <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
+              <canvas ref={canvasRef} className="hidden" />
+
+              {/* Scanning overlay */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-56 h-56 border-2 border-green-400 rounded-2xl relative">
+                  <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-green-400 rounded-tl-lg"></div>
+                  <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-green-400 rounded-tr-lg"></div>
+                  <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-green-400 rounded-bl-lg"></div>
+                  <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-green-400 rounded-br-lg"></div>
+                  {/* Scanning line */}
+                  <div className="absolute left-2 right-2 h-0.5 bg-green-400 opacity-60" style={{ animation: 'scanLine 2s ease-in-out infinite', top: '50%' }}></div>
                 </div>
-                <div className="form-group">
-                    <label className="form-label">Paste QR Code Data</label>
-                    <textarea className="form-input" rows={4} placeholder={'BOOTH-{id}  or  PITCH-{id}  or  {"name":"Jane","email":"…"}'} value={code} onChange={e => setCode(e.target.value)} />
-                </div>
-                <button className="btn btn-accent btn-full" onClick={process} disabled={scanning || !code.trim()}>
-                    {scanning ? 'Processing…' : 'Process QR Code'}
-                </button>
-                {result && (
-                    <div className="card" style={{ marginTop: 16, borderColor: resultBorder }}>
-                        <div style={{ fontSize: 14, color: resultColor }}>{result.error || result.success || result.info}</div>
-                    </div>
-                )}
+              </div>
             </div>
-        </>
-    )
+            <p className="text-center text-gray-500 font-body text-sm mt-4">
+              Point your camera at a booth QR code
+            </p>
+          </div>
+        ) : (
+          <div className="animate-scale-in text-center py-12">
+            <div className="text-6xl mb-4">{result?.success ? '✅' : '❌'}</div>
+            <h2 className="font-heading text-xl font-bold text-green-900 mb-2">
+              {result?.success ? 'Success!' : 'Oops!'}
+            </h2>
+            <p className="font-body text-gray-500 mb-8">{result?.message}</p>
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={() => { setScanning(true); setResult(null); startCamera(); }}
+                className="btn-primary btn-glow"
+              >
+                Scan Another
+              </button>
+              <button onClick={() => router.push('/app/passport')} className="btn-secondary">
+                View Passport
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

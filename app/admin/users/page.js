@@ -1,75 +1,109 @@
-'use client'
-export const dynamic = 'force-dynamic'
-import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { useToast } from '@/components/providers/ToastProvider'
-import { strColor, initials } from '@/lib/utils'
-import { ACCESS_LEVELS } from '@/lib/constants'
-import Loader from '@/components/Loader'
-import RoleChip from '@/components/RoleChip'
-import Modal from '@/components/Modal'
+'use client';
 
-export default function AdminUsers() {
-    const supabase = createClient()
-    const { showToast } = useToast()
-    const [users, setUsers] = useState([])
-    const [loading, setLoading] = useState(true)
-    const [editing, setEditing] = useState(null)
-    const [newLevel, setNewLevel] = useState(0)
-    const [search, setSearch] = useState('')
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import Avatar from '@/components/Avatar';
+import Loader from '@/components/Loader';
+import { ACCESS_LABELS, ACCESS_COLORS } from '@/lib/constants';
 
-    useEffect(() => {
-        supabase.from('profiles').select('*').order('full_name')
-            .then(({ data }) => { setUsers(data || []); setLoading(false) })
-    }, [])
+export default function AdminUsersPage() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
 
-    async function saveLevel() {
-        if (!editing) return
-        await supabase.from('profiles').update({ access_level: newLevel }).eq('id', editing.id)
-        setUsers(u => u.map(x => x.id === editing.id ? { ...x, access_level: newLevel } : x))
-        showToast(`Updated to ${ACCESS_LEVELS[newLevel]?.label || 'Unknown'} ✓`)
-        setEditing(null)
+  useEffect(() => {
+    fetch('/api/users')
+      .then(r => r.json())
+      .then(data => { setUsers(data || []); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const updateRole = async (userId, newLevel) => {
+    try {
+      const res = await fetch('/api/users', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: userId, access_level: parseInt(newLevel) }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setUsers(prev => prev.map(u => u.id === userId ? { ...u, access_level: updated.access_level } : u));
+        toast.success('Role updated');
+      } else {
+        toast.error('Failed to update');
+      }
+    } catch {
+      toast.error('Network error');
     }
+  };
 
-    const filtered = users.filter(u => (u.full_name || '').toLowerCase().includes(search.toLowerCase()) || (u.email || '').toLowerCase().includes(search.toLowerCase()))
+  if (loading) return <Loader />;
 
-    return (
-        <div className="anim-fade">
-            <div style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 18, marginBottom: 12 }}>User Management</div>
-            <div className="search-wrap">
-                <svg className="search-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
-                <input className="search-input" placeholder="Search users…" value={search} onChange={e => setSearch(e.target.value)} />
-            </div>
-            {loading && <Loader />}
-            {filtered.map(u => (
-                <div key={u.id} className="tile" onClick={() => { setEditing(u); setNewLevel(u.access_level || 0) }}>
-                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: strColor(u.full_name || ''), display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: '#fff', fontFamily: 'var(--fh)', flexShrink: 0, overflow: 'hidden' }}>
-                        {u.avatar_url ? <img src={u.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : initials(u.full_name)}
-                    </div>
-                    <div className="tile-body">
-                        <div className="tile-name">{u.full_name}</div>
-                        <div className="tile-desc">{u.email}</div>
-                    </div>
-                    <RoleChip level={u.access_level} />
-                </div>
-            ))}
-            <Modal open={!!editing} onClose={() => setEditing(null)} title="Edit Access Level">
-                {editing && (
-                    <>
-                        <div className="card" style={{ marginBottom: 12 }}>
-                            <div style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 15 }}>{editing.full_name}</div>
-                            <div style={{ fontSize: 12, color: 'var(--sub)' }}>{editing.email}</div>
-                        </div>
-                        <div className="form-group">
-                            <label className="form-label">Access Level</label>
-                            <select className="form-input" value={newLevel} onChange={e => setNewLevel(Number(e.target.value))}>
-                                {Object.entries(ACCESS_LEVELS).map(([k, v]) => (<option key={k} value={k}>{v.label} (Level {k})</option>))}
-                            </select>
-                        </div>
-                        <button className="btn btn-accent btn-full" onClick={saveLevel}>Save</button>
-                    </>
-                )}
-            </Modal>
+  const filtered = users.filter(u =>
+    u.name?.toLowerCase().includes(search.toLowerCase()) ||
+    u.email?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div className="page-enter">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <h2 className="font-heading text-2xl font-bold text-green-900 mb-6">👥 Users</h2>
+
+        <input
+          type="text"
+          placeholder="Search users..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="input-field mb-6"
+        />
+
+        <div className="glass-card overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm font-body">
+              <thead>
+                <tr className="bg-green-50">
+                  <th className="text-left p-3 font-heading font-bold text-green-900">User</th>
+                  <th className="text-left p-3 font-heading font-bold text-green-900">Email</th>
+                  <th className="text-center p-3 font-heading font-bold text-green-900">Checked In</th>
+                  <th className="text-center p-3 font-heading font-bold text-green-900">Role</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map(user => (
+                  <tr key={user.id} className="border-t border-amber-100 hover:bg-amber-50/50 transition-colors">
+                    <td className="p-3">
+                      <div className="flex items-center gap-2">
+                        <Avatar src={user.avatar} name={user.name} size={32} />
+                        <span className="font-medium text-green-900">{user.name || 'No name'}</span>
+                      </div>
+                    </td>
+                    <td className="p-3 text-gray-500">{user.email}</td>
+                    <td className="p-3 text-center">
+                      {user.checked_in ? (
+                        <span className="text-green-600 font-bold">✅</span>
+                      ) : (
+                        <span className="text-gray-300">—</span>
+                      )}
+                    </td>
+                    <td className="p-3">
+                      <select
+                        value={user.access_level}
+                        onChange={e => updateRole(user.id, e.target.value)}
+                        className={`px-2 py-1 rounded-lg text-xs font-bold border-0 ${ACCESS_COLORS[user.access_level] || ''}`}
+                      >
+                        <option value={0}>Attendee</option>
+                        <option value={1}>Company</option>
+                        <option value={2}>Staff</option>
+                        <option value={3}>Super Admin</option>
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-    )
+      </div>
+    </div>
+  );
 }

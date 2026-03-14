@@ -1,87 +1,85 @@
-'use client'
+'use client';
 
-import { usePathname, useRouter } from 'next/navigation'
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
 
-const NAV_ITEMS = [
-    {
-        path: '/app',
-        exact: true,
-        label: 'Home',
-        icon: (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-                <polyline points="9,22 9,12 15,12 15,22" />
-            </svg>
-        ),
-    },
-    {
-        path: '/app/schedule',
-        label: 'Schedule',
-        icon: (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <rect x="3" y="4" width="18" height="18" rx="2" />
-                <line x1="16" y1="2" x2="16" y2="6" />
-                <line x1="8" y1="2" x2="8" y2="6" />
-                <line x1="3" y1="10" x2="21" y2="10" />
-            </svg>
-        ),
-    },
-    {
-        path: '/app/pitches',
-        label: 'Pitches',
-        icon: (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-            </svg>
-        ),
-    },
-    {
-        path: '/app/passport',
-        label: 'Passport',
-        icon: (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <rect x="2" y="3" width="20" height="14" rx="2" />
-                <path d="M8 21h8M12 17v4" />
-            </svg>
-        ),
-    },
-    {
-        path: '/app/more',
-        label: 'More',
-        icon: (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <circle cx="12" cy="12" r="1" />
-                <circle cx="19" cy="12" r="1" />
-                <circle cx="5" cy="12" r="1" />
-            </svg>
-        ),
-    },
-]
+const tabs = [
+  { label: 'Home', href: '/app', icon: '🏠' },
+  { label: 'Schedule', href: '/app/schedule', icon: '📅' },
+  { label: 'Pitches', href: '/app/pitches', icon: '🎤' },
+  { label: 'Passport', href: '/app/passport', icon: '🛂' },
+  { label: 'Chat', href: '/app/chat', icon: '💬' },
+];
 
-export default function BottomNav({ hasUnread }) {
-    const router = useRouter()
-    const pathname = usePathname()
+export default function BottomNav() {
+  const pathname = usePathname();
+  const { data: session } = useSession();
+  const [unread, setUnread] = useState(0);
 
-    function isActive(item) {
-        if (item.exact) return pathname === item.path
-        return pathname.startsWith(item.path)
-    }
+  useEffect(() => {
+    if (!session?.profile?.id) return;
 
-    return (
-        <nav className="bottom-nav">
-            {NAV_ITEMS.map(item => (
-                <button
-                    key={item.path}
-                    className={`nav-btn ${isActive(item) ? 'active' : ''}`}
-                    onClick={() => router.push(item.path)}
-                >
-                    <span style={{ position: 'relative', display: 'inline-flex' }}>
-                        {item.icon}
-                        {item.label === 'More' && hasUnread && <span className="nav-pip" />}
-                    </span>
-                    <span>{item.label}</span>
-                </button>
-            ))}
-        </nav>
-    )
+    const fetchUnread = async () => {
+      try {
+        const res = await fetch('/api/messages?unread=true');
+        if (res.ok) {
+          const data = await res.json();
+          setUnread(data.unreadCount || 0);
+        }
+      } catch (e) {}
+    };
+
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 15000);
+    return () => clearInterval(interval);
+  }, [session?.profile?.id]);
+
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 z-50 safe-bottom" style={{
+      background: 'linear-gradient(to top, rgba(255,255,255,0.98), rgba(255,255,255,0.95))',
+      borderTop: '1px solid rgba(217, 164, 89, 0.2)',
+      backdropFilter: 'blur(10px)',
+    }}>
+      <div className="flex justify-around items-center h-16 max-w-lg mx-auto">
+        {tabs.map((tab) => {
+          const isActive =
+            tab.href === '/app'
+              ? pathname === '/app'
+              : pathname.startsWith(tab.href);
+
+          return (
+            <Link
+              key={tab.href}
+              href={tab.href}
+              className={`flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-300 relative ${
+                isActive
+                  ? 'text-green-800 font-bold scale-110'
+                  : 'text-gray-400 hover:text-green-700 active:scale-95'
+              }`}
+            >
+              <span className={`text-xl transition-transform duration-300 ${isActive ? 'scale-110' : ''}`}>
+                {tab.icon}
+              </span>
+              <span className="text-[10px] font-body">{tab.label}</span>
+              {isActive && (
+                <span
+                  className="absolute -bottom-1 w-6 h-1 rounded-full"
+                  style={{
+                    background: 'linear-gradient(90deg, #22c55e, #f59e0b)',
+                  }}
+                />
+              )}
+              {tab.label === 'Chat' && unread > 0 && (
+                <span className="absolute -top-0.5 right-0 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center pulse-glow">
+                  {unread > 9 ? '9+' : unread}
+                </span>
+              )}
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
+  );
 }

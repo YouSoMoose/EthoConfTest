@@ -1,93 +1,78 @@
-'use client'
-export const dynamic = 'force-dynamic'
-import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { useToast } from '@/components/providers/ToastProvider'
-import { strColor } from '@/lib/utils'
-import Modal from '@/components/Modal'
-import Loader from '@/components/Loader'
-import QRCode from '@/components/QRCode'
+'use client';
 
-export default function AdminCompanies() {
-    const supabase = createClient()
-    const { showToast } = useToast()
-    const [companies, setCompanies] = useState([])
-    const [loading, setLoading] = useState(true)
-    const [editing, setEditing] = useState(null)
-    const [qrCompany, setQrCompany] = useState(null)
-    const [form, setForm] = useState({})
+import { useEffect, useState } from 'react';
+import StarRating from '@/components/StarRating';
+import Loader from '@/components/Loader';
 
-    useEffect(() => { load() }, [])
+export default function AdminCompaniesPage() {
+  const [companies, setCompanies] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    async function load() {
-        const { data } = await supabase.from('companies').select('*').order('name')
-        setCompanies(data || [])
-        setLoading(false)
-    }
+  useEffect(() => {
+    fetch('/api/companies')
+      .then(r => r.json())
+      .then(data => { setCompanies(data || []); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
 
-    function openNew() { setForm({ name: '', industry: '', type: 'pitch', room_type: 'poster_room', description: '', presenter_name: '', logo_url: '', resume_url: '', emoji: '🏢' }); setEditing('new') }
+  if (loading) return <Loader />;
 
-    function openEdit(c) { setForm({ ...c }); setEditing(c.id) }
+  return (
+    <div className="page-enter">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <h2 className="font-heading text-2xl font-bold text-green-900 mb-6">🏢 Companies</h2>
 
-    async function save() {
-        if (!form.name?.trim()) { showToast('Name is required'); return }
-        if (editing === 'new') {
-            await supabase.from('companies').insert({ ...form, created_at: new Date().toISOString() })
-        } else {
-            await supabase.from('companies').update(form).eq('id', editing)
-        }
-        showToast(editing === 'new' ? 'Company added ✓' : 'Company updated ✓')
-        setEditing(null)
-        load()
-    }
-
-    async function remove(id) {
-        if (!confirm('Delete this company? This cannot be undone.')) return
-        await supabase.from('companies').delete().eq('id', id)
-        showToast('Company deleted')
-        load()
-    }
-
-    return (
-        <div className="anim-fade">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <div style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 18 }}>Companies</div>
-                <button className="btn btn-accent btn-sm" onClick={openNew}>+ Add</button>
+        {companies.length === 0 ? (
+          <div className="text-center py-12 text-gray-400">
+            <p className="text-4xl mb-3">🏢</p>
+            <p className="font-body">No companies registered yet</p>
+          </div>
+        ) : (
+          <div className="glass-card overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm font-body">
+                <thead>
+                  <tr className="bg-green-50">
+                    <th className="text-left p-3 font-heading font-bold text-green-900">Company</th>
+                    <th className="text-left p-3 font-heading font-bold text-green-900">Category</th>
+                    <th className="text-center p-3 font-heading font-bold text-green-900">Votes</th>
+                    <th className="text-center p-3 font-heading font-bold text-green-900">Avg Overall</th>
+                    <th className="text-center p-3 font-heading font-bold text-green-900">Sustainability</th>
+                    <th className="text-center p-3 font-heading font-bold text-green-900">Impact</th>
+                    <th className="text-center p-3 font-heading font-bold text-green-900">Feasibility</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {companies.map((c) => (
+                    <tr key={c.id} className="border-t border-amber-100 hover:bg-amber-50/50 transition-colors">
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          {c.logo_url ? (
+                            <img src={c.logo_url} alt="" className="w-8 h-8 rounded-lg object-cover" />
+                          ) : (
+                            <span className="text-lg">🏢</span>
+                          )}
+                          <span className="font-medium text-green-900">{c.name}</span>
+                        </div>
+                      </td>
+                      <td className="p-3 text-gray-500">{c.category || '—'}</td>
+                      <td className="p-3 text-center">{c.vote_count || 0}</td>
+                      <td className="p-3">
+                        <div className="flex justify-center">
+                          <StarRating value={Math.round(c.avg_overall || 0)} readonly size={14} />
+                        </div>
+                      </td>
+                      <td className="p-3 text-center">{(c.avg_sustainability || 0).toFixed(1)}</td>
+                      <td className="p-3 text-center">{(c.avg_impact || 0).toFixed(1)}</td>
+                      <td className="p-3 text-center">{(c.avg_feasibility || 0).toFixed(1)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            {loading && <Loader />}
-            {companies.map(c => (
-                <div key={c.id} className="tile">
-                    <div style={{ width: 36, height: 36, borderRadius: 10, background: strColor(c.name || ''), display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontFamily: 'var(--fh)', fontSize: 14, flexShrink: 0 }}>{(c.name || '?')[0]}</div>
-                    <div className="tile-body" onClick={() => openEdit(c)}>
-                        <div className="tile-name">{c.name}</div>
-                        <div className="tile-desc">{c.type} · {c.industry || 'No industry'}</div>
-                    </div>
-                    <div style={{ display: 'flex', gap: 4 }}>
-                        <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--sub)', fontSize: 16, padding: 4 }} onClick={() => setQrCompany(c)}>⊞</button>
-                        <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--red)', fontSize: 14, padding: 4 }} onClick={() => remove(c.id)}>✕</button>
-                    </div>
-                </div>
-            ))}
-
-            <Modal open={editing !== null} onClose={() => setEditing(null)} title={editing === 'new' ? 'Add Company' : 'Edit Company'}>
-                <div className="form-group"><label className="form-label">Name</label><input className="form-input" value={form.name || ''} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} /></div>
-                <div className="form-group"><label className="form-label">Industry</label><input className="form-input" value={form.industry || ''} onChange={e => setForm(f => ({ ...f, industry: e.target.value }))} /></div>
-                <div className="form-group"><label className="form-label">Type</label><select className="form-input" value={form.type || 'pitch'} onChange={e => setForm(f => ({ ...f, type: e.target.value }))}><option value="pitch">Pitch</option><option value="booth">Booth</option></select></div>
-                <div className="form-group"><label className="form-label">Room</label><select className="form-input" value={form.room_type || 'poster_room'} onChange={e => setForm(f => ({ ...f, room_type: e.target.value }))}><option value="poster_room">Poster Room</option><option value="conference_room">Conference Room</option></select></div>
-                <div className="form-group"><label className="form-label">Presenter</label><input className="form-input" value={form.presenter_name || ''} onChange={e => setForm(f => ({ ...f, presenter_name: e.target.value }))} /></div>
-                <div className="form-group"><label className="form-label">Description</label><textarea className="form-input" rows={3} value={form.description || ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} /></div>
-                <div className="form-group"><label className="form-label">Logo URL</label><input className="form-input" value={form.logo_url || ''} onChange={e => setForm(f => ({ ...f, logo_url: e.target.value }))} /></div>
-                <div className="form-group"><label className="form-label">Deck / Resume URL</label><input className="form-input" value={form.resume_url || ''} onChange={e => setForm(f => ({ ...f, resume_url: e.target.value }))} /></div>
-                <div className="form-group"><label className="form-label">Emoji</label><input className="form-input" value={form.emoji || ''} onChange={e => setForm(f => ({ ...f, emoji: e.target.value }))} /></div>
-                <button className="btn btn-accent btn-full" onClick={save}>Save</button>
-            </Modal>
-
-            <Modal open={!!qrCompany} onClose={() => setQrCompany(null)} title={qrCompany?.name}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, paddingBottom: 20 }}>
-                    {qrCompany && <QRCode value={`BOOTH-${qrCompany.id}`} size={200} />}
-                    <div style={{ fontSize: 12, color: 'var(--sub)' }}>Booth QR Code</div>
-                </div>
-            </Modal>
-        </div>
-    )
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

@@ -1,12 +1,11 @@
-'use client'
+'use client';
 
-import { ACCESS_LEVELS } from '@/lib/constants'
+import { ACCESS_LABELS, ACCESS_COLORS } from '@/lib/constants';
 
 export default function RoleChip({ level }) {
-    const info = ACCESS_LEVELS[level ?? 0]
-    return (
-        <span className={`role-chip ${info?.chip}`}>
-            {info?.label}
-        </span>
-    )
+  return (
+    <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold font-body mt-2 ${ACCESS_COLORS[level] || 'bg-gray-100 text-gray-600'}`}>
+      {ACCESS_LABELS[level] || 'Unknown'}
+    </span>
+  );
 }

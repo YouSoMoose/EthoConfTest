@@ -1,36 +1,87 @@
-'use client'
-export const dynamic = 'force-dynamic'
-import { useAuth } from '@/components/providers/AuthProvider'
-import { strColor } from '@/lib/utils'
-import { ACCESS_LEVELS } from '@/lib/constants'
-import Topbar from '@/components/Topbar'
-import Avatar from '@/components/Avatar'
-import RoleChip from '@/components/RoleChip'
-import QRCode from '@/components/QRCode'
+'use client';
+
+import { useSession } from 'next-auth/react';
+import { useState } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
+import toast from 'react-hot-toast';
+import Avatar from '@/components/Avatar';
 
 export default function MyCardPage() {
-    const { profile } = useAuth()
-    const cardData = JSON.stringify({ name: profile?.full_name, email: profile?.email, role: ACCESS_LEVELS[profile?.access_level ?? 0]?.label, resume: profile?.resume_url || '' })
+  const { data: session } = useSession();
+  const [resumeLink, setResumeLink] = useState(session?.profile?.resume_link || '');
+  const [saving, setSaving] = useState(false);
 
-    return (
-        <>
-            <Topbar title="My Profile Card" onBack={() => window.history.back()} />
-            <div className="content-notab" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 24, gap: 20 }}>
-                <div style={{ background: 'linear-gradient(135deg, var(--s2), var(--s1))', border: '1px solid var(--accent-border)', borderRadius: 20, padding: 24, width: '100%', maxWidth: 320, textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-                    <div style={{ position: 'absolute', top: -30, right: -30, width: 100, height: 100, background: 'var(--accent-dim)', borderRadius: '50%', pointerEvents: 'none' }} />
-                    <div style={{ margin: '0 auto 12px', width: 56, height: 56, borderRadius: '50%', background: strColor(profile?.full_name || ''), display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 700, fontFamily: 'var(--fh)', color: '#fff', overflow: 'hidden' }}>
-                        {profile?.avatar_url ? <img src={profile.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} /> : (profile?.full_name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
-                    </div>
-                    <div style={{ fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 20, marginBottom: 4 }}>{profile?.full_name}</div>
-                    <div style={{ fontSize: 13, color: 'var(--sub)', marginBottom: 8 }}>{profile?.email}</div>
-                    <RoleChip level={profile?.access_level} />
-                    {profile?.resume_url && <div style={{ marginTop: 10, fontSize: 12, color: 'var(--accent)' }}>📎 Resume attached</div>}
-                </div>
-                <QRCode value={cardData} size={200} />
-                <div style={{ fontSize: 13, color: 'var(--sub)', textAlign: 'center', maxWidth: 280, lineHeight: 1.5 }}>
-                    Others can scan this QR to save your contact info and resume link. Update your resume in Profile settings.
-                </div>
-            </div>
-        </>
-    )
+  const profile = session?.profile;
+
+  const saveResume = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resume_link: resumeLink }),
+      });
+      if (res.ok) toast.success('Resume link saved');
+      else toast.error('Failed to save');
+    } catch {
+      toast.error('Network error');
+    }
+    setSaving(false);
+  };
+
+  return (
+    <div className="page-enter">
+      <div className="page-header">
+        <div className="max-w-lg mx-auto">
+          <h1 className="font-heading text-2xl font-bold">🎫 My Card</h1>
+          <p className="text-green-200 text-sm font-body mt-1">Your digital badge</p>
+        </div>
+      </div>
+
+      <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
+        {/* Badge Card */}
+        <div className="glass-card p-8 text-center animate-scale-in">
+          <Avatar src={profile?.avatar} name={profile?.name} size={80} />
+          <h2 className="font-heading text-xl font-bold text-green-900 mt-4">{profile?.name}</h2>
+          <p className="font-body text-gray-500 text-sm">{profile?.email}</p>
+
+          {/* QR Code */}
+          <div className="mt-6 inline-block p-4 bg-white rounded-2xl shadow-sm border border-amber-100">
+            <QRCodeSVG
+              value={profile?.id || ''}
+              size={180}
+              level="H"
+              fgColor="#14532d"
+              bgColor="#ffffff"
+            />
+          </div>
+          <p className="text-xs text-gray-400 font-body mt-3">
+            Show this QR code for check-in
+          </p>
+        </div>
+
+        {/* Resume Link */}
+        <div className="glass-card p-6 animate-fade-up" style={{ animationDelay: '0.1s' }}>
+          <h3 className="font-heading text-lg font-bold text-green-900 mb-3">📄 Resume Link</h3>
+          <p className="text-gray-500 text-sm font-body mb-4">
+            Add a link to your resume so companies can view it
+          </p>
+          <input
+            type="url"
+            value={resumeLink}
+            onChange={(e) => setResumeLink(e.target.value)}
+            placeholder="https://your-resume-link.com"
+            className="input-field mb-3"
+          />
+          <button
+            onClick={saveResume}
+            disabled={saving}
+            className="btn-primary w-full btn-glow"
+          >
+            {saving ? 'Saving...' : 'Save Resume Link'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }

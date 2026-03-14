@@ -1,33 +1,52 @@
-import { NextResponse } from 'next/server'
+import { NextResponse } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request) {
-    const { pathname } = request.nextUrl
+  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+  const { pathname } = request.nextUrl;
 
-    // Check for Supabase auth cookies (they start with "sb-")
-    const allCookies = request.cookies.getAll()
-    const hasAuthCookie = allCookies.some(
-        (c) => c.name.includes('auth-token') || c.name.startsWith('sb-')
-    )
+  // Public routes
+  if (
+    pathname === '/' ||
+    pathname === '/login' ||
+    pathname.startsWith('/api/auth') ||
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/favicon')
+  ) {
+    return NextResponse.next();
+  }
 
-    // Protected: /app/* and /admin/* require auth cookie
-    if ((pathname.startsWith('/app') || pathname.startsWith('/admin')) && !hasAuthCookie) {
-        const url = request.nextUrl.clone()
-        url.pathname = '/login'
-        return NextResponse.redirect(url)
+  // Not logged in → redirect to login
+  if (!token) {
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  const accessLevel = token.profile?.access_level ?? 0;
+
+  // Protect /admin — requires level >= 2
+  if (pathname.startsWith('/admin')) {
+    if (accessLevel < 2) {
+      return NextResponse.redirect(new URL('/app', request.url));
     }
+  }
 
-    // Redirect logged-in users away from landing and login pages
-    if (hasAuthCookie && (pathname === '/' || pathname === '/login')) {
-        const url = request.nextUrl.clone()
-        url.pathname = '/app'
-        return NextResponse.redirect(url)
+  // Protect /company — requires level === 1 or level >= 2
+  if (pathname.startsWith('/company')) {
+    if (accessLevel < 1) {
+      return NextResponse.redirect(new URL('/app', request.url));
     }
+  }
 
-    return NextResponse.next()
+  // Redirect root-level authenticated users based on access level
+  if (pathname === '/login') {
+    if (accessLevel >= 2) return NextResponse.redirect(new URL('/admin', request.url));
+    if (accessLevel === 1) return NextResponse.redirect(new URL('/company', request.url));
+    return NextResponse.redirect(new URL('/app', request.url));
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
-    matcher: [
-        '/((?!_next/static|_next/image|favicon.ico|auth/callback|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-    ],
-}
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+};

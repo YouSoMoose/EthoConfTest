@@ -1,60 +1,90 @@
-'use client'
-export const dynamic = 'force-dynamic'
-import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import { useAuth } from '@/components/providers/AuthProvider'
-import { useToast } from '@/components/providers/ToastProvider'
-import Topbar from '@/components/Topbar'
-import Loader from '@/components/Loader'
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
+import Loader from '@/components/Loader';
 
 export default function NoteEditorPage() {
-    const params = useParams()
-    const id = params.id
-    const isNew = !id || id === 'new'
-    const { profile } = useAuth()
-    const { showToast } = useToast()
-    const router = useRouter()
-    const supabase = createClient()
+  const { id } = useParams();
+  const router = useRouter();
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-    const [title, setTitle] = useState('')
-    const [body, setBody] = useState('')
-    const [noteId, setNoteId] = useState(null)
-    const [loading, setLoading] = useState(!isNew)
-    const [saving, setSaving] = useState(false)
-
-    useEffect(() => {
-        if (isNew) return
-        supabase.from('notes').select('*').eq('id', id).single()
-            .then(({ data }) => {
-                if (data) { setTitle(data.title); setBody(data.body || ''); setNoteId(data.id) }
-                setLoading(false)
-            })
-    }, [id])
-
-    async function save() {
-        if (!title.trim()) { showToast('Add a title first'); return }
-        setSaving(true)
-        const now = new Date().toISOString()
-        if (noteId) {
-            await supabase.from('notes').update({ title, body, updated_at: now }).eq('id', noteId)
-        } else {
-            const { data } = await supabase.from('notes').insert({ user_id: profile?.id, title, body, created_at: now, updated_at: now }).select().single()
-            if (data) setNoteId(data.id)
+  useEffect(() => {
+    fetch('/api/notes')
+      .then(r => r.json())
+      .then(notes => {
+        const note = (notes || []).find(n => n.id === id);
+        if (note) {
+          setTitle(note.title || '');
+          setContent(note.content || '');
         }
-        setSaving(false)
-        showToast('Saved ✓')
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [id]);
+
+  const saveNote = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch('/api/notes', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, title, content }),
+      });
+      if (res.ok) {
+        toast.success('Saved');
+      } else {
+        toast.error('Failed to save');
+      }
+    } catch {
+      toast.error('Network error');
     }
+    setSaving(false);
+  };
 
-    if (loading) return <Loader fullPage />
+  if (loading) return <Loader />;
 
-    return (
-        <>
-            <Topbar title={isNew ? 'New Note' : title || 'Edit Note'} onBack={() => router.push('/app/notes')} actions={<button className="topbar-action accent" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save'}</button>} />
-            <div className="content-notab" style={{ padding: 16 }}>
-                <input className="note-title-input" placeholder="Note title…" value={title} onChange={e => setTitle(e.target.value)} />
-                <textarea className="note-editor" placeholder="Start writing your notes here…" value={body} onChange={e => setBody(e.target.value)} />
-            </div>
-        </>
-    )
+  return (
+    <div className="page-enter flex flex-col min-h-screen">
+      <div className="page-header">
+        <div className="max-w-lg mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button onClick={() => router.back()} className="text-white text-xl hover:opacity-80 transition-opacity">
+              ←
+            </button>
+            <h1 className="font-heading text-xl font-bold">Edit Note</h1>
+          </div>
+          <button
+            onClick={saveNote}
+            disabled={saving}
+            className="bg-white/20 text-white px-3 py-1.5 rounded-xl text-sm font-body hover:bg-white/30 transition-colors"
+          >
+            {saving ? 'Saving...' : 'Save'}
+          </button>
+        </div>
+      </div>
+
+      <div className="max-w-lg mx-auto px-4 py-6 flex-1 w-full flex flex-col">
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          onBlur={saveNote}
+          placeholder="Note title..."
+          className="font-heading text-2xl font-bold text-green-900 bg-transparent border-none outline-none w-full mb-4"
+        />
+        <textarea
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          onBlur={saveNote}
+          placeholder="Start writing..."
+          className="flex-1 font-body text-gray-700 bg-transparent border-none outline-none w-full resize-none leading-relaxed"
+        />
+      </div>
+    </div>
+  );
 }

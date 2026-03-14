@@ -1,90 +1,155 @@
-'use client'
-export const dynamic = 'force-dynamic'
-import { useEffect, useRef, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { useAuth } from '@/components/providers/AuthProvider'
-import { useToast } from '@/components/providers/ToastProvider'
-import { timeAgo, hasBadWords } from '@/lib/utils'
-import Topbar from '@/components/Topbar'
+'use client';
+
+import { useEffect, useState, useRef } from 'react';
+import { useSession } from 'next-auth/react';
+import toast from 'react-hot-toast';
+import Avatar from '@/components/Avatar';
+import Loader from '@/components/Loader';
 
 export default function ChatPage() {
-    const { profile } = useAuth()
-    const { showToast } = useToast()
-    const supabase = createClient()
-    const [messages, setMessages] = useState([])
-    const [input, setInput] = useState('')
-    const [sending, setSending] = useState(false)
-    const bottomRef = useRef(null)
-    const lastSentAt = useRef(0)
-    const textareaRef = useRef(null)
+  const { data: session } = useSession();
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const bottomRef = useRef(null);
 
-    useEffect(() => {
-        load()
-        const ch = supabase.channel('chat-updates')
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, load)
-            .subscribe()
-        return () => supabase.removeChannel(ch)
-    }, [])
+  const fetchMessages = async () => {
+    try {
+      const res = await fetch('/api/messages');
+      if (res.ok) {
+        const data = await res.json();
+        setMessages(data || []);
+      }
+    } catch {}
+    setLoading(false);
+  };
 
-    async function load() {
-        const { data } = await supabase.from('messages').select('*')
-            .or(`to_user_id.eq.${profile?.id},from_user_id.eq.${profile?.id},to_user_id.eq.broadcast`)
-            .order('created_at')
-        setMessages(data || [])
-        await supabase.from('messages').update({ read: true }).eq('to_user_id', profile?.id).eq('read', false)
-        setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 80)
+  useEffect(() => {
+    fetchMessages();
+    // Mark messages as read
+    fetch('/api/messages', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mark_read: true }),
+    }).catch(() => {});
+
+    // Poll every 15s
+    const interval = setInterval(() => {
+      fetchMessages();
+      fetch('/api/messages', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mark_read: true }),
+      }).catch(() => {});
+    }, 15000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleSend = async (e) => {
+    e.preventDefault();
+    if (!newMessage.trim()) return;
+
+    setSending(true);
+    try {
+      const res = await fetch('/api/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: newMessage.trim() }),
+      });
+
+      if (res.ok) {
+        const msg = await res.json();
+        setMessages(prev => [...prev, msg]);
+        setNewMessage('');
+      } else {
+        const err = await res.json();
+        toast.error(err.error || 'Failed to send');
+      }
+    } catch {
+      toast.error('Network error');
     }
+    setSending(false);
+  };
 
-    async function send() {
-        const body = input.trim()
-        if (!body || sending) return
-        if (hasBadWords(body)) { showToast('Please keep messages respectful 🙏'); return }
-        const now = Date.now()
-        if (now - lastSentAt.current < 2500) { showToast('Slow down a bit!'); return }
-        const recentMine = messages.filter(m => m.from_user_id === profile?.id && Date.now() - new Date(m.created_at).getTime() < 3600000)
-        if (recentMine.length >= 10) { showToast('Message limit reached — please wait a bit'); return }
-        setSending(true)
-        lastSentAt.current = now
-        await supabase.from('messages').insert({ from_user_id: profile?.id, from_name: profile.full_name, from_email: profile.email, to_user_id: 'admin', body, read: false, created_at: new Date().toISOString() })
-        setInput('')
-        if (textareaRef.current) textareaRef.current.style.height = 'auto'
-        setSending(false)
-        load()
-    }
+  if (loading) return <Loader />;
 
-    const chatItems = messages.filter(m => m.to_user_id === profile?.id || m.from_user_id === profile?.id || m.to_user_id === 'broadcast')
+  const myId = session?.profile?.id;
 
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh' }}>
-            <Topbar title="Chat with Staff" onBack={() => window.history.back()} />
-            <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: 4 }}>
-                {chatItems.length === 0 && (<div className="empty"><div className="empty-ico">💬</div><div className="empty-txt">Ask us anything! We&apos;re here to help.</div></div>)}
-                {chatItems.map(m => {
-                    const isMe = m.from_user_id === profile?.id
-                    const isBroadcast = m.to_user_id === 'broadcast'
-                    return (
-                        <div key={m.id}>
-                            <div className={`bubble-wrap ${isMe ? 'me' : 'them'}`}>
-                                {(isBroadcast || !isMe) && <div className="bubble-name">{isBroadcast ? '📣 Ethos Staff' : m.from_name || 'Staff'}</div>}
-                                <div className={`bubble ${isMe ? 'me' : 'them'}`}>{m.body}</div>
-                                <div className="bubble-time">{timeAgo(m.created_at)}</div>
-                            </div>
-                            {m.admin_reply && (
-                                <div className="bubble-wrap them" style={{ marginTop: 2 }}>
-                                    <div className="bubble-name">Staff Reply</div>
-                                    <div className="bubble them">{m.admin_reply}</div>
-                                    <div className="bubble-time">{timeAgo(m.replied_at)}</div>
-                                </div>
-                            )}
-                        </div>
-                    )
-                })}
-                <div ref={bottomRef} />
-            </div>
-            <div style={{ padding: '10px 16px max(16px, env(safe-area-inset-bottom))', background: 'var(--s1)', borderTop: '1px solid var(--border)', display: 'flex', gap: 10, alignItems: 'flex-end' }}>
-                <textarea ref={textareaRef} className="form-input" style={{ flex: 1, resize: 'none', minHeight: 44, maxHeight: 120, padding: '10px 12px', fontSize: 14 }} placeholder="Message…" value={input} onChange={e => { setInput(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px' }} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }} />
-                <button className="btn btn-accent btn-sm" onClick={send} disabled={sending || !input.trim()}>Send</button>
-            </div>
+  return (
+    <div className="page-enter flex flex-col h-[calc(100vh-5rem)]">
+      <div className="page-header">
+        <div className="max-w-lg mx-auto">
+          <h1 className="font-heading text-2xl font-bold">💬 Chat</h1>
+          <p className="text-green-200 text-sm font-body mt-1">Message event staff</p>
         </div>
-    )
+      </div>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 max-w-lg mx-auto w-full">
+        {messages.length === 0 ? (
+          <div className="text-center py-12 text-gray-400">
+            <p className="text-4xl mb-3">💬</p>
+            <p className="font-body">No messages yet. Say hello!</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {messages.map((msg) => {
+              const isMe = msg.sender_id === myId;
+              return (
+                <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`flex gap-2 max-w-[80%] ${isMe ? 'flex-row-reverse' : ''}`}>
+                    <Avatar
+                      src={isMe ? session?.profile?.avatar : msg.sender?.avatar}
+                      name={isMe ? session?.profile?.name : msg.sender?.name}
+                      size={28}
+                    />
+                    <div
+                      className={`rounded-2xl px-4 py-2.5 text-sm font-body ${
+                        isMe
+                          ? 'bg-gradient-to-br from-green-800 to-green-900 text-white rounded-br-md'
+                          : 'glass-card rounded-bl-md'
+                      }`}
+                    >
+                      <p>{msg.content}</p>
+                      <p className={`text-[10px] mt-1 ${isMe ? 'text-green-300' : 'text-gray-400'}`}>
+                        {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+            <div ref={bottomRef} />
+          </div>
+        )}
+      </div>
+
+      {/* Input */}
+      <div className="border-t border-amber-200 bg-white px-4 py-3">
+        <form onSubmit={handleSend} className="max-w-lg mx-auto flex gap-2">
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Type a message..."
+            className="input-field flex-1"
+            disabled={sending}
+          />
+          <button
+            type="submit"
+            disabled={sending || !newMessage.trim()}
+            className="btn-primary px-4 btn-glow"
+          >
+            {sending ? '...' : '→'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
 }

@@ -1,70 +1,68 @@
-'use client'
-export const dynamic = 'force-dynamic'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import { formatTime, formatDate } from '@/lib/utils'
-import Loader from '@/components/Loader'
-import Topbar from '@/components/Topbar'
+import { useEffect, useState } from 'react';
+import Loader from '@/components/Loader';
 
 export default function SchedulePage() {
-    const [items, setItems] = useState([])
-    const [loading, setLoading] = useState(true)
-    const [filter, setFilter] = useState('all')
-    const router = useRouter()
-    const supabase = createClient()
+  const [schedule, setSchedule] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        supabase.from('schedule_items').select('*').order('start_time')
-            .then(({ data }) => { setItems(data || []); setLoading(false) })
-    }, [])
+  useEffect(() => {
+    fetch('/api/schedule')
+      .then(r => r.json())
+      .then(data => { setSchedule(data || []); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
 
-    const rooms = ['all', ...new Set(items.map(i => i.location).filter(Boolean))]
-    const filtered = filter === 'all' ? items : items.filter(i => i.location === filter)
+  if (loading) return <Loader />;
 
-    const grouped = filtered.reduce((acc, item) => {
-        const day = formatDate(item.start_time)
-        if (!acc[day]) acc[day] = []
-        acc[day].push(item)
-        return acc
-    }, {})
+  return (
+    <div className="page-enter">
+      <div className="page-header">
+        <div className="max-w-lg mx-auto">
+          <h1 className="font-heading text-2xl font-bold">📅 Schedule</h1>
+          <p className="text-green-200 text-sm font-body mt-1">March 21, 2026</p>
+        </div>
+      </div>
 
-    return (
-        <>
-            <Topbar title="Schedule" />
-            <div className="content">
-                <div className="chip-row" style={{ overflowX: 'auto', flexWrap: 'nowrap', paddingBottom: 4 }}>
-                    {rooms.map(r => (
-                        <button key={r} className={`chip ${filter === r ? 'active' : ''}`} onClick={() => setFilter(r)}>
-                            {r === 'all' ? 'All Rooms' : r}
-                        </button>
-                    ))}
-                </div>
-                {loading && <Loader />}
-                {Object.entries(grouped).map(([day, evts]) => (
-                    <div key={day}>
-                        <div style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 16, marginBottom: 10, marginTop: 16, paddingBottom: 6, borderBottom: '2px solid var(--accent)' }}>
-                            {day}
-                        </div>
-                        {evts.map(item => (
-                            <div key={item.id} className="sched-item" onClick={() => router.push(`/app/schedule/${item.id}`)}>
-                                <div className="sched-time">{formatTime(item.start_time)}</div>
-                                <div className="sched-body">
-                                    <div className="sched-name">{item.title}</div>
-                                    <div className="sched-loc">{item.location}{item.speaker ? ` · ${item.speaker}` : ''}</div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                ))}
-                {!loading && filtered.length === 0 && (
-                    <div className="empty">
-                        <div className="empty-ico">🗓️</div>
-                        <div className="empty-txt">No events yet — check back soon!</div>
-                    </div>
+      <div className="max-w-lg mx-auto px-4 py-6">
+        <div className="space-y-4 stagger-in">
+          {schedule.map((item, i) => (
+            <div key={item.id} className="flex gap-4">
+              {/* Timeline line */}
+              <div className="flex flex-col items-center">
+                <div className="w-3 h-3 rounded-full bg-green-600 border-2 border-green-200 flex-shrink-0 mt-1.5"></div>
+                {i < schedule.length - 1 && (
+                  <div className="w-0.5 flex-1 bg-gradient-to-b from-green-300 to-green-100 mt-1"></div>
                 )}
+              </div>
+
+              {/* Event card */}
+              <div className="glass-card p-4 flex-1 mb-2">
+                <div className="flex justify-between items-start gap-2">
+                  <h3 className="font-heading font-bold text-green-900">{item.title}</h3>
+                  <span className="text-xs font-bold text-green-800 bg-green-100 px-2 py-0.5 rounded-full whitespace-nowrap">
+                    {item.start_time}
+                  </span>
+                </div>
+                {item.description && (
+                  <p className="text-gray-500 text-sm font-body mt-2">{item.description}</p>
+                )}
+                <div className="flex items-center gap-4 mt-3">
+                  {item.location && (
+                    <span className="text-xs text-amber-700 font-body">📍 {item.location}</span>
+                  )}
+                  {item.end_time && (
+                    <span className="text-xs text-gray-400 font-body">
+                      {item.start_time} — {item.end_time}
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
-        </>
-    )
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
