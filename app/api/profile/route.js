@@ -32,7 +32,9 @@ export async function PUT(request) {
     .update({ 
       resume_link: body.resume_link,
       phone: body.phone,
-      bio: body.bio
+      bio: body.bio,
+      name: body.name,
+      avatar: body.avatar
     })
     .eq('id', session.profile.id)
     .select()

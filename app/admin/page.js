@@ -94,6 +94,7 @@ export default function AdminDashboard() {
     { label: 'Total Votes', value: stats?.totalVotes || 0, icon: '🗳️' },
     { label: 'Unread Messages', value: stats?.unreadMessages || 0, icon: '💬', href: '/admin/messages', minLevel: 2 },
     { label: 'Raffle Entries', value: stats?.raffleEntries || 0, icon: '🎰', href: '/admin/raffle', minLevel: 3 },
+    { label: 'Print ID Cards', value: '🪪', icon: '🖨️', href: '/admin/cards', minLevel: 3 },
   ];
 
   return (

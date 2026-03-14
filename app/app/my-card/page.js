@@ -15,6 +15,8 @@ export default function MyCardPage() {
   const [resumeLink, setResumeLink] = useState(profile?.resume_link || '');
   const [phone, setPhone] = useState(profile?.phone || '');
   const [bio, setBio] = useState(profile?.bio || '');
+  const [name, setName] = useState(profile?.name || '');
+  const [avatar, setAvatar] = useState(profile?.avatar || '');
   const [saving, setSaving] = useState(false);
   const [qrExpanded, setQrExpanded] = useState(false);
 
@@ -24,7 +26,7 @@ export default function MyCardPage() {
       const res = await fetch('/api/profile', { 
         method: 'PUT', 
         headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify({ resume_link: resumeLink, phone, bio }) 
+        body: JSON.stringify({ resume_link: resumeLink, phone, bio, name, avatar }) 
       });
       if (res.ok) toast.success('Profile saved successfully');
       else toast.error('Failed to save');
@@ -42,9 +44,9 @@ export default function MyCardPage() {
           padding: '32px 20px', textAlign: 'center', marginBottom: 16,
           animation: 'scaleIn 0.3s ease both',
         }}>
-          <Avatar src={profile?.avatar} name={profile?.name} size={72} />
+          <Avatar src={avatar || profile?.avatar} name={name || profile?.name} size={72} />
           <h2 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 20, color: 'var(--text)', marginTop: 12 }}>
-            {profile?.name}
+            {name || profile?.name}
           </h2>
           <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--muted)', marginTop: 2 }}>
             {profile?.email}
@@ -77,6 +79,40 @@ export default function MyCardPage() {
         }}>
           <div>
             <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 15, color: 'var(--text)', marginBottom: 6 }}>
+              👤 Name
+            </h3>
+            <input
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="Your Name"
+              style={{
+                width: '100%', background: 'var(--white)', border: '1.5px solid var(--border)',
+                borderRadius: 10, padding: '11px 14px', fontSize: 14,
+                fontFamily: 'var(--fb)', color: 'var(--text)', outline: 'none',
+              }}
+            />
+          </div>
+
+          <div>
+            <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 15, color: 'var(--text)', marginBottom: 6 }}>
+              🖼️ Profile Picture URL
+            </h3>
+            <input
+              type="url"
+              value={avatar}
+              onChange={e => setAvatar(e.target.value)}
+              placeholder="https://example.com/avatar.jpg"
+              style={{
+                width: '100%', background: 'var(--white)', border: '1.5px solid var(--border)',
+                borderRadius: 10, padding: '11px 14px', fontSize: 14,
+                fontFamily: 'var(--fb)', color: 'var(--text)', outline: 'none',
+              }}
+            />
+          </div>
+
+          <div>
+            <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 15, color: 'var(--text)', marginBottom: 6 }}>
               📞 Phone Number
             </h3>
             <input
@@ -94,7 +130,7 @@ export default function MyCardPage() {
 
           <div>
             <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 15, color: 'var(--text)', marginBottom: 6 }}>
-              📝 Bio / Description
+              💼 Job Title (Bio)
             </h3>
             <textarea
               value={bio}
