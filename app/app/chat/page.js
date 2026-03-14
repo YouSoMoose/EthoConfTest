@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import toast from 'react-hot-toast';
 import Avatar from '@/components/Avatar';
+import Topbar from '@/components/Topbar';
 import Loader from '@/components/Loader';
 
 export default function ChatPage() {
@@ -17,44 +18,26 @@ export default function ChatPage() {
   const fetchMessages = async () => {
     try {
       const res = await fetch('/api/messages');
-      if (res.ok) {
-        const data = await res.json();
-        setMessages(data || []);
-      }
+      if (res.ok) setMessages(await res.json());
     } catch {}
     setLoading(false);
   };
 
   useEffect(() => {
     fetchMessages();
-    // Mark messages as read
-    fetch('/api/messages', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ mark_read: true }),
-    }).catch(() => {});
-
-    // Poll every 15s
-    const interval = setInterval(() => {
+    fetch('/api/messages', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mark_read: true }) }).catch(() => {});
+    const iv = setInterval(() => {
       fetchMessages();
-      fetch('/api/messages', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mark_read: true }),
-      }).catch(() => {});
+      fetch('/api/messages', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mark_read: true }) }).catch(() => {});
     }, 15000);
-
-    return () => clearInterval(interval);
+    return () => clearInterval(iv);
   }, []);
 
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
   const handleSend = async (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
-
     setSending(true);
     try {
       const res = await fetch('/api/messages', {
@@ -62,62 +45,46 @@ export default function ChatPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: newMessage.trim() }),
       });
-
-      if (res.ok) {
-        const msg = await res.json();
-        setMessages(prev => [...prev, msg]);
-        setNewMessage('');
-      } else {
-        const err = await res.json();
-        toast.error(err.error || 'Failed to send');
-      }
-    } catch {
-      toast.error('Network error');
-    }
+      if (res.ok) { const msg = await res.json(); setMessages(p => [...p, msg]); setNewMessage(''); }
+      else { const e = await res.json(); toast.error(e.error || 'Failed to send'); }
+    } catch { toast.error('Network error'); }
     setSending(false);
   };
 
   if (loading) return <Loader />;
-
   const myId = session?.profile?.id;
 
   return (
-    <div className="page-enter flex flex-col h-[calc(100vh-5rem)]">
-      <div className="page-header">
-        <div className="max-w-lg mx-auto">
-          <h1 className="font-heading text-2xl font-bold">💬 Chat</h1>
-          <p className="text-green-200 text-sm font-body mt-1">Message event staff</p>
-        </div>
-      </div>
+    <div className="page-enter" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 72px)' }}>
+      <Topbar title="💬 Chat" />
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 max-w-lg mx-auto w-full">
+      <div style={{ flex: 1, overflowY: 'auto', padding: '16px 16px', maxWidth: 500, margin: '0 auto', width: '100%' }}>
         {messages.length === 0 ? (
-          <div className="text-center py-12 text-gray-400">
-            <p className="text-4xl mb-3">💬</p>
-            <p className="font-body">No messages yet. Say hello!</p>
+          <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--muted)' }}>
+            <span style={{ fontSize: 40, display: 'block', marginBottom: 8 }}>💬</span>
+            <p style={{ fontFamily: 'var(--fb)', fontSize: 14 }}>No messages yet. Say hello!</p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {messages.map((msg) => {
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {messages.map(msg => {
               const isMe = msg.sender_id === myId;
               return (
-                <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`flex gap-2 max-w-[80%] ${isMe ? 'flex-row-reverse' : ''}`}>
-                    <Avatar
-                      src={isMe ? session?.profile?.avatar : msg.sender?.avatar}
-                      name={isMe ? session?.profile?.name : msg.sender?.name}
-                      size={28}
-                    />
-                    <div
-                      className={`rounded-2xl px-4 py-2.5 text-sm font-body ${
-                        isMe
-                          ? 'bg-gradient-to-br from-green-800 to-green-900 text-white rounded-br-md'
-                          : 'glass-card rounded-bl-md'
-                      }`}
-                    >
-                      <p>{msg.content}</p>
-                      <p className={`text-[10px] mt-1 ${isMe ? 'text-green-300' : 'text-gray-400'}`}>
+                <div key={msg.id} style={{ display: 'flex', justifyContent: isMe ? 'flex-end' : 'flex-start' }}>
+                  <div style={{ display: 'flex', gap: 8, maxWidth: '80%', flexDirection: isMe ? 'row-reverse' : 'row' }}>
+                    <Avatar src={isMe ? session?.profile?.avatar : msg.sender?.avatar} name={isMe ? session?.profile?.name : msg.sender?.name} size={28} />
+                    <div style={{
+                      borderRadius: 16,
+                      padding: '10px 14px',
+                      fontSize: 14,
+                      fontFamily: 'var(--fb)',
+                      ...(isMe
+                        ? { background: 'var(--g)', color: '#fff', borderBottomRightRadius: 4 }
+                        : { background: 'var(--white)', border: '1px solid var(--border)', borderBottomLeftRadius: 4, color: 'var(--text)' }
+                      ),
+                    }}>
+                      <p style={{ margin: 0 }}>{msg.content}</p>
+                      <p style={{ fontSize: 10, marginTop: 4, opacity: 0.6, margin: 0 }}>
                         {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
@@ -131,22 +98,44 @@ export default function ChatPage() {
       </div>
 
       {/* Input */}
-      <div className="border-t border-amber-200 bg-white px-4 py-3">
-        <form onSubmit={handleSend} className="max-w-lg mx-auto flex gap-2">
+      <div style={{
+        borderTop: '1px solid var(--border)',
+        background: 'var(--white)',
+        padding: '12px 16px',
+        paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+      }}>
+        <form onSubmit={handleSend} style={{ display: 'flex', gap: 8, maxWidth: 500, margin: '0 auto' }}>
           <input
             type="text"
             value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
+            onChange={e => setNewMessage(e.target.value)}
             placeholder="Type a message..."
-            className="input-field flex-1"
             disabled={sending}
+            style={{
+              flex: 1,
+              background: 'var(--s1)',
+              border: '1.5px solid var(--border)',
+              borderRadius: 10,
+              padding: '10px 14px',
+              fontSize: 14,
+              fontFamily: 'var(--fb)',
+              color: 'var(--text)',
+              outline: 'none',
+            }}
           />
-          <button
-            type="submit"
-            disabled={sending || !newMessage.trim()}
-            className="btn-primary px-4 btn-glow"
-          >
-            {sending ? '...' : '→'}
+          <button type="submit" disabled={sending || !newMessage.trim()} style={{
+            background: 'var(--g)',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 10,
+            padding: '10px 16px',
+            cursor: 'pointer',
+            fontFamily: 'var(--fb)',
+            fontWeight: 600,
+            fontSize: 16,
+            opacity: (sending || !newMessage.trim()) ? 0.5 : 1,
+          }}>
+            →
           </button>
         </form>
       </div>

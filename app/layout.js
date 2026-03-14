@@ -10,16 +10,17 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="font-body bg-amber-50 min-h-screen">
+      <body style={{ fontFamily: 'var(--fb)', background: 'var(--bg)', color: 'var(--text)', minHeight: '100vh' }}>
         <SessionProvider>
           <Toaster
             position="top-center"
             toastOptions={{
               style: {
                 borderRadius: '12px',
-                background: '#14532d',
+                background: 'var(--g)',
                 color: '#fff',
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: 'var(--fb)',
+                fontSize: '14px',
               },
             }}
           />

@@ -14,12 +14,12 @@ export default function AdminDashboard() {
       fetch('/api/messages?unread=true').then(r => r.json()),
       fetch('/api/raffle').then(r => r.json()).catch(() => []),
     ]).then(([users, companies, unread, raffle]) => {
-      const userList = Array.isArray(users) ? users : [];
+      const u = Array.isArray(users) ? users : [];
       setStats({
-        totalUsers: userList.length,
-        checkedIn: userList.filter(u => u.checked_in).length,
+        totalUsers: u.length,
+        checkedIn: u.filter(x => x.checked_in).length,
         companies: (companies || []).length,
-        totalVotes: (companies || []).reduce((sum, c) => sum + (c.vote_count || 0), 0),
+        totalVotes: (companies || []).reduce((s, c) => s + (c.vote_count || 0), 0),
         unreadMessages: unread?.unreadCount || 0,
         raffleEntries: Array.isArray(raffle) ? raffle.length : 0,
       });
@@ -27,28 +27,44 @@ export default function AdminDashboard() {
     }).catch(() => setLoading(false));
   }, []);
 
-  if (loading) return <Loader />;
+  if (loading) return <Loader admin />;
 
   const cards = [
-    { label: 'Total Users', value: stats?.totalUsers || 0, icon: '👥', color: 'from-blue-500 to-blue-600' },
-    { label: 'Checked In', value: stats?.checkedIn || 0, icon: '✅', color: 'from-green-500 to-green-600' },
-    { label: 'Companies', value: stats?.companies || 0, icon: '🏢', color: 'from-purple-500 to-purple-600' },
-    { label: 'Total Votes', value: stats?.totalVotes || 0, icon: '🗳️', color: 'from-amber-500 to-amber-600' },
-    { label: 'Unread Messages', value: stats?.unreadMessages || 0, icon: '💬', color: 'from-pink-500 to-pink-600' },
-    { label: 'Raffle Entries', value: stats?.raffleEntries || 0, icon: '🎰', color: 'from-teal-500 to-teal-600' },
+    { label: 'Total Users', value: stats?.totalUsers || 0, icon: '👥' },
+    { label: 'Checked In', value: stats?.checkedIn || 0, icon: '✅' },
+    { label: 'Companies', value: stats?.companies || 0, icon: '🏢' },
+    { label: 'Total Votes', value: stats?.totalVotes || 0, icon: '🗳️' },
+    { label: 'Unread Messages', value: stats?.unreadMessages || 0, icon: '💬' },
+    { label: 'Raffle Entries', value: stats?.raffleEntries || 0, icon: '🎰' },
   ];
 
   return (
-    <div className="page-enter">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <h2 className="font-heading text-2xl font-bold text-green-900 mb-6">📊 Dashboard</h2>
+    <div className="page-enter" style={{ padding: '24px 16px' }}>
+      <div style={{ maxWidth: 900, margin: '0 auto' }}>
+        <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 22, color: 'var(--atext)', marginBottom: 20 }}>
+          📊 Dashboard
+        </h2>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 stagger-in">
-          {cards.map((card) => (
-            <div key={card.label} className="glass-card p-5 text-center">
-              <div className="text-3xl mb-2">{card.icon}</div>
-              <p className="font-heading text-3xl font-bold text-green-900">{card.value}</p>
-              <p className="font-body text-sm text-gray-500 mt-1">{card.label}</p>
+        <div className="stagger admin-stat-grid" style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: 12,
+        }}>
+          {cards.map(card => (
+            <div key={card.label} style={{
+              background: 'var(--as2)',
+              border: '1px solid var(--aborder)',
+              borderRadius: 'var(--r)',
+              padding: 20,
+              textAlign: 'center',
+            }}>
+              <span style={{ fontSize: 24, display: 'block', marginBottom: 8 }}>{card.icon}</span>
+              <p style={{ fontFamily: 'var(--fhs)', fontWeight: 800, fontSize: 28, color: 'var(--accent)' }}>
+                {card.value}
+              </p>
+              <p style={{ fontFamily: 'var(--fb)', fontSize: 12, color: 'var(--asub)', marginTop: 4 }}>
+                {card.label}
+              </p>
             </div>
           ))}
         </div>

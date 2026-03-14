@@ -1,164 +1,129 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import jsQR from 'jsqr';
+import Topbar from '@/components/Topbar';
+import Btn from '@/components/Btn';
 
 export default function ScanPage() {
-  const { data: session } = useSession();
   const router = useRouter();
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-  const [scanning, setScanning] = useState(true);
+  const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState(null);
-  const animationRef = useRef(null);
   const streamRef = useRef(null);
-
-  useEffect(() => {
-    startCamera();
-    return () => stopCamera();
-  }, []);
+  const animRef = useRef(null);
 
   const startCamera = async () => {
+    setScanning(true);
+    setResult(null);
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' },
-      });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         videoRef.current.play();
         requestAnimationFrame(scan);
       }
-    } catch (err) {
+    } catch {
       toast.error('Camera access denied');
+      setScanning(false);
     }
   };
 
   const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(t => t.stop());
-    }
-    if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current);
-    }
+    streamRef.current?.getTracks().forEach(t => t.stop());
+    if (animRef.current) cancelAnimationFrame(animRef.current);
+    setScanning(false);
   };
+
+  useEffect(() => () => stopCamera(), []);
 
   const scan = () => {
-    if (!videoRef.current || !canvasRef.current || !scanning) return;
-
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-
-    if (video.readyState === video.HAVE_ENOUGH_DATA) {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-      const code = jsQR(imageData.data, imageData.width, imageData.height);
-      if (code) {
-        handleQRResult(code.data);
-        return;
-      }
+    if (!videoRef.current || !canvasRef.current) return;
+    const v = videoRef.current;
+    const c = canvasRef.current;
+    if (v.readyState === v.HAVE_ENOUGH_DATA) {
+      c.width = v.videoWidth;
+      c.height = v.videoHeight;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(v, 0, 0, c.width, c.height);
+      const img = ctx.getImageData(0, 0, c.width, c.height);
+      const code = jsQR(img.data, img.width, img.height);
+      if (code) { handleStamp(code.data); return; }
     }
-
-    animationRef.current = requestAnimationFrame(scan);
+    animRef.current = requestAnimationFrame(scan);
   };
 
-  const handleQRResult = async (data) => {
-    setScanning(false);
+  const handleStamp = async (boothId) => {
     stopCamera();
-
-    // The QR data should be a booth UUID
     try {
       const res = await fetch('/api/stamp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ booth_id: data }),
+        body: JSON.stringify({ booth_id: boothId }),
       });
-
-      const result = await res.json();
-
+      const data = await res.json();
       if (res.ok) {
-        // Store stamp locally for passport page
-        const stampKey = `stamps_${session?.profile?.id}`;
-        const stored = JSON.parse(localStorage.getItem(stampKey) || '[]');
-        if (!stored.includes(data)) {
-          stored.push(data);
-          localStorage.setItem(stampKey, JSON.stringify(stored));
-        }
-        setResult({ success: true, message: `Stamped: ${result.booth_name || 'Booth'}` });
-        toast.success(`Stamped: ${result.booth_name || 'Booth'}!`);
+        setResult({ success: true, ...data });
+        toast.success('Booth stamped! ✅');
       } else {
-        setResult({ success: false, message: result.error || 'Failed to stamp' });
-        if (result.error === 'Already stamped') {
-          toast.error(`Already stamped: ${result.booth_name || 'this booth'}`);
-        } else {
-          toast.error(result.error || 'Failed to stamp');
-        }
+        setResult({ success: false, error: data.error });
+        toast.error(data.error || 'Failed');
       }
-    } catch {
-      setResult({ success: false, message: 'Network error' });
-      toast.error('Network error');
-    }
+    } catch { toast.error('Network error'); }
   };
 
   return (
     <div className="page-enter">
-      <div className="page-header">
-        <div className="max-w-lg mx-auto flex items-center gap-3">
-          <button onClick={() => router.back()} className="text-white text-xl hover:opacity-80 transition-opacity">
-            ←
-          </button>
-          <h1 className="font-heading text-xl font-bold">📷 Scan QR</h1>
-        </div>
-      </div>
-
-      <div className="max-w-lg mx-auto px-4 py-6">
-        {scanning ? (
-          <div className="animate-fade-up">
-            <div className="relative rounded-2xl overflow-hidden bg-black aspect-square">
-              <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
-              <canvas ref={canvasRef} className="hidden" />
-
-              {/* Scanning overlay */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-56 h-56 border-2 border-green-400 rounded-2xl relative">
-                  <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-green-400 rounded-tl-lg"></div>
-                  <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-green-400 rounded-tr-lg"></div>
-                  <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-green-400 rounded-bl-lg"></div>
-                  <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-green-400 rounded-br-lg"></div>
-                  {/* Scanning line */}
-                  <div className="absolute left-2 right-2 h-0.5 bg-green-400 opacity-60" style={{ animation: 'scanLine 2s ease-in-out infinite', top: '50%' }}></div>
-                </div>
-              </div>
-            </div>
-            <p className="text-center text-gray-500 font-body text-sm mt-4">
+      <Topbar title="📷 Scan QR" onBack={() => router.back()} />
+      <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px', textAlign: 'center' }}>
+        {!scanning && !result && (
+          <div style={{ padding: '60px 0' }}>
+            <span style={{ fontSize: 56, display: 'block', marginBottom: 16 }}>📷</span>
+            <p style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'var(--sub)', marginBottom: 24 }}>
               Point your camera at a booth QR code
             </p>
+            <Btn onClick={startCamera}>Start Scanner</Btn>
           </div>
-        ) : (
-          <div className="animate-scale-in text-center py-12">
-            <div className="text-6xl mb-4">{result?.success ? '✅' : '❌'}</div>
-            <h2 className="font-heading text-xl font-bold text-green-900 mb-2">
-              {result?.success ? 'Success!' : 'Oops!'}
-            </h2>
-            <p className="font-body text-gray-500 mb-8">{result?.message}</p>
-            <div className="flex gap-3 justify-center">
-              <button
-                onClick={() => { setScanning(true); setResult(null); startCamera(); }}
-                className="btn-primary btn-glow"
-              >
-                Scan Another
-              </button>
-              <button onClick={() => router.push('/app/passport')} className="btn-secondary">
-                View Passport
-              </button>
+        )}
+
+        {scanning && (
+          <div style={{ animation: 'fadeUp 0.22s ease both' }}>
+            <div style={{
+              position: 'relative', borderRadius: 16, overflow: 'hidden',
+              background: '#000', aspectRatio: '1', maxWidth: 360, margin: '0 auto',
+            }}>
+              <video ref={videoRef} style={{ width: '100%', height: '100%', objectFit: 'cover' }} playsInline muted />
+              <canvas ref={canvasRef} style={{ display: 'none' }} />
+              <div style={{
+                position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <div style={{ width: 200, height: 200, border: '2px solid var(--warm)', borderRadius: 16 }} />
+              </div>
             </div>
+            <div style={{ marginTop: 16 }}>
+              <Btn variant="outline" onClick={stopCamera}>Cancel</Btn>
+            </div>
+          </div>
+        )}
+
+        {result && (
+          <div style={{ animation: 'scaleIn 0.3s ease both', padding: '40px 0' }}>
+            <span style={{ fontSize: 56, display: 'block', marginBottom: 16 }}>
+              {result.success ? '✅' : '❌'}
+            </span>
+            <h2 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 20, color: 'var(--text)', marginBottom: 8 }}>
+              {result.success ? 'Stamped!' : 'Oops'}
+            </h2>
+            <p style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'var(--sub)', marginBottom: 24 }}>
+              {result.success
+                ? (result.raffle_eligible ? '🎉 You are now raffle eligible!' : 'Keep collecting stamps!')
+                : result.error}
+            </p>
+            <Btn onClick={startCamera}>Scan Another</Btn>
           </div>
         )}
       </div>

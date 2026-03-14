@@ -1,74 +1,53 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
 import { useParams, useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import toast from 'react-hot-toast';
-import StarRating from '@/components/StarRating';
+import Topbar from '@/components/Topbar';
 import Loader from '@/components/Loader';
+import StarRating from '@/components/StarRating';
+import Btn from '@/components/Btn';
+import Modal from '@/components/Modal';
 
 export default function PitchDetailPage() {
   const { id } = useParams();
   const router = useRouter();
   const { data: session } = useSession();
   const [company, setCompany] = useState(null);
-  const [vote, setVote] = useState({ sustainability: 0, impact: 0, feasibility: 0, overall: 0 });
-  const [existingVote, setExistingVote] = useState(null);
-  const [votingLocked, setVotingLocked] = useState(false);
-  const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  const [voting, setVoting] = useState(false);
+  const [showVote, setShowVote] = useState(false);
+  const [vote, setVote] = useState({ sustainability: 0, impact: 0, feasibility: 0, overall: 0 });
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    Promise.all([
-      fetch('/api/companies').then(r => r.json()),
-      fetch(`/api/votes?company_id=${id}`).then(r => r.json()),
-      fetch('/api/voting-settings').then(r => r.json()),
-      fetch('/api/wallet').then(r => r.json()),
-    ]).then(([companies, userVote, settings, wallet]) => {
-      const comp = (companies || []).find(c => c.id === id);
-      setCompany(comp || null);
-      if (userVote) {
-        setVote({
-          sustainability: userVote.sustainability || 0,
-          impact: userVote.impact || 0,
-          feasibility: userVote.feasibility || 0,
-          overall: userVote.overall || 0,
-        });
-        setExistingVote(userVote);
-      }
-      setVotingLocked(settings?.locked || false);
-      setSaved((wallet || []).some(w => w.company_id === id));
+    fetch('/api/companies').then(r => r.json()).then(list => {
+      const c = (list || []).find(x => x.id === id);
+      setCompany(c);
       setLoading(false);
     }).catch(() => setLoading(false));
+
+    fetch('/api/wallet').then(r => r.json()).then(items => {
+      if ((items || []).some(w => w.company_id === id)) setSaved(true);
+    }).catch(() => {});
   }, [id]);
 
-  const handleSubmitVote = async () => {
-    if (vote.sustainability === 0 || vote.impact === 0 || vote.feasibility === 0 || vote.overall === 0) {
-      toast.error('Please rate all categories');
-      return;
-    }
-    setSubmitting(true);
+  const submitVote = async () => {
+    setVoting(true);
     try {
       const res = await fetch('/api/votes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ company_id: id, ...vote }),
       });
-      if (res.ok) {
-        toast.success(existingVote ? 'Vote updated!' : 'Vote submitted!');
-        setExistingVote(await res.json());
-      } else {
-        const err = await res.json();
-        toast.error(err.error || 'Failed to submit vote');
-      }
-    } catch {
-      toast.error('Network error');
-    }
-    setSubmitting(false);
+      if (res.ok) { toast.success('Vote submitted!'); setShowVote(false); }
+      else { const e = await res.json(); toast.error(e.error || 'Failed'); }
+    } catch { toast.error('Network error'); }
+    setVoting(false);
   };
 
-  const handleToggleWallet = async () => {
+  const toggleWallet = async () => {
     try {
       if (saved) {
         await fetch(`/api/wallet?company_id=${id}`, { method: 'DELETE' });
@@ -81,162 +60,104 @@ export default function PitchDetailPage() {
           body: JSON.stringify({ company_id: id }),
         });
         setSaved(true);
-        toast.success('Saved to wallet!');
+        toast.success('Saved to wallet');
       }
-    } catch {
-      toast.error('Network error');
-    }
+    } catch { toast.error('Failed'); }
   };
 
   if (loading) return <Loader />;
-  if (!company) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-4xl mb-3">🔍</p>
-          <p className="font-body text-gray-500">Company not found</p>
-          <button onClick={() => router.back()} className="btn-secondary mt-4">Go Back</button>
-        </div>
-      </div>
-    );
-  }
-
-  const categories = [
-    { key: 'sustainability', label: '🌱 Sustainability', icon: '🌱' },
-    { key: 'impact', label: '💥 Impact', icon: '💥' },
-    { key: 'feasibility', label: '⚙️ Feasibility', icon: '⚙️' },
-    { key: 'overall', label: '⭐ Overall', icon: '⭐' },
-  ];
+  if (!company) return <div style={{ padding: 40, textAlign: 'center' }}>Company not found</div>;
 
   return (
     <div className="page-enter">
-      <div className="page-header">
-        <div className="max-w-lg mx-auto flex items-center gap-3">
-          <button onClick={() => router.back()} className="text-white text-xl hover:opacity-80 transition-opacity">
-            ←
-          </button>
-          <h1 className="font-heading text-xl font-bold truncate">{company.name}</h1>
-        </div>
-      </div>
-
-      <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
-        {/* Company Info */}
-        <div className="glass-card p-6 animate-fade-up">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-100 to-amber-50 flex items-center justify-center flex-shrink-0">
+      <Topbar title={company.name} onBack={() => router.back()} />
+      <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px' }}>
+        {/* Company info */}
+        <div style={{
+          background: 'var(--white)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--r)',
+          padding: 20,
+          marginBottom: 16,
+        }}>
+          <div style={{ display: 'flex', gap: 14, alignItems: 'center', marginBottom: 16 }}>
+            <div style={{
+              width: 56, height: 56, borderRadius: 14, background: 'var(--s1)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0,
+            }}>
               {company.logo_url ? (
-                <img src={company.logo_url} alt={company.name} className="w-14 h-14 rounded-xl object-cover" />
-              ) : (
-                <span className="text-3xl">🏢</span>
-              )}
+                <img src={company.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : <span style={{ fontSize: 28 }}>🏢</span>}
             </div>
-            <div className="flex-1">
-              <h2 className="font-heading text-xl font-bold text-green-900">{company.name}</h2>
+            <div>
+              <h2 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 20, color: 'var(--text)' }}>
+                {company.name}
+              </h2>
               {company.category && (
-                <span className="text-xs text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full font-body">{company.category}</span>
+                <span style={{ fontFamily: 'var(--fb)', fontSize: 12, color: 'var(--muted)' }}>{company.category}</span>
               )}
             </div>
-            <button
-              onClick={handleToggleWallet}
-              className={`text-2xl transition-all duration-300 ${saved ? 'scale-110' : 'opacity-60 hover:opacity-100'}`}
-              title={saved ? 'Remove from wallet' : 'Save to wallet'}
-            >
-              {saved ? '💛' : '🤍'}
-            </button>
           </div>
 
           {company.description && (
-            <p className="text-gray-600 font-body text-sm mb-4">{company.description}</p>
+            <p style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'var(--sub)', lineHeight: 1.5, marginBottom: 16 }}>
+              {company.description}
+            </p>
           )}
 
-          <div className="grid grid-cols-2 gap-3 text-sm font-body">
-            {company.contact_email && (
-              <a href={`mailto:${company.contact_email}`} className="text-green-700 hover:underline truncate">
-                ✉️ {company.contact_email}
-              </a>
-            )}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
             {company.website && (
-              <a href={company.website} target="_blank" rel="noreferrer" className="text-green-700 hover:underline truncate">
-                🌐 Website
-              </a>
+              <a href={company.website} target="_blank" rel="noopener noreferrer" style={{
+                fontFamily: 'var(--fb)', fontSize: 12, color: 'var(--g)', background: 'var(--gl)',
+                padding: '4px 10px', borderRadius: 8,
+              }}>🌐 Website</a>
             )}
             {company.deck_link && (
-              <a href={company.deck_link} target="_blank" rel="noreferrer" className="text-green-700 hover:underline truncate">
-                📊 Pitch Deck
-              </a>
-            )}
-            {company.resume_link && (
-              <a href={company.resume_link} target="_blank" rel="noreferrer" className="text-green-700 hover:underline truncate">
-                📄 Resume
-              </a>
+              <a href={company.deck_link} target="_blank" rel="noopener noreferrer" style={{
+                fontFamily: 'var(--fb)', fontSize: 12, color: 'var(--g)', background: 'var(--gl)',
+                padding: '4px 10px', borderRadius: 8,
+              }}>📑 Pitch Deck</a>
             )}
           </div>
-        </div>
 
-        {/* Voting section */}
-        <div className="glass-card p-6 animate-fade-up" style={{ animationDelay: '0.1s' }}>
-          <h3 className="font-heading text-lg font-bold text-green-900 mb-4">Rate This Pitch</h3>
-
-          {votingLocked ? (
-            <div className="text-center py-6">
-              <p className="text-4xl mb-3">🔒</p>
-              <p className="font-body text-gray-500">Voting is currently locked</p>
-            </div>
-          ) : (
-            <>
-              <div className="space-y-4">
-                {categories.map((cat) => (
-                  <div key={cat.key} className="flex items-center justify-between">
-                    <span className="font-body text-sm text-gray-700">{cat.label}</span>
-                    <StarRating
-                      value={vote[cat.key]}
-                      onChange={(v) => setVote(prev => ({ ...prev, [cat.key]: v }))}
-                    />
-                  </div>
-                ))}
+          {/* Ratings */}
+          <div style={{
+            display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8,
+            padding: 12, background: 'var(--s1)', borderRadius: 10,
+          }}>
+            {[
+              { label: 'Overall', val: company.avg_overall },
+              { label: 'Sustainability', val: company.avg_sustainability },
+              { label: 'Impact', val: company.avg_impact },
+              { label: 'Feasibility', val: company.avg_feasibility },
+            ].map(r => (
+              <div key={r.label}>
+                <span style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--muted)' }}>{r.label}</span>
+                <StarRating value={Math.round(r.val || 0)} readonly size={14} />
               </div>
-
-              <button
-                onClick={handleSubmitVote}
-                disabled={submitting}
-                className="btn-primary w-full mt-6 btn-glow"
-              >
-                {submitting ? 'Submitting...' : existingVote ? 'Update Vote' : 'Submit Vote'}
-              </button>
-            </>
-          )}
+            ))}
+          </div>
         </div>
 
-        {/* Average ratings */}
-        <div className="glass-card p-6 animate-fade-up" style={{ animationDelay: '0.2s' }}>
-          <h3 className="font-heading text-lg font-bold text-green-900 mb-3">Average Ratings</h3>
-          <div className="grid grid-cols-2 gap-4 text-sm font-body">
-            <div className="flex items-center gap-2">
-              <span>🌱</span>
-              <span className="text-gray-600">Sustainability:</span>
-              <span className="font-bold text-green-800">{(company.avg_sustainability || 0).toFixed(1)}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span>💥</span>
-              <span className="text-gray-600">Impact:</span>
-              <span className="font-bold text-green-800">{(company.avg_impact || 0).toFixed(1)}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span>⚙️</span>
-              <span className="text-gray-600">Feasibility:</span>
-              <span className="font-bold text-green-800">{(company.avg_feasibility || 0).toFixed(1)}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span>⭐</span>
-              <span className="text-gray-600">Overall:</span>
-              <span className="font-bold text-green-800">{(company.avg_overall || 0).toFixed(1)}</span>
-            </div>
-          </div>
-          <p className="text-xs text-gray-400 font-body mt-3">
-            Based on {company.vote_count || 0} vote{company.vote_count !== 1 ? 's' : ''}
-          </p>
+        {/* Actions */}
+        <div style={{ display: 'flex', gap: 10 }}>
+          <Btn onClick={() => setShowVote(true)} style={{ flex: 1 }}>Vote</Btn>
+          <Btn variant={saved ? 'outline' : 'outline'} onClick={toggleWallet} sm style={{ flexShrink: 0 }}>
+            {saved ? '💼 Saved' : '💼 Save'}
+          </Btn>
         </div>
       </div>
+
+      {/* Vote Modal */}
+      <Modal open={showVote} onClose={() => setShowVote(false)} title="Rate This Company" subtitle="Score each category from 1–5">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <StarRating label="Sustainability" value={vote.sustainability} onChange={v => setVote(p => ({ ...p, sustainability: v }))} />
+          <StarRating label="Impact" value={vote.impact} onChange={v => setVote(p => ({ ...p, impact: v }))} />
+          <StarRating label="Feasibility" value={vote.feasibility} onChange={v => setVote(p => ({ ...p, feasibility: v }))} />
+          <StarRating label="Overall" value={vote.overall} onChange={v => setVote(p => ({ ...p, overall: v }))} />
+          <Btn onClick={submitVote} disabled={voting}>{voting ? 'Submitting…' : 'Submit Vote'}</Btn>
+        </div>
+      </Modal>
     </div>
   );
 }

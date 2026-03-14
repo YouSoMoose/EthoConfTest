@@ -1,16 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Topbar from '@/components/Topbar';
 import Loader from '@/components/Loader';
+import Empty from '@/components/Empty';
 
 export default function SchedulePage() {
   const [schedule, setSchedule] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/schedule')
-      .then(r => r.json())
-      .then(data => { setSchedule(data || []); setLoading(false); })
+    fetch('/api/schedule').then(r => r.json())
+      .then(d => { setSchedule(d || []); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
 
@@ -18,50 +19,73 @@ export default function SchedulePage() {
 
   return (
     <div className="page-enter">
-      <div className="page-header">
-        <div className="max-w-lg mx-auto">
-          <h1 className="font-heading text-2xl font-bold">📅 Schedule</h1>
-          <p className="text-green-200 text-sm font-body mt-1">March 21, 2026</p>
-        </div>
-      </div>
-
-      <div className="max-w-lg mx-auto px-4 py-6">
-        <div className="space-y-4 stagger-in">
-          {schedule.map((item, i) => (
-            <div key={item.id} className="flex gap-4">
-              {/* Timeline line */}
-              <div className="flex flex-col items-center">
-                <div className="w-3 h-3 rounded-full bg-green-600 border-2 border-green-200 flex-shrink-0 mt-1.5"></div>
-                {i < schedule.length - 1 && (
-                  <div className="w-0.5 flex-1 bg-gradient-to-b from-green-300 to-green-100 mt-1"></div>
-                )}
-              </div>
-
-              {/* Event card */}
-              <div className="glass-card p-4 flex-1 mb-2">
-                <div className="flex justify-between items-start gap-2">
-                  <h3 className="font-heading font-bold text-green-900">{item.title}</h3>
-                  <span className="text-xs font-bold text-green-800 bg-green-100 px-2 py-0.5 rounded-full whitespace-nowrap">
-                    {item.start_time}
-                  </span>
+      <Topbar title="📅 Schedule" />
+      <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px' }}>
+        {schedule.length === 0 ? (
+          <Empty icon="📅" text="No events scheduled yet" />
+        ) : (
+          <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {schedule.map((item) => (
+              <div key={item.id} style={{
+                background: 'var(--white)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--r)',
+                padding: 16,
+                display: 'flex',
+                gap: 14,
+              }}>
+                {/* Timeline dot */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 4 }}>
+                  <div style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: '50%',
+                    background: 'var(--g)',
+                    flexShrink: 0,
+                  }} />
+                  <div style={{ width: 2, flex: 1, background: 'var(--s2)', marginTop: 4 }} />
                 </div>
-                {item.description && (
-                  <p className="text-gray-500 text-sm font-body mt-2">{item.description}</p>
-                )}
-                <div className="flex items-center gap-4 mt-3">
-                  {item.location && (
-                    <span className="text-xs text-amber-700 font-body">📍 {item.location}</span>
-                  )}
-                  {item.end_time && (
-                    <span className="text-xs text-gray-400 font-body">
-                      {item.start_time} — {item.end_time}
+
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 15, color: 'var(--text)' }}>
+                      {item.title}
+                    </h3>
+                    <span style={{
+                      fontFamily: 'var(--fb)',
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: 'var(--g)',
+                      background: 'var(--gl)',
+                      padding: '3px 8px',
+                      borderRadius: 8,
+                      flexShrink: 0,
+                    }}>
+                      {item.start_time}
                     </span>
+                  </div>
+                  {item.description && (
+                    <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--sub)', marginTop: 4 }}>
+                      {item.description}
+                    </p>
                   )}
+                  <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+                    {item.location && (
+                      <span style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--muted)' }}>
+                        📍 {item.location}
+                      </span>
+                    )}
+                    {item.end_time && (
+                      <span style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--muted)' }}>
+                        Until {item.end_time}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

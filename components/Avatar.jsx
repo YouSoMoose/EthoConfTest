@@ -1,33 +1,40 @@
 'use client';
 
 export default function Avatar({ src, name, size = 40 }) {
-  const initials = (name || '?')
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-
   if (src) {
     return (
       <img
         src={src}
-        alt={name || 'Avatar'}
-        width={size}
-        height={size}
-        className="rounded-full object-cover border-2 border-amber-200"
-        style={{ width: size, height: size }}
+        alt={name || ''}
         referrerPolicy="no-referrer"
+        style={{
+          width: size,
+          height: size,
+          borderRadius: '50%',
+          objectFit: 'cover',
+          flexShrink: 0,
+        }}
       />
     );
   }
 
+  const initial = (name || '?').charAt(0).toUpperCase();
   return (
-    <div
-      className="rounded-full bg-green-800 text-white flex items-center justify-center font-heading font-bold border-2 border-amber-200"
-      style={{ width: size, height: size, fontSize: size * 0.4 }}
-    >
-      {initials}
+    <div style={{
+      width: size,
+      height: size,
+      borderRadius: '50%',
+      background: 'var(--gl)',
+      color: 'var(--g)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontFamily: 'var(--fh)',
+      fontWeight: 700,
+      fontSize: size * 0.4,
+      flexShrink: 0,
+    }}>
+      {initial}
     </div>
   );
 }

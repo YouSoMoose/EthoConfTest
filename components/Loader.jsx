@@ -1,15 +1,30 @@
 'use client';
 
-export default function Loader() {
+export default function Loader({ admin }) {
+  const bg = admin ? 'var(--abg)' : 'var(--bg)';
+  const ringColor = admin ? 'var(--aborder)' : 'var(--border)';
+  const spinColor = admin ? 'var(--accent)' : 'var(--g)';
+  const textColor = admin ? 'var(--amuted)' : 'var(--muted)';
+
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #fffbeb, #fef3c7)' }}>
-      <div className="flex flex-col items-center gap-4 animate-fade-up">
-        <div className="relative">
-          <div className="w-12 h-12 rounded-full border-4 border-green-200 border-t-green-700 animate-spin"></div>
-          <div className="absolute inset-0 w-12 h-12 rounded-full border-4 border-transparent border-b-amber-400 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
-        </div>
-        <p className="text-sm text-gray-400 font-body">Loading...</p>
-      </div>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'column',
+      gap: 16,
+      background: bg,
+    }}>
+      <div style={{
+        width: 32,
+        height: 32,
+        borderRadius: '50%',
+        border: `3px solid ${ringColor}`,
+        borderTopColor: spinColor,
+        animation: 'spin 0.7s linear infinite',
+      }} />
+      <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: textColor }}>Loading…</p>
     </div>
   );
 }

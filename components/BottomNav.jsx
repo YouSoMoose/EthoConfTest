@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 
-const tabs = [
+const attendeeTabs = [
   { label: 'Home', href: '/app', icon: '🏠' },
   { label: 'Schedule', href: '/app/schedule', icon: '📅' },
   { label: 'Pitches', href: '/app/pitches', icon: '🎤' },
@@ -13,66 +13,107 @@ const tabs = [
   { label: 'Chat', href: '/app/chat', icon: '💬' },
 ];
 
-export default function BottomNav() {
+export default function BottomNav({ items, admin }) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [unread, setUnread] = useState(0);
+  const tabs = items || attendeeTabs;
 
   useEffect(() => {
-    if (!session?.profile?.id) return;
-
+    if (admin || !session?.profile?.id) return;
     const fetchUnread = async () => {
       try {
         const res = await fetch('/api/messages?unread=true');
-        if (res.ok) {
-          const data = await res.json();
-          setUnread(data.unreadCount || 0);
-        }
-      } catch (e) {}
+        if (res.ok) { const d = await res.json(); setUnread(d.unreadCount || 0); }
+      } catch {}
     };
-
     fetchUnread();
-    const interval = setInterval(fetchUnread, 15000);
-    return () => clearInterval(interval);
-  }, [session?.profile?.id]);
+    const iv = setInterval(fetchUnread, 15000);
+    return () => clearInterval(iv);
+  }, [session?.profile?.id, admin]);
+
+  const bg = admin ? 'var(--as1)' : 'var(--white)';
+  const border = admin ? 'var(--aborder)' : 'var(--border)';
+  const activeColor = admin ? 'var(--accent)' : 'var(--g)';
+  const inactiveColor = admin ? 'var(--amuted)' : 'var(--muted)';
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 safe-bottom" style={{
-      background: 'linear-gradient(to top, rgba(255,255,255,0.98), rgba(255,255,255,0.95))',
-      borderTop: '1px solid rgba(217, 164, 89, 0.2)',
-      backdropFilter: 'blur(10px)',
+    <nav className={admin ? 'admin-bottom-nav' : ''} style={{
+      position: 'fixed',
+      bottom: 0,
+      left: admin ? undefined : 0,
+      right: 0,
+      zIndex: 50,
+      background: bg,
+      borderTop: `1px solid ${border}`,
+      paddingBottom: 'max(8px, env(safe-area-inset-bottom))',
+      display: admin ? undefined : 'flex',
+      justifyContent: 'space-around',
+      alignItems: 'center',
+      ...(admin ? { justifyContent: 'space-around', alignItems: 'center', left: 0 } : {}),
     }}>
-      <div className="flex justify-around items-center h-16 max-w-lg mx-auto">
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        maxWidth: admin ? '100%' : 500,
+        margin: '0 auto',
+        width: '100%',
+        height: 56,
+      }}>
         {tabs.map((tab) => {
-          const isActive =
-            tab.href === '/app'
-              ? pathname === '/app'
-              : pathname.startsWith(tab.href);
+          const isActive = tab.href === (admin ? '/admin' : '/app')
+            ? pathname === tab.href
+            : pathname.startsWith(tab.href);
 
           return (
-            <Link
-              key={tab.href}
-              href={tab.href}
-              className={`flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-300 relative ${
-                isActive
-                  ? 'text-green-800 font-bold scale-110'
-                  : 'text-gray-400 hover:text-green-700 active:scale-95'
-              }`}
-            >
-              <span className={`text-xl transition-transform duration-300 ${isActive ? 'scale-110' : ''}`}>
-                {tab.icon}
-              </span>
-              <span className="text-[10px] font-body">{tab.label}</span>
+            <Link key={tab.href} href={tab.href} style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 2,
+              padding: '6px 12px',
+              position: 'relative',
+              color: isActive ? activeColor : inactiveColor,
+              fontFamily: 'var(--fb)',
+              fontSize: 10,
+              fontWeight: isActive ? 600 : 400,
+              transition: 'color 0.2s',
+              minWidth: 44,
+              minHeight: 44,
+            }}>
               {isActive && (
-                <span
-                  className="absolute -bottom-1 w-6 h-1 rounded-full"
-                  style={{
-                    background: 'linear-gradient(90deg, #22c55e, #f59e0b)',
-                  }}
-                />
+                <span style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: 24,
+                  height: 3,
+                  borderRadius: 3,
+                  background: activeColor,
+                }} />
               )}
-              {tab.label === 'Chat' && unread > 0 && (
-                <span className="absolute -top-0.5 right-0 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center pulse-glow">
+              <span style={{ fontSize: 20 }}>{tab.icon}</span>
+              <span>{tab.label}</span>
+              {!admin && tab.label === 'Chat' && unread > 0 && (
+                <span style={{
+                  position: 'absolute',
+                  top: 2,
+                  right: 4,
+                  background: '#e44',
+                  color: '#fff',
+                  fontSize: 9,
+                  fontWeight: 700,
+                  borderRadius: 10,
+                  width: 16,
+                  height: 16,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  animation: 'pulseGlow 2s ease-in-out infinite',
+                }}>
                   {unread > 9 ? '9+' : unread}
                 </span>
               )}

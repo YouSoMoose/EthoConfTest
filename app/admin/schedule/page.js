@@ -3,6 +3,9 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import Loader from '@/components/Loader';
+import Btn from '@/components/Btn';
+import FormInput from '@/components/FormInput';
+import Empty from '@/components/Empty';
 
 export default function AdminSchedulePage() {
   const [schedule, setSchedule] = useState([]);
@@ -11,114 +14,86 @@ export default function AdminSchedulePage() {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ title: '', description: '', location: '', start_time: '', end_time: '' });
 
-  const fetchSchedule = async () => {
-    try {
-      const res = await fetch('/api/schedule');
-      if (res.ok) setSchedule(await res.json());
-    } catch {}
-    setLoading(false);
-  };
+  useEffect(() => {
+    fetch('/api/schedule').then(r => r.json()).then(d => { setSchedule(d || []); setLoading(false); }).catch(() => setLoading(false));
+  }, []);
 
-  useEffect(() => { fetchSchedule(); }, []);
-
-  const resetForm = () => {
-    setForm({ title: '', description: '', location: '', start_time: '', end_time: '' });
-    setEditing(null);
-    setShowForm(false);
-  };
+  const resetForm = () => { setForm({ title: '', description: '', location: '', start_time: '', end_time: '' }); setEditing(null); setShowForm(false); };
 
   const handleEdit = (item) => {
-    setForm({
-      title: item.title || '',
-      description: item.description || '',
-      location: item.location || '',
-      start_time: item.start_time || '',
-      end_time: item.end_time || '',
-    });
-    setEditing(item);
-    setShowForm(true);
+    setForm({ title: item.title || '', description: item.description || '', location: item.location || '', start_time: item.start_time || '', end_time: item.end_time || '' });
+    setEditing(item); setShowForm(true);
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
-    if (!form.title.trim()) { toast.error('Title is required'); return; }
-
-    try {
-      const method = editing ? 'PUT' : 'POST';
-      const body = editing ? { id: editing.id, ...form } : form;
-      const res = await fetch('/api/schedule', {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      if (res.ok) {
-        toast.success(editing ? 'Updated!' : 'Added!');
-        resetForm();
-        fetchSchedule();
-      } else {
-        toast.error('Failed to save');
-      }
-    } catch {
-      toast.error('Network error');
-    }
+    if (!form.title.trim()) { toast.error('Title required'); return; }
+    const method = editing ? 'PUT' : 'POST';
+    const body = editing ? { id: editing.id, ...form } : form;
+    const res = await fetch('/api/schedule', { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (res.ok) {
+      toast.success(editing ? 'Updated!' : 'Added!'); resetForm();
+      const d = await fetch('/api/schedule').then(r => r.json()); setSchedule(d || []);
+    } else toast.error('Failed');
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this event?')) return;
-    try {
-      await fetch(`/api/schedule?id=${id}`, { method: 'DELETE' });
-      setSchedule(prev => prev.filter(s => s.id !== id));
-      toast.success('Deleted');
-    } catch {
-      toast.error('Failed to delete');
-    }
+    if (!confirm('Delete?')) return;
+    await fetch(`/api/schedule?id=${id}`, { method: 'DELETE' });
+    setSchedule(p => p.filter(s => s.id !== id)); toast.success('Deleted');
   };
 
-  if (loading) return <Loader />;
+  if (loading) return <Loader admin />;
 
   return (
-    <div className="page-enter">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="font-heading text-2xl font-bold text-green-900">📅 Schedule</h2>
-          <button onClick={() => { resetForm(); setShowForm(!showForm); }} className="btn-primary btn-glow">
-            {showForm ? 'Cancel' : '+ Add Event'}
-          </button>
+    <div className="page-enter" style={{ padding: '24px 16px' }}>
+      <div style={{ maxWidth: 700, margin: '0 auto' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+          <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 22, color: 'var(--atext)' }}>📅 Schedule</h2>
+          <Btn variant="accent" sm onClick={() => { resetForm(); setShowForm(!showForm); }}>{showForm ? 'Cancel' : '+ Add'}</Btn>
         </div>
 
         {showForm && (
-          <form onSubmit={handleSave} className="glass-card p-6 mb-6 animate-fade-up space-y-4">
-            <input type="text" value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} placeholder="Event Title *" className="input-field" required />
-            <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} placeholder="Description" className="input-field min-h-[80px]" />
-            <div className="grid grid-cols-3 gap-3">
-              <input type="text" value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} placeholder="Location" className="input-field" />
-              <input type="text" value={form.start_time} onChange={e => setForm(p => ({ ...p, start_time: e.target.value }))} placeholder="Start (e.g. 9:00 AM)" className="input-field" />
-              <input type="text" value={form.end_time} onChange={e => setForm(p => ({ ...p, end_time: e.target.value }))} placeholder="End (e.g. 10:00 AM)" className="input-field" />
+          <form onSubmit={handleSave} style={{
+            background: 'var(--as2)', border: '1px solid var(--aborder)', borderRadius: 'var(--r)',
+            padding: 20, marginBottom: 20, animation: 'fadeUp 0.22s ease both',
+          }}>
+            <FormInput admin label="Title *" value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} required />
+            <FormInput admin label="Description" type="textarea" value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+              <FormInput admin label="Location" value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} />
+              <FormInput admin label="Start" value={form.start_time} onChange={e => setForm(p => ({ ...p, start_time: e.target.value }))} placeholder="9:00 AM" />
+              <FormInput admin label="End" value={form.end_time} onChange={e => setForm(p => ({ ...p, end_time: e.target.value }))} placeholder="10:00 AM" />
             </div>
-            <button type="submit" className="btn-primary btn-glow">
-              {editing ? 'Update' : 'Add Event'}
-            </button>
+            <Btn variant="accent" type="submit">{editing ? 'Update' : 'Add Event'}</Btn>
           </form>
         )}
 
-        <div className="space-y-3 stagger-in">
-          {schedule.map(item => (
-            <div key={item.id} className="glass-card p-4 flex justify-between items-start">
-              <div className="flex-1">
-                <h3 className="font-heading font-bold text-green-900">{item.title}</h3>
-                {item.description && <p className="text-gray-500 text-sm font-body mt-1">{item.description}</p>}
-                <div className="flex gap-4 mt-2 text-xs text-gray-400 font-body">
-                  {item.location && <span>📍 {item.location}</span>}
-                  <span>{item.start_time} — {item.end_time}</span>
+        {schedule.length === 0 ? (
+          <Empty icon="📅" text="No events yet" admin />
+        ) : (
+          <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {schedule.map(item => (
+              <div key={item.id} style={{
+                background: 'var(--as2)', border: '1px solid var(--aborder)', borderRadius: 'var(--r)',
+                padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+              }}>
+                <div style={{ flex: 1 }}>
+                  <h3 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 15, color: 'var(--atext)' }}>{item.title}</h3>
+                  {item.description && <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--asub)', marginTop: 4 }}>{item.description}</p>}
+                  <div style={{ display: 'flex', gap: 12, marginTop: 8, fontSize: 11, color: 'var(--amuted)', fontFamily: 'var(--fb)' }}>
+                    {item.location && <span>📍 {item.location}</span>}
+                    <span>{item.start_time} — {item.end_time}</span>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 6, marginLeft: 12 }}>
+                  <button onClick={() => handleEdit(item)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14 }}>✏️</button>
+                  <button onClick={() => handleDelete(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14 }}>🗑️</button>
                 </div>
               </div>
-              <div className="flex gap-2 ml-3 flex-shrink-0">
-                <button onClick={() => handleEdit(item)} className="text-gray-400 hover:text-green-700 transition-colors">✏️</button>
-                <button onClick={() => handleDelete(item.id)} className="text-gray-400 hover:text-red-500 transition-colors">🗑️</button>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

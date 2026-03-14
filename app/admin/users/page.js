@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import Avatar from '@/components/Avatar';
 import Loader from '@/components/Loader';
-import { ACCESS_LABELS, ACCESS_COLORS } from '@/lib/constants';
+import RoleChip from '@/components/RoleChip';
+import { ACCESS_LABELS } from '@/lib/constants';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
@@ -12,32 +13,19 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    fetch('/api/users')
-      .then(r => r.json())
-      .then(data => { setUsers(data || []); setLoading(false); })
-      .catch(() => setLoading(false));
+    fetch('/api/users').then(r => r.json()).then(d => { setUsers(d || []); setLoading(false); }).catch(() => setLoading(false));
   }, []);
 
   const updateRole = async (userId, newLevel) => {
-    try {
-      const res = await fetch('/api/users', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: userId, access_level: parseInt(newLevel) }),
-      });
-      if (res.ok) {
-        const updated = await res.json();
-        setUsers(prev => prev.map(u => u.id === userId ? { ...u, access_level: updated.access_level } : u));
-        toast.success('Role updated');
-      } else {
-        toast.error('Failed to update');
-      }
-    } catch {
-      toast.error('Network error');
-    }
+    const res = await fetch('/api/users', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: userId, access_level: parseInt(newLevel) }) });
+    if (res.ok) {
+      const u = await res.json();
+      setUsers(p => p.map(x => x.id === userId ? { ...x, access_level: u.access_level } : x));
+      toast.success('Updated');
+    } else toast.error('Failed');
   };
 
-  if (loading) return <Loader />;
+  if (loading) return <Loader admin />;
 
   const filtered = users.filter(u =>
     u.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -45,63 +33,104 @@ export default function AdminUsersPage() {
   );
 
   return (
-    <div className="page-enter">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <h2 className="font-heading text-2xl font-bold text-green-900 mb-6">👥 Users</h2>
+    <div className="page-enter" style={{ padding: '24px 16px' }}>
+      <div style={{ maxWidth: 900, margin: '0 auto' }}>
+        <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 22, color: 'var(--atext)', marginBottom: 20 }}>
+          👥 Users
+        </h2>
 
         <input
           type="text"
           placeholder="Search users..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="input-field mb-6"
+          style={{
+            width: '100%', background: 'var(--as2)', border: '1px solid var(--aborder)',
+            borderRadius: 10, padding: '11px 14px', fontSize: 14,
+            fontFamily: 'var(--fb)', color: 'var(--atext)', outline: 'none', marginBottom: 16,
+          }}
         />
 
-        <div className="glass-card overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm font-body">
-              <thead>
-                <tr className="bg-green-50">
-                  <th className="text-left p-3 font-heading font-bold text-green-900">User</th>
-                  <th className="text-left p-3 font-heading font-bold text-green-900">Email</th>
-                  <th className="text-center p-3 font-heading font-bold text-green-900">Checked In</th>
-                  <th className="text-center p-3 font-heading font-bold text-green-900">Role</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map(user => (
-                  <tr key={user.id} className="border-t border-amber-100 hover:bg-amber-50/50 transition-colors">
-                    <td className="p-3">
-                      <div className="flex items-center gap-2">
-                        <Avatar src={user.avatar} name={user.name} size={32} />
-                        <span className="font-medium text-green-900">{user.name || 'No name'}</span>
-                      </div>
-                    </td>
-                    <td className="p-3 text-gray-500">{user.email}</td>
-                    <td className="p-3 text-center">
-                      {user.checked_in ? (
-                        <span className="text-green-600 font-bold">✅</span>
-                      ) : (
-                        <span className="text-gray-300">—</span>
-                      )}
-                    </td>
-                    <td className="p-3">
-                      <select
-                        value={user.access_level}
-                        onChange={e => updateRole(user.id, e.target.value)}
-                        className={`px-2 py-1 rounded-lg text-xs font-bold border-0 ${ACCESS_COLORS[user.access_level] || ''}`}
-                      >
-                        <option value={0}>Attendee</option>
-                        <option value={1}>Company</option>
-                        <option value={2}>Staff</option>
-                        <option value={3}>Super Admin</option>
-                      </select>
-                    </td>
-                  </tr>
+        {/* Desktop table */}
+        <div className="admin-table" style={{
+          background: 'var(--as2)', border: '1px solid var(--aborder)', borderRadius: 'var(--r)', overflow: 'hidden',
+        }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'var(--fb)', fontSize: 13 }}>
+            <thead>
+              <tr style={{ background: 'var(--as3)' }}>
+                {['User', 'Email', 'Checked In', 'Role'].map(h => (
+                  <th key={h} style={{ padding: '12px 14px', textAlign: 'left', fontFamily: 'var(--fhs)', fontWeight: 600, fontSize: 12, color: 'var(--asub)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(u => (
+                <tr key={u.id} style={{ borderTop: '1px solid var(--aborder)' }}>
+                  <td style={{ padding: '12px 14px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <Avatar src={u.avatar} name={u.name} size={28} />
+                      <span style={{ color: 'var(--atext)', fontWeight: 500 }}>{u.name || 'No name'}</span>
+                    </div>
+                  </td>
+                  <td style={{ padding: '12px 14px', color: 'var(--asub)' }}>{u.email}</td>
+                  <td style={{ padding: '12px 14px' }}>
+                    <span style={{ color: u.checked_in ? 'var(--agreen)' : 'var(--amuted)', fontWeight: 600 }}>
+                      {u.checked_in ? '✅' : '—'}
+                    </span>
+                  </td>
+                  <td style={{ padding: '12px 14px' }}>
+                    <select
+                      value={u.access_level}
+                      onChange={e => updateRole(u.id, e.target.value)}
+                      style={{
+                        background: 'var(--as3)', border: '1px solid var(--aborder)',
+                        borderRadius: 8, padding: '4px 8px', fontSize: 12,
+                        fontFamily: 'var(--fb)', color: 'var(--atext)', outline: 'none',
+                      }}
+                    >
+                      <option value={0}>Attendee</option>
+                      <option value={1}>Company</option>
+                      <option value={2}>Staff</option>
+                      <option value={3}>Super Admin</option>
+                    </select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Mobile cards */}
+        <div className="admin-cards stagger">
+          {filtered.map(u => (
+            <div key={u.id} style={{
+              background: 'var(--as2)', border: '1px solid var(--aborder)', borderRadius: 'var(--r)',
+              padding: 16, display: 'flex', alignItems: 'center', gap: 12,
+            }}>
+              <Avatar src={u.avatar} name={u.name} size={36} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <h3 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 14, color: 'var(--atext)' }}>{u.name || 'No name'}</h3>
+                <p style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--amuted)' }}>{u.email}</p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                {u.checked_in && <span style={{ color: 'var(--agreen)' }}>✅</span>}
+                <select
+                  value={u.access_level}
+                  onChange={e => updateRole(u.id, e.target.value)}
+                  style={{
+                    background: 'var(--as3)', border: '1px solid var(--aborder)',
+                    borderRadius: 6, padding: '4px 6px', fontSize: 11,
+                    fontFamily: 'var(--fb)', color: 'var(--atext)', outline: 'none',
+                  }}
+                >
+                  <option value={0}>Attendee</option>
+                  <option value={1}>Company</option>
+                  <option value={2}>Staff</option>
+                  <option value={3}>Super Admin</option>
+                </select>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
