@@ -116,7 +116,7 @@ export default function PitchDetailPage() {
               <a href={company.deck_link} target="_blank" rel="noopener noreferrer" style={{
                 fontFamily: 'var(--fb)', fontSize: 12, color: 'var(--g)', background: 'var(--gl)',
                 padding: '4px 10px', borderRadius: 8,
-              }}>📑 Pitch Deck</a>
+              }}>📑 Research Deck</a>
             )}
           </div>
 
@@ -141,7 +141,7 @@ export default function PitchDetailPage() {
 
         {/* Actions */}
         <div style={{ display: 'flex', gap: 10 }}>
-          <Btn onClick={() => setShowVote(true)} style={{ flex: 1 }}>Vote</Btn>
+          <Btn onClick={() => setShowVote(true)} style={{ flex: 1 }}>⭐ Rate</Btn>
           <Btn variant={saved ? 'outline' : 'outline'} onClick={toggleWallet} sm style={{ flexShrink: 0 }}>
             {saved ? '💼 Saved' : '💼 Save'}
           </Btn>
@@ -149,7 +149,7 @@ export default function PitchDetailPage() {
       </div>
 
       {/* Vote Modal */}
-      <Modal open={showVote} onClose={() => setShowVote(false)} title="Rate This Company" subtitle="Score each category from 1–5">
+      <Modal open={showVote} onClose={() => setShowVote(false)} title="Rate This Company" subtitle="Score each category from 1–5 stars">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <StarRating label="Sustainability" value={vote.sustainability} onChange={v => setVote(p => ({ ...p, sustainability: v }))} />
           <StarRating label="Impact" value={vote.impact} onChange={v => setVote(p => ({ ...p, impact: v }))} />

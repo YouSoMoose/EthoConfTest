@@ -8,7 +8,7 @@ import { useSession } from 'next-auth/react';
 const attendeeTabs = [
   { label: 'Home', href: '/app', icon: '🏠' },
   { label: 'Schedule', href: '/app/schedule', icon: '📅' },
-  { label: 'Pitches', href: '/app/pitches', icon: '🎤' },
+  { label: 'Companies', href: '/app/pitches', icon: '🏢' },
   { label: 'Passport', href: '/app/passport', icon: '🛂' },
   { label: 'Chat', href: '/app/chat', icon: '💬' },
 ];
@@ -18,6 +18,7 @@ export default function BottomNav({ items, admin }) {
   const { data: session } = useSession();
   const [unread, setUnread] = useState(0);
   const tabs = items || attendeeTabs;
+  const manyTabs = tabs.length > 5;
 
   useEffect(() => {
     if (admin || !session?.profile?.id) return;
@@ -25,7 +26,7 @@ export default function BottomNav({ items, admin }) {
       try {
         const res = await fetch('/api/messages?unread=true');
         if (res.ok) { const d = await res.json(); setUnread(d.unreadCount || 0); }
-      } catch {}
+      } catch { }
     };
     fetchUnread();
     const iv = setInterval(fetchUnread, 15000);
@@ -41,25 +42,26 @@ export default function BottomNav({ items, admin }) {
     <nav className={admin ? 'admin-bottom-nav' : ''} style={{
       position: 'fixed',
       bottom: 0,
-      left: admin ? undefined : 0,
+      left: 0,
       right: 0,
       zIndex: 50,
       background: bg,
       borderTop: `1px solid ${border}`,
       paddingBottom: 'max(8px, env(safe-area-inset-bottom))',
-      display: admin ? undefined : 'flex',
-      justifyContent: 'space-around',
-      alignItems: 'center',
-      ...(admin ? { justifyContent: 'space-around', alignItems: 'center', left: 0 } : {}),
     }}>
       <div style={{
         display: 'flex',
-        justifyContent: 'space-around',
+        justifyContent: manyTabs ? 'flex-start' : 'space-around',
         alignItems: 'center',
         maxWidth: admin ? '100%' : 500,
         margin: '0 auto',
         width: '100%',
         height: 56,
+        overflowX: manyTabs ? 'auto' : 'visible',
+        WebkitOverflowScrolling: 'touch',
+        gap: manyTabs ? 0 : 0,
+        paddingLeft: manyTabs ? 8 : 0,
+        paddingRight: manyTabs ? 8 : 0,
       }}>
         {tabs.map((tab) => {
           const isActive = tab.href === (admin ? '/admin' : '/app')
@@ -73,15 +75,17 @@ export default function BottomNav({ items, admin }) {
               alignItems: 'center',
               justifyContent: 'center',
               gap: 2,
-              padding: '6px 12px',
+              padding: manyTabs ? '6px 6px' : '6px 12px',
               position: 'relative',
               color: isActive ? activeColor : inactiveColor,
               fontFamily: 'var(--fb)',
-              fontSize: 10,
+              fontSize: manyTabs ? 9 : 10,
               fontWeight: isActive ? 600 : 400,
               transition: 'color 0.2s',
-              minWidth: 44,
+              minWidth: manyTabs ? 48 : 44,
+              flexShrink: 0,
               minHeight: 44,
+              flex: manyTabs ? '1 0 auto' : undefined,
             }}>
               {isActive && (
                 <span style={{
@@ -95,7 +99,7 @@ export default function BottomNav({ items, admin }) {
                   background: activeColor,
                 }} />
               )}
-              <span style={{ fontSize: 20 }}>{tab.icon}</span>
+              <span style={{ fontSize: manyTabs ? 18 : 20 }}>{tab.icon}</span>
               <span>{tab.label}</span>
               {!admin && tab.label === 'Chat' && unread > 0 && (
                 <span style={{

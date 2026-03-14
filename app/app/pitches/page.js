@@ -27,7 +27,7 @@ export default function PitchesPage() {
 
   return (
     <div className="page-enter">
-      <Topbar title="🎤 Pitches" />
+      <Topbar title="🏢 Companies" />
       <div style={{ maxWidth: 500, margin: '0 auto', padding: '16px 16px' }}>
         <input
           type="text"
@@ -49,7 +49,7 @@ export default function PitchesPage() {
         />
 
         {filtered.length === 0 ? (
-          <Empty icon="🎤" text="No companies found" />
+          <Empty icon="🏢" text="No companies found" />
         ) : (
           <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {filtered.map(c => (
@@ -93,9 +93,6 @@ export default function PitchesPage() {
                 </div>
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
                   <StarRating value={Math.round(c.avg_overall || 0)} readonly size={14} />
-                  <span style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--muted)', display: 'block', marginTop: 4 }}>
-                    {c.vote_count || 0} votes
-                  </span>
                 </div>
               </Link>
             ))}

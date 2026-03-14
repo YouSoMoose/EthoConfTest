@@ -19,16 +19,16 @@ export default function ChatPage() {
     try {
       const res = await fetch('/api/messages');
       if (res.ok) setMessages(await res.json());
-    } catch {}
+    } catch { }
     setLoading(false);
   };
 
   useEffect(() => {
     fetchMessages();
-    fetch('/api/messages', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mark_read: true }) }).catch(() => {});
+    fetch('/api/messages', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mark_read: true }) }).catch(() => { });
     const iv = setInterval(() => {
       fetchMessages();
-      fetch('/api/messages', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mark_read: true }) }).catch(() => {});
+      fetch('/api/messages', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mark_read: true }) }).catch(() => { });
     }, 15000);
     return () => clearInterval(iv);
   }, []);
@@ -99,25 +99,29 @@ export default function ChatPage() {
 
       {/* Input */}
       <div style={{
-        borderTop: '1px solid var(--border)',
-        background: 'var(--white)',
         padding: '12px 16px',
-        paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+        paddingBottom: 16,
+        background: 'transparent',
       }}>
-        <form onSubmit={handleSend} style={{ display: 'flex', gap: 8, maxWidth: 500, margin: '0 auto' }}>
+        <form onSubmit={handleSend} style={{
+          display: 'flex', gap: 8, maxWidth: 500, margin: '0 auto',
+          background: 'var(--white)',
+          border: '1px solid var(--border)',
+          borderRadius: 24,
+          padding: '6px 6px 6px 16px',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.06)'
+        }}>
           <input
             type="text"
             value={newMessage}
             onChange={e => setNewMessage(e.target.value)}
-            placeholder="Type a message..."
+            placeholder="iMessage"
             disabled={sending}
             style={{
               flex: 1,
-              background: 'var(--s1)',
-              border: '1.5px solid var(--border)',
-              borderRadius: 10,
-              padding: '10px 14px',
-              fontSize: 14,
+              background: 'transparent',
+              border: 'none',
+              fontSize: 15,
               fontFamily: 'var(--fb)',
               color: 'var(--text)',
               outline: 'none',
@@ -127,15 +131,21 @@ export default function ChatPage() {
             background: 'var(--g)',
             color: '#fff',
             border: 'none',
-            borderRadius: 10,
-            padding: '10px 16px',
+            borderRadius: '50%',
+            width: 32,
+            height: 32,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             cursor: 'pointer',
             fontFamily: 'var(--fb)',
-            fontWeight: 600,
-            fontSize: 16,
+            fontWeight: 700,
+            fontSize: 18,
+            paddingBottom: 2,
             opacity: (sending || !newMessage.trim()) ? 0.5 : 1,
+            flexShrink: 0,
           }}>
-            →
+            ↑
           </button>
         </form>
       </div>

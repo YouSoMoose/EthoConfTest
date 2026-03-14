@@ -31,7 +31,7 @@ export default function AttendeeDashboard() {
 
   const quickLinks = [
     { icon: '📅', label: 'Schedule', href: '/app/schedule' },
-    { icon: '🎤', label: 'Pitches', href: '/app/pitches' },
+    { icon: '🏢', label: 'Companies', href: '/app/pitches' },
     { icon: '🛂', label: 'Passport', href: '/app/passport' },
     { icon: '💬', label: 'Chat', href: '/app/chat' },
     { icon: '📝', label: 'Notes', href: '/app/notes' },
@@ -59,23 +59,55 @@ export default function AttendeeDashboard() {
                 Welcome to Ethos 2026
               </p>
             </div>
-            <button
-              onClick={() => signOut({ callbackUrl: '/' })}
-              style={{
-                background: 'rgba(255,255,255,0.12)',
-                border: 'none',
-                color: 'rgba(255,255,255,0.8)',
-                fontSize: 12,
-                fontFamily: 'var(--fb)',
-                padding: '6px 12px',
-                borderRadius: 10,
-                cursor: 'pointer',
-                transition: 'background 0.2s',
-                flexShrink: 0,
-              }}
-            >
-              Sign Out
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+              {profile?.access_level >= 2 && (
+                <Link href="/admin" style={{
+                  background: 'rgba(255,255,255,0.15)',
+                  border: '1px solid rgba(255,255,255,0.25)',
+                  borderRadius: 8,
+                  padding: '5px 10px',
+                  fontFamily: 'var(--fb)',
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: '#fff',
+                  whiteSpace: 'nowrap',
+                }}>
+                  ⚙️ Admin
+                </Link>
+              )}
+              {profile?.access_level === 1 && (
+                <Link href="/company" style={{
+                  background: 'rgba(255,255,255,0.15)',
+                  border: '1px solid rgba(255,255,255,0.25)',
+                  borderRadius: 8,
+                  padding: '5px 10px',
+                  fontFamily: 'var(--fb)',
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: '#fff',
+                  whiteSpace: 'nowrap',
+                }}>
+                  🏢 Portal
+                </Link>
+              )}
+              <button
+                onClick={() => signOut({ callbackUrl: '/' })}
+                style={{
+                  background: 'rgba(255,255,255,0.12)',
+                  border: 'none',
+                  color: 'rgba(255,255,255,0.8)',
+                  fontSize: 12,
+                  fontFamily: 'var(--fb)',
+                  padding: '6px 12px',
+                  borderRadius: 10,
+                  cursor: 'pointer',
+                  transition: 'background 0.2s',
+                  flexShrink: 0,
+                }}
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
         </div>
       </div>

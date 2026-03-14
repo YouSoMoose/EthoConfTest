@@ -1,11 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 import Loader from '@/components/Loader';
 
 export default function AdminDashboard() {
+  const { data: session } = useSession();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const level = session?.profile?.access_level || 0;
 
   useEffect(() => {
     Promise.all([
@@ -30,12 +34,12 @@ export default function AdminDashboard() {
   if (loading) return <Loader admin />;
 
   const cards = [
-    { label: 'Total Users', value: stats?.totalUsers || 0, icon: '👥' },
-    { label: 'Checked In', value: stats?.checkedIn || 0, icon: '✅' },
-    { label: 'Companies', value: stats?.companies || 0, icon: '🏢' },
+    { label: 'Total Users', value: stats?.totalUsers || 0, icon: '👥', href: '/admin/users', minLevel: 3 },
+    { label: 'Checked In', value: stats?.checkedIn || 0, icon: '✅', href: '/admin/checkin', minLevel: 2 },
+    { label: 'Companies', value: stats?.companies || 0, icon: '🏢', href: '/admin/companies', minLevel: 2 },
     { label: 'Total Votes', value: stats?.totalVotes || 0, icon: '🗳️' },
-    { label: 'Unread Messages', value: stats?.unreadMessages || 0, icon: '💬' },
-    { label: 'Raffle Entries', value: stats?.raffleEntries || 0, icon: '🎰' },
+    { label: 'Unread Messages', value: stats?.unreadMessages || 0, icon: '💬', href: '/admin/messages', minLevel: 2 },
+    { label: 'Raffle Entries', value: stats?.raffleEntries || 0, icon: '🎰', href: '/admin/raffle', minLevel: 3 },
   ];
 
   return (
@@ -50,23 +54,38 @@ export default function AdminDashboard() {
           gridTemplateColumns: 'repeat(2, 1fr)',
           gap: 12,
         }}>
-          {cards.map(card => (
-            <div key={card.label} style={{
-              background: 'var(--as2)',
-              border: '1px solid var(--aborder)',
-              borderRadius: 'var(--r)',
-              padding: 20,
-              textAlign: 'center',
-            }}>
-              <span style={{ fontSize: 24, display: 'block', marginBottom: 8 }}>{card.icon}</span>
-              <p style={{ fontFamily: 'var(--fhs)', fontWeight: 800, fontSize: 28, color: 'var(--accent)' }}>
-                {card.value}
-              </p>
-              <p style={{ fontFamily: 'var(--fb)', fontSize: 12, color: 'var(--asub)', marginTop: 4 }}>
-                {card.label}
-              </p>
-            </div>
-          ))}
+          {cards.map(card => {
+            const canAccess = card.href && (!card.minLevel || level >= card.minLevel);
+
+            const content = (
+              <div style={{
+                background: 'var(--as2)',
+                border: '1px solid var(--aborder)',
+                borderRadius: 'var(--r)',
+                padding: 20,
+                textAlign: 'center',
+                cursor: canAccess ? 'pointer' : 'default',
+                opacity: (card.minLevel && level < card.minLevel) ? 0.45 : 1,
+                height: '100%',
+              }}>
+                <span style={{ fontSize: 24, display: 'block', marginBottom: 8 }}>{card.icon}</span>
+                <p style={{ fontFamily: 'var(--fhs)', fontWeight: 800, fontSize: 28, color: 'var(--accent)' }}>
+                  {card.value}
+                </p>
+                <p style={{ fontFamily: 'var(--fb)', fontSize: 12, color: 'var(--asub)', marginTop: 4 }}>
+                  {card.label}
+                </p>
+              </div>
+            );
+
+            return canAccess ? (
+              <Link key={card.label} href={card.href} style={{ textDecoration: 'none' }}>
+                {content}
+              </Link>
+            ) : (
+              <div key={card.label}>{content}</div>
+            );
+          })}
         </div>
       </div>
     </div>
