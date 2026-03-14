@@ -115,7 +115,7 @@ export default function ChatPage() {
             type="text"
             value={newMessage}
             onChange={e => setNewMessage(e.target.value)}
-            placeholder="iMessage"
+            placeholder="Message..."
             disabled={sending}
             style={{
               flex: 1,
