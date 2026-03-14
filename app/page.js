@@ -10,31 +10,36 @@ const slides = [
     icon: '📅',
     title: 'Live Schedule',
     desc: 'Stay on track with the real-time event timeline. Never miss a session, workshop, or keynote.',
-    gradient: 'linear-gradient(135deg, #A89E94 0%, #7D6F63 100%)',
+    gradient: 'linear-gradient(135deg, #FFE2D6 0%, #FCBD9D 100%)',
+    textMode: 'dark',
   },
   {
     icon: '🏢',
     title: 'Explore Companies',
     desc: 'Browse and rate participating companies. Discover innovative startups and sustainability leaders.',
-    gradient: 'linear-gradient(135deg, #7D6F63 0%, #514033 100%)',
+    gradient: 'linear-gradient(135deg, #FCBD9D 0%, #D4CCC4 100%)',
+    textMode: 'dark',
   },
   {
     icon: '🛂',
     title: 'Passport Stamps',
     desc: 'Visit booths and collect stamps on your digital passport. Complete your journey through Ethos.',
-    gradient: 'linear-gradient(135deg, #514033 0%, #413429 100%)',
+    gradient: 'linear-gradient(135deg, #D4CCC4 0%, #A89E94 100%)',
+    textMode: 'dark',
   },
   {
     icon: '💬',
     title: 'Live Chat',
     desc: 'Message event staff in real-time. Get answers, share feedback, and stay connected.',
-    gradient: 'linear-gradient(135deg, #413429 0%, #7D6F63 100%)',
+    gradient: 'linear-gradient(135deg, #A89E94 0%, #7D6F63 100%)',
+    textMode: 'light',
   },
   {
     icon: '📝',
     title: 'Smart Notes',
     desc: 'Take notes during sessions and save them to your account. Access them anytime, anywhere.',
-    gradient: 'linear-gradient(135deg, #7D6F63 0%, #A89E94 100%)',
+    gradient: 'linear-gradient(135deg, #7D6F63 0%, #413429 100%)',
+    textMode: 'light',
   },
 ];
 
@@ -129,31 +134,31 @@ export default function LandingPage() {
         textAlign: 'center',
       }}>
         <div style={{
-          width: 'clamp(48px, 10vh, 56px)', height: 'clamp(48px, 10vh, 56px)', borderRadius: 16,
-          background: 'rgba(255,255,255,0.12)',
+          width: 'clamp(48px, 10vh, 56px)', height: 'clamp(48px, 10vh, 56px)', borderRadius: 28,
+          background: 'rgba(255,255,255,0.4)',
           backdropFilter: 'blur(10px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          margin: '0 auto clamp(10px, 2vh, 16px)',
-          fontSize: 'clamp(24px, 5vh, 28px)', fontFamily: 'var(--fh)', fontWeight: 800, color: '#fff',
-        }}>E</div>
+          margin: '0 auto clamp(10px, 2vh, 16px)', overflow: 'hidden', padding: 4
+        }}>
+          <img src="/assets/ethos-logo.png" alt="Ethos" style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { e.target.style.display='none'; e.target.parentNode.innerHTML = '<span style="font-size: 28px; font-weight: 800; color: var(--text); font-family: var(--fh)">e</span>'; }} />
+        </div>
         <p style={{
           fontSize: 'clamp(10px, 2vh, 11px)', fontWeight: 700, letterSpacing: '.2em',
-          color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', marginBottom: 8,
+          color: slide.textMode === 'light' ? 'rgba(255,255,255,.6)' : 'var(--muted)', textTransform: 'uppercase', marginBottom: 8, transition: 'color 0.6s ease'
         }}>
           Annual Conference · 2026
         </p>
         <h1 style={{
           fontFamily: 'var(--fh)', fontSize: 'clamp(32px, 8vh, 42px)', fontWeight: 800,
-          color: '#fff', lineHeight: 1.05, marginBottom: 6,
+          color: slide.textMode === 'light' ? '#fff' : 'var(--text)', lineHeight: 1.05, marginBottom: 6, transition: 'color 0.6s ease'
         }}>
           Ethos<br />
-          <span style={{ color: 'var(--warm)', fontWeight: 300 }}>2026</span>
         </h1>
         <p style={{
-          fontSize: 'clamp(12px, 2.5vh, 14px)', color: 'rgba(255,255,255,.5)', marginTop: 8, lineHeight: 1.6,
-          fontFamily: 'var(--fb)',
+          fontSize: 'clamp(12px, 2.5vh, 14px)', color: slide.textMode === 'light' ? 'rgba(255,255,255,.7)' : 'var(--sub)', marginTop: 8, lineHeight: 1.6,
+          fontFamily: 'var(--fb)', transition: 'color 0.6s ease'
         }}>
-          Where student entrepreneurs shape the future
+          SUSTAINABILITY
         </p>
       </div>
 
@@ -184,11 +189,12 @@ export default function LandingPage() {
           }} key={current + 'icon'}>{slide.icon}</span>
           <h2 style={{
             fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 'clamp(20px, 4vh, 24px)',
-            color: '#fff', marginBottom: 10,
+            color: slide.textMode === 'light' ? '#fff' : 'var(--text)', marginBottom: 10, transition: 'color 0.6s ease',
             animation: 'fadeUp 0.3s ease both',
           }} key={current + 'title'}>{slide.title}</h2>
           <p style={{
-            fontFamily: 'var(--fb)', fontSize: 'clamp(13px, 2.5vh, 14px)', color: 'rgba(255,255,255,.65)',
+            fontFamily: 'var(--fb)', fontSize: 'clamp(13px, 2.5vh, 14px)',
+            color: slide.textMode === 'light' ? 'rgba(255,255,255,.65)' : 'var(--sub)', transition: 'color 0.6s ease',
             lineHeight: 1.6,
             animation: 'fadeUp 0.3s ease 0.05s both',
           }} key={current + 'desc'}>{slide.desc}</p>
@@ -203,7 +209,9 @@ export default function LandingPage() {
             <button key={i} onClick={() => goTo(i)} style={{
               width: current === i ? 24 : 8, height: 8,
               borderRadius: 4,
-              background: current === i ? '#fff' : 'rgba(255,255,255,.3)',
+              background: current === i 
+                ? (slide.textMode === 'light' ? '#fff' : 'var(--text)')
+                : (slide.textMode === 'light' ? 'rgba(255,255,255,.3)' : 'rgba(65, 52, 41, 0.2)'),
               border: 'none', cursor: 'pointer', padding: 0,
               transition: 'all 0.3s ease',
             }} />
@@ -220,10 +228,11 @@ export default function LandingPage() {
           <button onClick={finishCarousel} style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             width: '100%', padding: '16px 24px',
-            background: '#fff', color: '#1a1814',
+            background: slide.textMode === 'light' ? '#fff' : 'var(--text)',
+            color: slide.textMode === 'light' ? '#1a1814' : '#fff',
             borderRadius: 14, fontFamily: 'var(--fb)',
             fontSize: 16, fontWeight: 700, cursor: 'pointer',
-            border: 'none', transition: 'transform 0.1s',
+            border: 'none', transition: 'all 0.3s',
           }}>
             Get Started 🚀
           </button>
@@ -231,17 +240,21 @@ export default function LandingPage() {
           <div style={{ display: 'flex', gap: 12 }}>
             <button onClick={finishCarousel} style={{
               flex: 1, padding: '14px 20px', textAlign: 'center',
-              background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,.7)',
+              background: slide.textMode === 'light' ? 'rgba(255,255,255,0.1)' : 'transparent',
+              color: slide.textMode === 'light' ? 'rgba(255,255,255,.7)' : 'var(--sub)',
               borderRadius: 14, fontFamily: 'var(--fb)',
-              fontSize: 14, fontWeight: 600, border: '1px solid rgba(255,255,255,.15)', cursor: 'pointer',
+              fontSize: 14, fontWeight: 600, border: `1px solid ${slide.textMode === 'light' ? 'rgba(255,255,255,.15)' : 'rgba(65, 52, 41, 0.2)'}`, cursor: 'pointer',
+              transition: 'all 0.3s ease'
             }}>
               Skip
             </button>
             <button onClick={next} style={{
               flex: 2, padding: '14px 20px',
-              background: 'rgba(255,255,255,0.2)', color: '#fff',
+              background: slide.textMode === 'light' ? 'rgba(255,255,255,0.2)' : 'var(--text)',
+              color: slide.textMode === 'light' ? '#fff' : '#fff',
               borderRadius: 14, fontFamily: 'var(--fb)',
               fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer',
+              transition: 'all 0.3s ease'
             }}>
               Next →
             </button>

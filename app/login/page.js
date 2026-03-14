@@ -24,9 +24,9 @@ export default function LoginPage() {
       <Link href="/?carousel=1" style={{
         position: 'absolute', top: 'max(24px, env(safe-area-inset-top))', right: 24,
         width: 32, height: 32, borderRadius: 16,
-        background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)',
+        background: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.5)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: 'rgba(255,255,255,0.7)', fontSize: 16, fontFamily: 'var(--fb)',
+        color: 'var(--sub)', fontSize: 16, fontFamily: 'var(--fb)',
         textDecoration: 'none', transition: 'all 0.2s', cursor: 'pointer',
       }}>
         ℹ
@@ -39,32 +39,32 @@ export default function LoginPage() {
         padding: '0 24px',
       }}>
         <div style={{
-          width: 'clamp(52px, 12vh, 64px)', height: 'clamp(52px, 12vh, 64px)', borderRadius: 18,
-          background: 'rgba(255,255,255,0.12)',
+          width: 'clamp(52px, 12vh, 64px)', height: 'clamp(52px, 12vh, 64px)', borderRadius: 32,
+          background: 'rgba(255,255,255,0.4)',
           backdropFilter: 'blur(10px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          margin: '0 auto clamp(12px, 3vh, 20px)',
-          fontSize: 'clamp(28px, 6vh, 32px)', fontFamily: 'var(--fh)', fontWeight: 800, color: '#fff',
-        }}>E</div>
+          margin: '0 auto clamp(12px, 3vh, 20px)', overflow: 'hidden', padding: 4
+        }}>
+          <img src="/assets/ethos-logo.png" alt="Ethos" style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { e.target.style.display='none'; e.target.parentNode.innerHTML = '<span style="font-size: 32px; font-weight: 800; color: var(--text); font-family: var(--fh)">e</span>'; }} />
+        </div>
         <p style={{
           fontSize: 'clamp(10px, 2.5vh, 11px)', fontWeight: 700, letterSpacing: '.2em',
-          color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', marginBottom: 8,
+          color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 8,
           textAlign: 'center',
         }}>
           Annual Conference · 2026
         </p>
         <h1 style={{
           fontFamily: 'var(--fh)', fontSize: 'clamp(36px, 8vh, 44px)', fontWeight: 800,
-          color: '#fff', lineHeight: 1.05, marginBottom: 6, textAlign: 'center',
+          color: 'var(--text)', lineHeight: 1.05, marginBottom: 6, textAlign: 'center',
         }}>
           Ethos<br />
-          <span style={{ color: 'var(--warm)', fontWeight: 300 }}>2026</span>
         </h1>
         <p style={{
-          fontSize: 'clamp(13px, 3vh, 14px)', color: 'rgba(255,255,255,.5)', marginTop: 10, lineHeight: 1.6,
+          fontSize: 'clamp(13px, 3vh, 14px)', color: 'var(--sub)', marginTop: 10, lineHeight: 1.6,
           fontFamily: 'var(--fb)', textAlign: 'center',
         }}>
-          Where student entrepreneurs shape the future
+          SUSTAINABILITY
         </p>
       </div>
 
