@@ -2,9 +2,10 @@
   "/api/announcements/route": "app/api/announcements/route.js",
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/api/messages/route": "app/api/messages/route.js",
+  "/api/schedule/route": "app/api/schedule/route.js",
   "/admin/page": "app/admin/page.js",
   "/app/my-card/page": "app/app/my-card/page.js",
   "/app/scan/page": "app/app/scan/page.js",
   "/app/wallet/page": "app/app/wallet/page.js",
-  "/app/page": "app/app/page.js"
+  "/app/schedule/page": "app/app/schedule/page.js"
 }

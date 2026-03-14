@@ -70,7 +70,13 @@ export async function POST(req) {
       .eq('id', finalScannedId)
       .single();
 
-    if (profileError || !existingProfile) {
+    if (profileError) {
+      console.error('Supabase Error fetching profile:', profileError);
+      // Let's pass the exact error back to the frontend so we know if columns are missing
+      return NextResponse.json({ error: `DB Error: ${profileError.message}` }, { status: 500 });
+    }
+
+    if (!existingProfile) {
       return NextResponse.json({ error: 'Invalid QR Code. Person not found.' }, { status: 404 });
     }
 

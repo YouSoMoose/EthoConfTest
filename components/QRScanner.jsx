@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import jsQR from 'jsqr';
 import Btn from '@/components/Btn';
+import Link from 'next/link';
 
 export default function QRScanner() {
   const videoRef = useRef(null);
@@ -55,19 +56,22 @@ export default function QRScanner() {
   };
 
   const handleScan = async (scannedId) => {
+    const cleanId = scannedId?.trim();
+    if (!cleanId) return; // Prevent scanning empty strings rapidly 
+
     stopCamera();
     try {
       const res = await fetch('/api/connections', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scanned_id: scannedId }),
+        body: JSON.stringify({ scanned_id: cleanId }),
       });
       const data = await res.json();
       if (res.ok) {
         setResult({ success: true, message: data.message || 'Added to Wallet! 💼', profile: data.profile });
         toast.success(data.message || 'Added to Wallet! 💼');
       } else {
-        setResult({ success: false, error: data.error });
+        setResult({ success: false, error: data.error, raw: cleanId });
         toast.error(data.error || 'Failed');
       }
     } catch { toast.error('Network error'); }
@@ -154,13 +158,13 @@ export default function QRScanner() {
           )}
           <Btn onClick={startCamera} variant={result.success ? "outline" : "primary"}>Scan Another</Btn>
           <div style={{ marginTop: 12 }}>
-            <a href="/app/wallet" style={{ 
+            <Link href="/app/wallet" style={{ 
               fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--sub)', 
               textDecoration: 'underline', cursor: 'pointer', display: 'inline-block',
               padding: '8px'
             }}>
               Go to Wallet →
-            </a>
+            </Link>
           </div>
         </div>
       )}

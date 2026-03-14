@@ -26,7 +26,7 @@ export default function AdminDashboard() {
       fetch('/api/companies').then(r => r.json()),
       fetch('/api/messages?unread=true').then(r => r.json()),
       fetch('/api/raffle').then(r => r.json()).catch(() => []),
-      fetch('/api/announcements').then(r => r.json()).catch(() => []),
+      fetch('/api/announcements?all=true').then(r => r.json()).catch(() => []),
     ]).then(([users, companies, unread, raffle, ann]) => {
       const u = Array.isArray(users) ? users : [];
       setAnnouncements(Array.isArray(ann) ? ann : []);

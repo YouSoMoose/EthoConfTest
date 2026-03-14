@@ -3,16 +3,28 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase';
 
-export async function GET() {
-  // Return the most recent announcement from the last 24 hours
-  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+export async function GET(request) {
+  const url = new URL(request.url);
+  const fetchAll = url.searchParams.get('all') === 'true';
 
-  const { data, error } = await supabaseAdmin
+  let query = supabaseAdmin
     .from('announcements')
     .select('*')
-    .gte('created_at', since)
-    .order('created_at', { ascending: false })
-    .limit(5);
+    .order('created_at', { ascending: false });
+
+  if (!fetchAll) {
+    // Standard view: only last 24 hours, limit 5
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    query = query.gte('created_at', since).limit(5);
+  } else {
+    // Admin view: check session
+    const session = await getServerSession(authOptions);
+    if (!session?.profile || session.profile.access_level < 3) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
+  }
+
+  const { data, error } = await query;
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data || []);

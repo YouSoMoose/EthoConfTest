@@ -50,16 +50,20 @@ export default function MyCardPage() {
             {profile?.email}
           </p>
 
-          <div 
-            onClick={() => setQrExpanded(true)}
-            style={{
-              display: 'inline-block', padding: 16, background: 'var(--white)',
-              borderRadius: 16, border: '1px solid var(--s2)', marginTop: 20,
-              cursor: 'zoom-in'
-            }}
-          >
-            <QRCodeSVG value={profile?.id || ''} size={170} level="H" fgColor="#2d5016" bgColor="#ffffff" />
-          </div>
+          {profile?.id ? (
+            <div 
+              onClick={() => setQrExpanded(true)}
+              style={{
+                display: 'inline-block', padding: 16, background: 'var(--white)',
+                borderRadius: 16, border: '1px solid var(--s2)', marginTop: 20,
+                cursor: 'zoom-in'
+              }}
+            >
+              <QRCodeSVG value={profile.id} size={170} level="M" fgColor="#000000" bgColor="#ffffff" />
+            </div>
+          ) : (
+            <div style={{ display: 'inline-block', padding: 16, marginTop: 20 }}>Generating QR...</div>
+          )}
           <p style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--muted)', marginTop: 12 }}>
             Show this QR code for check-in
           </p>
@@ -128,7 +132,7 @@ export default function MyCardPage() {
 
       <Modal center open={qrExpanded} onClose={() => setQrExpanded(false)}>
         <div style={{ display: 'flex', justifyContent: 'center', padding: 20, background: '#fff', borderRadius: 24 }}>
-          <QRCodeSVG value={profile?.id || ''} size={300} level="H" fgColor="#2d5016" bgColor="#ffffff" />
+          {profile?.id && <QRCodeSVG value={profile.id} size={300} level="M" fgColor="#000000" bgColor="#ffffff" />}
         </div>
       </Modal>
     </div>
