@@ -1,23 +1,39 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import toast from 'react-hot-toast';
 import Avatar from '@/components/Avatar';
 import Loader from '@/components/Loader';
-import FormInput from '@/components/FormInput';
-import Btn from '@/components/Btn';
 
 export default function AdminMessagesPage() {
   const { data: session } = useSession();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [replyTo, setReplyTo] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState(null);
   const [replyContent, setReplyContent] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sending, setSending] = useState(false);
+  const bottomRef = useRef(null);
+
+  const fetchMessages = async () => {
+    try {
+      const res = await fetch('/api/messages');
+      if (res.ok) setMessages((await res.json()) || []);
+    } catch {}
+    setLoading(false);
+  };
 
   useEffect(() => {
-    fetch('/api/messages').then(r => r.json()).then(d => { setMessages(d || []); setLoading(false); }).catch(() => setLoading(false));
+    fetchMessages();
+    const iv = setInterval(fetchMessages, 10000);
+    return () => clearInterval(iv);
   }, []);
+
+  useEffect(() => {
+    // Scroll to bottom when messages or selected chat changes
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, selectedUserId]);
 
   const handleDelete = async (id) => {
     await fetch(`/api/messages?id=${id}`, { method: 'DELETE' });
@@ -25,85 +41,256 @@ export default function AdminMessagesPage() {
     toast.success('Deleted');
   };
 
-  const handleReply = async (userId) => {
-    if (!replyContent.trim()) return;
-    const res = await fetch('/api/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: replyContent.trim(), recipient_id: userId }) });
-    if (res.ok) { const msg = await res.json(); setMessages(p => [...p, msg]); setReplyContent(''); setReplyTo(null); toast.success('Sent'); }
+  const handleSend = async (e) => {
+    e.preventDefault();
+    if (!replyContent.trim() || !selectedUserId) return;
+    
+    const content = replyContent.trim();
+    setSending(true);
+    
+    try {
+      const res = await fetch('/api/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content, recipient_id: selectedUserId })
+      });
+      if (res.ok) {
+        const msg = await res.json();
+        setMessages(p => [...p, msg]);
+        setReplyContent('');
+      } else {
+        toast.error('Failed to send');
+      }
+    } catch {
+      toast.error('Network error');
+    }
+    setSending(false);
   };
 
   if (loading) return <Loader admin />;
 
+  // Process unique conversations
   const convos = {};
   messages.forEach(m => {
-    const oid = m.sender_id === session?.profile?.id ? m.recipient_id : m.sender_id;
-    const other = m.sender_id === session?.profile?.id ? m.recipient : m.sender;
-    if (!convos[oid]) convos[oid] = { user: other, messages: [] };
-    convos[oid].messages.push(m);
+    const isMe = m.sender_id === session?.profile?.id;
+    const otherId = isMe ? m.recipient_id : m.sender_id;
+    const otherUser = isMe ? m.recipient : m.sender;
+    
+    if (!otherId || !otherUser) return;
+    if (!convos[otherId]) convos[otherId] = { user: otherUser, messages: [], highestTime: 0 };
+    
+    convos[otherId].messages.push(m);
+    const mTime = new Date(m.created_at).getTime();
+    if (mTime > convos[otherId].highestTime) convos[otherId].highestTime = mTime;
   });
 
+  // Filter & Sort
+  let convoList = Object.entries(convos)
+    .sort((a, b) => b[1].highestTime - a[1].highestTime)
+    .map(([uid, c]) => ({ uid, ...c }));
+
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    convoList = convoList.filter(c => 
+      c.user?.name?.toLowerCase().includes(q) || 
+      c.user?.email?.toLowerCase().includes(q)
+    );
+  }
+
+  const activeConvo = selectedUserId ? convos[selectedUserId] : null;
+  const myAvatar = session?.profile?.avatar;
+
   return (
-    <div className="page-enter" style={{ padding: '24px 16px' }}>
-      <div style={{ maxWidth: 900, margin: '0 auto' }}>
-        <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 22, color: 'var(--atext)', marginBottom: 20 }}>
-          💬 Messages
-        </h2>
-
-        {Object.keys(convos).length === 0 ? (
-          <div style={{ textAlign: 'center', padding: 60, color: 'var(--amuted)' }}>
-            <span style={{ fontSize: 40, display: 'block', marginBottom: 8 }}>💬</span>
-            <p style={{ fontFamily: 'var(--fb)', fontSize: 14 }}>No messages yet</p>
+    <div className="page-enter" style={{ padding: '0px 0px', height: 'calc(100vh - 40px)', display: 'flex', flexDirection: 'column' }}>
+      
+      {/* 2-Column Desktop App Wrapper */}
+      <div style={{
+        flex: 1,
+        display: 'flex',
+        background: 'var(--as2)',
+        border: '1px solid var(--aborder)',
+        borderRadius: 'var(--r)',
+        overflow: 'hidden',
+        boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
+      }}>
+        
+        {/* Left Column: Contact List */}
+        <div className={`chat-list ${selectedUserId ? 'hidden-mobile' : ''}`}>
+          <div style={{ padding: '20px 16px', borderBottom: '1px solid var(--aborder)', background: 'var(--as1)' }}>
+            <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 20, color: 'var(--atext)', marginBottom: 16 }}>
+              Messages
+            </h2>
+            <div style={{
+              background: 'var(--abg)',
+              borderRadius: 12,
+              padding: '8px 12px',
+              display: 'flex',
+              alignItems: 'center',
+              border: '1px solid var(--aborder)',
+            }}>
+              <span style={{ fontSize: 14, marginRight: 8, opacity: 0.5 }}>🔍</span>
+              <input
+                type="text"
+                placeholder="Search attendees..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                style={{
+                  background: 'none', border: 'none', color: 'var(--atext)',
+                  fontFamily: 'var(--fb)', fontSize: 13, outline: 'none', width: '100%'
+                }}
+              />
+            </div>
           </div>
-        ) : (
-          <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {Object.entries(convos).map(([uid, conv]) => (
-              <div key={uid} style={{
-                background: 'var(--as2)', border: '1px solid var(--aborder)', borderRadius: 'var(--r)', padding: 16,
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid var(--aborder)' }}>
-                  <Avatar src={conv.user?.avatar} name={conv.user?.name} size={32} />
-                  <div>
-                    <h3 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 14, color: 'var(--atext)' }}>{conv.user?.name || 'Unknown'}</h3>
-                    <p style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--amuted)' }}>{conv.user?.email}</p>
-                  </div>
-                </div>
-
-                <div style={{ maxHeight: 200, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12 }}>
-                  {conv.messages.map(m => (
-                    <div key={m.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8, fontSize: 13 }}>
-                      <div style={{ flex: 1 }}>
-                        <span style={{ fontFamily: 'var(--fb)', fontWeight: 600, color: 'var(--accent)' }}>{m.sender?.name}: </span>
-                        <span style={{ fontFamily: 'var(--fb)', color: 'var(--asub)' }}>{m.content}</span>
-                        <span style={{ fontSize: 10, color: 'var(--amuted)', marginLeft: 6 }}>
-                          {new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          
+          <div style={{ flex: 1, overflowY: 'auto', background: 'var(--as1)' }}>
+            {convoList.length === 0 ? (
+              <div style={{ padding: 30, textAlign: 'center', color: 'var(--amuted)', fontSize: 13, fontFamily: 'var(--fb)' }}>
+                No conversations found.
+              </div>
+            ) : (
+              convoList.map(c => {
+                const isActive = selectedUserId === c.uid;
+                const lastMsg = c.messages[c.messages.length - 1];
+                return (
+                  <button
+                    key={c.uid}
+                    onClick={() => setSelectedUserId(c.uid)}
+                    style={{
+                      width: '100%', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 12,
+                      padding: '16px', background: isActive ? 'var(--ad)' : 'transparent',
+                      border: 'none', borderBottom: '1px solid var(--aborder)',
+                      textAlign: 'left', cursor: 'pointer', transition: 'background 0.2s',
+                    }}
+                  >
+                    <Avatar src={c.user?.avatar} name={c.user?.name} size={42} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                        <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 14, color: isActive ? 'var(--accent)' : 'var(--atext)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {c.user?.name || 'Unknown User'}
+                        </h3>
+                        <span style={{ fontSize: 10, color: 'var(--amuted)', flexShrink: 0 }}>
+                          {lastMsg && new Date(lastMsg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
-                      <button onClick={() => handleDelete(m.id)} style={{
-                        background: 'none', border: 'none', color: 'var(--amuted)', cursor: 'pointer', fontSize: 12, flexShrink: 0,
-                      }}>🗑️</button>
+                      <p style={{ fontFamily: 'var(--fb)', fontSize: 12, color: isActive ? 'var(--accent)' : 'var(--asub)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', opacity: isActive ? 0.8 : 1 }}>
+                        {lastMsg?.sender_id === session?.profile?.id ? 'You: ' : ''}{lastMsg?.content}
+                      </p>
                     </div>
-                  ))}
-                </div>
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
 
-                <div style={{ display: 'flex', gap: 8, paddingTop: 12, borderTop: '1px solid var(--aborder)' }}>
-                  <input
-                    type="text"
-                    value={replyTo === uid ? replyContent : ''}
-                    onChange={e => { setReplyTo(uid); setReplyContent(e.target.value); }}
-                    onFocus={() => setReplyTo(uid)}
-                    placeholder="Reply..."
-                    style={{
-                      flex: 1, background: 'var(--as3)', border: '1px solid var(--aborder)',
-                      borderRadius: 8, padding: '8px 12px', fontSize: 13,
-                      fontFamily: 'var(--fb)', color: 'var(--atext)', outline: 'none',
-                    }}
-                  />
-                  <Btn variant="accent" sm onClick={() => handleReply(uid)}>Send</Btn>
+        {/* Right Column: Chat Pane */}
+        <div className={`chat-pane ${!selectedUserId ? 'hidden-mobile' : ''}`}>
+          {selectedUserId && activeConvo ? (
+            <>
+              {/* Chat Header */}
+              <div style={{
+                padding: '16px 20px', background: 'var(--as1)', borderBottom: '1px solid var(--aborder)',
+                display: 'flex', alignItems: 'center', gap: 12, zIndex: 10,
+              }}>
+                <button 
+                  className="mobile-back" 
+                  onClick={() => setSelectedUserId(null)}
+                  style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: 24, cursor: 'pointer', padding: 0, marginRight: 4, display: 'none' }}
+                >
+                  ‹
+                </button>
+                <Avatar src={activeConvo.user?.avatar} name={activeConvo.user?.name} size={36} />
+                <div>
+                  <h3 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 15, color: 'var(--atext)', margin: 0 }}>{activeConvo.user?.name}</h3>
+                  <p style={{ fontFamily: 'var(--fb)', fontSize: 12, color: 'var(--amuted)', margin: 0 }}>{activeConvo.user?.email}</p>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+
+              {/* Chat History */}
+              <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: 12, background: 'var(--abg)' }}>
+                {activeConvo.messages.map(m => {
+                  const isMe = m.sender_id === session?.profile?.id;
+                  return (
+                    <div key={m.id} style={{ display: 'flex', justifyContent: isMe ? 'flex-end' : 'flex-start', group: 'chat-bubble' }}>
+                      <div style={{ display: 'flex', gap: 8, maxWidth: '75%', flexDirection: isMe ? 'row-reverse' : 'row', position: 'relative' }}>
+                        <Avatar src={isMe ? myAvatar : m.sender?.avatar} name={isMe ? session?.profile?.name : m.sender?.name} size={28} />
+                        <div style={{
+                          borderRadius: 16, padding: '10px 14px', fontSize: 14, fontFamily: 'var(--fb)',
+                          ...(isMe
+                            ? { background: 'var(--accent)', color: '#000', borderBottomRightRadius: 4 }
+                            : { background: 'var(--as2)', border: '1px solid var(--aborder)', borderBottomLeftRadius: 4, color: 'var(--atext)' }
+                          ),
+                        }}>
+                          <p style={{ margin: 0 }}>{m.content}</p>
+                          <div style={{ display: 'flex', justifyContent: isMe ? 'flex-end' : 'space-between', alignItems: 'center', marginTop: 4, gap: 10 }}>
+                            {!isMe && (
+                              <button onClick={() => handleDelete(m.id)} style={{ background: 'none', border: 'none', color: 'var(--amuted)', fontSize: 10, cursor: 'pointer', padding: 0 }}>
+                                Delete
+                              </button>
+                            )}
+                            <span style={{ fontSize: 10, color: isMe ? 'rgba(0,0,0,0.5)' : 'var(--amuted)' }}>
+                              {new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                            {isMe && (
+                              <button onClick={() => handleDelete(m.id)} style={{ background: 'none', border: 'none', color: 'rgba(0,0,0,0.5)', fontSize: 10, cursor: 'pointer', padding: 0 }}>
+                                🗑️
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+                <div ref={bottomRef} />
+              </div>
+
+              {/* Input Area */}
+              <div style={{ padding: '16px 20px', background: 'var(--as1)', borderTop: '1px solid var(--aborder)' }}>
+                <form onSubmit={handleSend} style={{ display: 'flex', gap: 10 }}>
+                  <input
+                    type="text"
+                    placeholder="Type a message..."
+                    value={replyContent}
+                    onChange={e => setReplyContent(e.target.value)}
+                    style={{
+                      flex: 1, background: 'var(--abg)', border: '1px solid var(--aborder)',
+                      color: 'var(--atext)', fontSize: 14, fontFamily: 'var(--fb)',
+                      padding: '12px 16px', borderRadius: 20, outline: 'none'
+                    }}
+                  />
+                  <button type="submit" disabled={!replyContent.trim() || sending} style={{
+                    background: 'var(--accent)', color: '#000', border: 'none',
+                    width: 44, height: 44, borderRadius: '50%',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', fontSize: 20, fontWeight: 700, paddingBottom: 2,
+                    opacity: (!replyContent.trim() || sending) ? 0.5 : 1, transition: 'opacity 0.2s',
+                  }}>
+                    ↑
+                  </button>
+                </form>
+              </div>
+            </>
+          ) : (
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--abg)', color: 'var(--amuted)' }}>
+              <span style={{ fontSize: 48, marginBottom: 16, opacity: 0.5 }}>💬</span>
+              <p style={{ fontFamily: 'var(--fb)', fontSize: 15, fontWeight: 500 }}>Select a conversation to start messaging</p>
+            </div>
+          )}
+        </div>
       </div>
+
+      <style dangerouslySetInnerHTML={{__html: `
+        .chat-list { width: 340px; border-right: 1px solid var(--aborder); display: flex; flex-direction: column; background: var(--as1); z-index: 10; }
+        .chat-pane { flex: 1; display: flex; flex-direction: column; background: var(--as2); position: relative; }
+        
+        @media (max-width: 768px) {
+          .chat-list { width: 100%; border-right: none; }
+          .chat-pane { width: 100%; position: absolute; inset: 0; z-index: 20; background: var(--abg); }
+          .hidden-mobile { display: none !important; }
+          .mobile-back { display: block !important; }
+        }
+      `}} />
     </div>
   );
 }

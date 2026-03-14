@@ -17,7 +17,7 @@ export default function ChatPage() {
 
   const fetchMessages = async () => {
     try {
-      const res = await fetch('/api/messages');
+      const res = await fetch('/api/messages?as=attendee');
       if (res.ok) setMessages(await res.json());
     } catch { }
     setLoading(false);
@@ -25,10 +25,10 @@ export default function ChatPage() {
 
   useEffect(() => {
     fetchMessages();
-    fetch('/api/messages', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mark_read: true }) }).catch(() => { });
+    fetch('/api/messages?as=attendee', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mark_read: true }) }).catch(() => { });
     const iv = setInterval(() => {
       fetchMessages();
-      fetch('/api/messages', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mark_read: true }) }).catch(() => { });
+      fetch('/api/messages?as=attendee', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mark_read: true }) }).catch(() => { });
     }, 15000);
     return () => clearInterval(iv);
   }, []);
@@ -40,7 +40,7 @@ export default function ChatPage() {
     if (!newMessage.trim()) return;
     setSending(true);
     try {
-      const res = await fetch('/api/messages', {
+      const res = await fetch('/api/messages?as=attendee', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: newMessage.trim() }),

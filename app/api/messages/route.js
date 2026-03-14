@@ -11,6 +11,7 @@ export async function GET(request) {
 
   const { searchParams } = new URL(request.url);
   const unreadOnly = searchParams.get('unread');
+  const asAttendee = searchParams.get('as') === 'attendee';
   const userId = session.profile.id;
   const level = session.profile.access_level;
 
@@ -27,7 +28,7 @@ export async function GET(request) {
   }
 
   // Staff/admin: get all messages or messages for a specific user
-  if (level >= 2) {
+  if (level >= 2 && !asAttendee) {
     const targetUser = searchParams.get('user_id');
     let query = supabaseAdmin
       .from('messages')
@@ -62,13 +63,15 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  const { searchParams } = new URL(request.url);
+  const asAttendee = searchParams.get('as') === 'attendee';
   const body = await request.json();
   const level = session.profile.access_level;
 
   let recipientId = body.recipient_id;
 
   // Attendees auto-route to any staff member
-  if (level < 2 && !recipientId) {
+  if ((level < 2 || asAttendee) && !recipientId) {
     const { data: staffMembers } = await supabaseAdmin
       .from('profiles')
       .select('id')
