@@ -1,10 +1,14 @@
 {
-  "/page": "app/page.js",
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/login/page": "app/login/page.js",
   "/api/messages/route": "app/api/messages/route.js",
   "/api/announcements/route": "app/api/announcements/route.js",
+  "/api/wallet/route": "app/api/wallet/route.js",
+  "/api/companies/route": "app/api/companies/route.js",
+  "/api/schedule/route": "app/api/schedule/route.js",
+  "/api/votes/route": "app/api/votes/route.js",
   "/admin/page": "app/admin/page.js",
-  "/app/chat/page": "app/app/chat/page.js",
-  "/admin/messages/page": "app/admin/messages/page.js"
+  "/app/pitches/page": "app/app/pitches/page.js",
+  "/app/page": "app/app/page.js",
+  "/app/my-card/page": "app/app/my-card/page.js",
+  "/app/pitches/[id]/page": "app/app/pitches/[id]/page.js"
 }

@@ -20,7 +20,7 @@ export default function AdminMessagesPage() {
     try {
       const res = await fetch('/api/messages');
       if (res.ok) setMessages((await res.json()) || []);
-    } catch {}
+    } catch { }
     setLoading(false);
   };
 
@@ -44,10 +44,10 @@ export default function AdminMessagesPage() {
   const handleSend = async (e) => {
     e.preventDefault();
     if (!replyContent.trim() || !selectedUserId) return;
-    
+
     const content = replyContent.trim();
     setSending(true);
-    
+
     try {
       const res = await fetch('/api/messages', {
         method: 'POST',
@@ -75,10 +75,10 @@ export default function AdminMessagesPage() {
     const isMe = m.sender_id === session?.profile?.id;
     const otherId = isMe ? m.recipient_id : m.sender_id;
     const otherUser = isMe ? m.recipient : m.sender;
-    
+
     if (!otherId || !otherUser) return;
     if (!convos[otherId]) convos[otherId] = { user: otherUser, messages: [], highestTime: 0 };
-    
+
     convos[otherId].messages.push(m);
     const mTime = new Date(m.created_at).getTime();
     if (mTime > convos[otherId].highestTime) convos[otherId].highestTime = mTime;
@@ -91,8 +91,8 @@ export default function AdminMessagesPage() {
 
   if (searchQuery) {
     const q = searchQuery.toLowerCase();
-    convoList = convoList.filter(c => 
-      c.user?.name?.toLowerCase().includes(q) || 
+    convoList = convoList.filter(c =>
+      c.user?.name?.toLowerCase().includes(q) ||
       c.user?.email?.toLowerCase().includes(q)
     );
   }
@@ -102,7 +102,7 @@ export default function AdminMessagesPage() {
 
   return (
     <div className="page-enter" style={{ padding: '0px 0px', height: 'calc(100vh - 40px)', display: 'flex', flexDirection: 'column' }}>
-      
+
       {/* 2-Column Desktop App Wrapper */}
       <div style={{
         flex: 1,
@@ -113,7 +113,7 @@ export default function AdminMessagesPage() {
         overflow: 'hidden',
         boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
       }}>
-        
+
         {/* Left Column: Contact List */}
         <div className={`chat-list ${selectedUserId ? 'hidden-mobile' : ''}`}>
           <div style={{ padding: '20px 16px', borderBottom: '1px solid var(--aborder)', background: 'var(--as1)' }}>
@@ -141,7 +141,7 @@ export default function AdminMessagesPage() {
               />
             </div>
           </div>
-          
+
           <div style={{ flex: 1, overflowY: 'auto', background: 'var(--as1)' }}>
             {convoList.length === 0 ? (
               <div style={{ padding: 30, textAlign: 'center', color: 'var(--amuted)', fontSize: 13, fontFamily: 'var(--fb)' }}>
@@ -192,8 +192,8 @@ export default function AdminMessagesPage() {
                 padding: '16px 20px', background: 'var(--as1)', borderBottom: '1px solid var(--aborder)',
                 display: 'flex', alignItems: 'center', gap: 12, zIndex: 10,
               }}>
-                <button 
-                  className="mobile-back" 
+                <button
+                  className="mobile-back"
                   onClick={() => setSelectedUserId(null)}
                   style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: 24, cursor: 'pointer', padding: 0, marginRight: 4, display: 'none' }}
                 >
@@ -280,7 +280,8 @@ export default function AdminMessagesPage() {
         </div>
       </div>
 
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .chat-list { width: 340px; border-right: 1px solid var(--aborder); display: flex; flex-direction: column; background: var(--as1); z-index: 10; }
         .chat-pane { flex: 1; display: flex; flex-direction: column; background: var(--as2); position: relative; }
         

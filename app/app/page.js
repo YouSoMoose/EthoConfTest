@@ -74,14 +74,14 @@ export default function AttendeeDashboard() {
   const upNext = schedule[0];
 
   const quickLinks = [
-    { icon: '📅', label: 'Schedule', href: '/app/schedule' },
-    { icon: '🏢', label: 'Companies', href: '/app/pitches' },
-    { icon: '🛂', label: 'Passport', href: '/app/passport' },
-    { icon: '💬', label: 'Chat', href: '/app/chat' },
-    { icon: '📝', label: 'Notes', href: '/app/notes' },
-    { icon: '💼', label: 'Wallet', href: '/app/wallet' },
-    { icon: '🎫', label: 'My Card', href: '/app/my-card' },
-    { icon: '🔍', label: 'Scan', href: '/app/scan' },
+    { icon: '📅', label: 'Schedule', href: '/app/schedule?anim=scale' },
+    { icon: '🏢', label: 'Companies', href: '/app/pitches?anim=scale' },
+    { icon: '🛂', label: 'Passport', href: '/app/passport?anim=scale' },
+    { icon: '💬', label: 'Chat', href: '/app/chat?anim=scale' },
+    { icon: '📝', label: 'Notes', href: '/app/notes?anim=scale' },
+    { icon: '💼', label: 'Wallet', href: '/app/wallet?anim=scale' },
+    { icon: '🎫', label: 'My Card', href: '/app/my-card?anim=scale' },
+    { icon: '🔍', label: 'Scan', href: '/app/scan?anim=scale' },
   ];
 
   return (
