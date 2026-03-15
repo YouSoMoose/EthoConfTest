@@ -2,7 +2,7 @@
   "/login/page": "app/login/page.js",
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/admin/page": "app/admin/page.js",
-  "/app/page": "app/app/page.js",
   "/admin/cards/page": "app/admin/cards/page.js",
-  "/admin/messages/page": "app/admin/messages/page.js"
+  "/admin/messages/page": "app/admin/messages/page.js",
+  "/app/page": "app/app/page.js"
 }

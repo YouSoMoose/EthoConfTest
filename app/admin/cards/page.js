@@ -8,6 +8,7 @@ import { QRCodeSVG } from 'qrcode.react';
 export default function AdminIDCardsPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [printingId, setPrintingId] = useState(null);
 
   useEffect(() => {
     fetch('/api/users')
@@ -22,7 +23,7 @@ export default function AdminIDCardsPage() {
   if (loading) return <Loader admin />;
 
   return (
-    <div className="page-enter" style={{ padding: '24px 16px' }}>
+    <div className={`page-enter ${printingId ? 'is-printing-single' : ''}`} style={{ padding: '24px 16px' }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
           <Link href="/admin" style={{
@@ -40,7 +41,7 @@ export default function AdminIDCardsPage() {
         </p>
 
         {users.length === 0 && !loading && (
-          <div style={{ textAlign: 'center', padding: '60px 0', background: 'var(--as1)', borderRadius: 'var(--r)', border: '1px dashed var(--aborder)' }}>
+          <div className="print-hide" style={{ textAlign: 'center', padding: '60px 0', background: 'var(--as1)', borderRadius: 'var(--r)', border: '1px dashed var(--aborder)' }}>
             <span style={{ fontSize: 40, display: 'block', marginBottom: 12 }}>😶</span>
             <p style={{ fontFamily: 'var(--fb)', color: 'var(--asub)' }}>No users found.</p>
           </div>
@@ -52,9 +53,10 @@ export default function AdminIDCardsPage() {
           gap: 16,
         }}>
           {users.map(u => (
-            <div key={u.id} style={{
-              background: '#ffffff', // Cards are always white for printing
-              borderRadius: 12,
+            <div key={u.id} className={printingId && printingId !== u.id ? 'hide-when-printing-single' : ''} style={{ position: 'relative' }}>
+              <div style={{
+                background: '#ffffff', // Cards are always white for printing
+                borderRadius: 12,
               border: '1px solid #ccc',
               width: '87mm',
               height: '57mm',
@@ -112,6 +114,28 @@ export default function AdminIDCardsPage() {
               }}>
                 <QRCodeSVG value={u.id} size={84} level="M" fgColor="#413429" bgColor="#ffffff" />
               </div>
+            </div>
+            
+            {/* Print Button Wrapper */}
+            <div className="print-hide" style={{ marginTop: 8, display: 'flex', justifyContent: 'flex-end' }}>
+              <button 
+                onClick={() => {
+                  setPrintingId(u.id);
+                  setTimeout(() => {
+                    window.print();
+                    setPrintingId(null);
+                  }, 150);
+                }}
+                style={{
+                  background: 'var(--as1)', border: '1px solid var(--aborder)', 
+                  borderRadius: 8, padding: '6px 12px', fontSize: 13, 
+                  fontFamily: 'var(--fh)', fontWeight: 600, color: 'var(--atext)',
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6
+                }}
+              >
+                🖨️ Print Card
+              </button>
+            </div>
             </div>
           ))}
         </div>
