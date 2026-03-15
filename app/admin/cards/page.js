@@ -79,7 +79,7 @@ export default function AdminIDCardsPage() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                   {/* Small Logo next to Name */}
                   <div style={{ width: 20, height: 20, borderRadius: 4, overflow: 'hidden' }}>
-                    <img src="/assets/ethos-logo.png" alt="E" style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { e.target.style.display='none'; }} />
+                    <img src="/assets/EthosLogoInsignia.png" alt="E" style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { e.target.style.display='none'; }} />
                   </div>
                   <h3 style={{
                     fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 18, color: '#413429', margin: 0,
