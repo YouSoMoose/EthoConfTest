@@ -23,18 +23,15 @@ export default function AdminDashboard() {
     if (level === 2) { setLoading(false); return; }
     Promise.all([
       fetch('/api/users').then(r => r.json()),
-      fetch('/api/companies').then(r => r.json()),
       fetch('/api/messages?unread=true').then(r => r.json()),
       fetch('/api/raffle').then(r => r.json()).catch(() => []),
       fetch('/api/announcements?all=true').then(r => r.json()).catch(() => []),
-    ]).then(([users, companies, unread, raffle, ann]) => {
+    ]).then(([users, unread, raffle, ann]) => {
       const u = Array.isArray(users) ? users : [];
       setAnnouncements(Array.isArray(ann) ? ann : []);
       setStats({
         totalUsers: u.length,
         checkedIn: u.filter(x => x.checked_in).length,
-        companies: (companies || []).length,
-        totalVotes: (companies || []).reduce((s, c) => s + (c.vote_count || 0), 0),
         unreadMessages: unread?.unreadCount || 0,
         raffleEntries: Array.isArray(raffle) ? raffle.length : 0,
       });
@@ -91,7 +88,6 @@ export default function AdminDashboard() {
   const cards = [
     { label: 'Total Users', value: stats?.totalUsers || 0, icon: '👥', href: '/admin/users', minLevel: 3 },
     { label: 'Checked In', value: stats?.checkedIn || 0, icon: '✅', href: '/admin/checkin', minLevel: 2 },
-    { label: 'Total Votes', value: stats?.totalVotes || 0, icon: '🗳️' },
     { label: 'Unread Messages', value: stats?.unreadMessages || 0, icon: '💬', href: '/admin/messages', minLevel: 2 },
     { label: 'Raffle Entries', value: stats?.raffleEntries || 0, icon: '🎰', href: '/admin/raffle', minLevel: 3 },
     { label: 'Print ID Cards', value: '🪪', icon: '🖨️', href: '/admin/cards', minLevel: 3 },
