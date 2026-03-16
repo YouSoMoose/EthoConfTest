@@ -1,12 +1,15 @@
 {
-  "/login/page": "app/login/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/api/announcements/route": "app/api/announcements/route.js",
-  "/api/schedule/route": "app/api/schedule/route.js",
   "/api/messages/route": "app/api/messages/route.js",
-  "/admin/checkin/page": "app/admin/checkin/page.js",
-  "/admin/page": "app/admin/page.js",
-  "/admin/schedule/page": "app/admin/schedule/page.js",
+  "/api/users/route": "app/api/users/route.js",
+  "/api/schedule/route": "app/api/schedule/route.js",
+  "/login/page": "app/login/page.js",
   "/admin/messages/page": "app/admin/messages/page.js",
-  "/app/page": "app/app/page.js"
+  "/admin/page": "app/admin/page.js",
+  "/admin/checkin/page": "app/admin/checkin/page.js",
+  "/app/page": "app/app/page.js",
+  "/admin/schedule/page": "app/admin/schedule/page.js",
+  "/app/chat/page": "app/app/chat/page.js"
 }

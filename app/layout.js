@@ -1,6 +1,8 @@
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import SessionProvider from '@/components/SessionProvider';
+import MessageNotification from '@/components/MessageNotification';
+import AnnouncementBanner from '@/components/AnnouncementBanner';
 
 export const metadata = {
   title: 'Ethos 2026 — Sustainability Conference',
@@ -31,6 +33,8 @@ export default function RootLayout({ children }) {
               },
             }}
           />
+          <MessageNotification />
+          <AnnouncementBanner />
           {children}
         </SessionProvider>
       </body>

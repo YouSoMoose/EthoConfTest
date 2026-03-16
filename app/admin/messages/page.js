@@ -9,6 +9,7 @@ import Loader from '@/components/Loader';
 export default function AdminMessagesPage() {
   const { data: session } = useSession();
   const [messages, setMessages] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [replyContent, setReplyContent] = useState('');
@@ -16,17 +17,21 @@ export default function AdminMessagesPage() {
   const [sending, setSending] = useState(false);
   const bottomRef = useRef(null);
 
-  const fetchMessages = async () => {
+  const fetchData = async () => {
     try {
-      const res = await fetch('/api/messages');
-      if (res.ok) setMessages((await res.json()) || []);
+      const [mRes, uRes] = await Promise.all([
+        fetch('/api/messages'),
+        fetch('/api/users')
+      ]);
+      if (mRes.ok) setMessages((await mRes.json()) || []);
+      if (uRes.ok) setAllUsers((await uRes.json()) || []);
     } catch { }
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchMessages();
-    const iv = setInterval(fetchMessages, 10000);
+    fetchData();
+    const iv = setInterval(fetchData, 10000);
     return () => clearInterval(iv);
   }, []);
 
@@ -82,6 +87,14 @@ export default function AdminMessagesPage() {
     convos[otherId].messages.push(m);
     const mTime = new Date(m.created_at).getTime();
     if (mTime > convos[otherId].highestTime) convos[otherId].highestTime = mTime;
+  });
+
+  // Merge with allUsers to allow messaging anyone
+  allUsers.forEach(u => {
+    if (u.id === session?.profile?.id) return;
+    if (!convos[u.id]) {
+      convos[u.id] = { user: u, messages: [], highestTime: 0 };
+    }
   });
 
   // Filter & Sort

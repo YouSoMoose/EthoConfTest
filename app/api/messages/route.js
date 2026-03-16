@@ -15,8 +15,25 @@ export async function GET(request) {
   const userId = session.profile.id;
   const level = session.profile.access_level;
 
-  // Unread count request
+  // Unread count or latest unread message request
   if (unreadOnly === 'true') {
+    const latest = searchParams.get('latest') === 'true';
+    
+    if (latest) {
+      const { data, error } = await supabaseAdmin
+        .from('messages')
+        .select('*, sender:profiles!sender_id(id, name, email, avatar)')
+        .eq('recipient_id', userId)
+        .eq('read', false)
+        .eq('deleted', false)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+      
+      if (error && error.code !== 'PGRST116') return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json(data || null);
+    }
+
     const { count } = await supabaseAdmin
       .from('messages')
       .select('*', { count: 'exact', head: true })
