@@ -36,7 +36,8 @@ export async function PUT(request) {
       name: body.name,
       avatar: body.avatar,
       company: body.company,
-      linkedin: body.linkedin
+      linkedin: body.linkedin,
+      card_made: true
     })
     .eq('id', session.profile.id)
     .select()

@@ -1,8 +1,10 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { toPng } from 'html-to-image';
 import toast from 'react-hot-toast';
 import Topbar from '@/components/Topbar';
 import Avatar from '@/components/Avatar';
@@ -10,7 +12,11 @@ import Btn from '@/components/Btn';
 import Modal from '@/components/Modal';
 
 export default function MyCardPage() {
-  const { data: session } = useSession();
+  const { data: session, update: updateSession } = useSession();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const isOnboarding = searchParams.get('onboarding') === '1';
+  
   const profile = session?.profile;
   const [resumeLink, setResumeLink] = useState(profile?.resume_link || '');
   const [phone, setPhone] = useState(profile?.phone || '');
@@ -21,8 +27,22 @@ export default function MyCardPage() {
   const [linkedin, setLinkedin] = useState(profile?.linkedin || '');
   const [saving, setSaving] = useState(false);
   const [qrExpanded, setQrExpanded] = useState(false);
+  const cardRef = useRef(null);
+
+  useEffect(() => {
+    if (profile) {
+      setName(profile.name || '');
+      setAvatar(profile.avatar || '');
+      setCompany(profile.company || '');
+      setBio(profile.bio || '');
+      setPhone(profile.phone || '');
+      setLinkedin(profile.linkedin || '');
+      setResumeLink(profile.resume_link || '');
+    }
+  }, [profile]);
 
   const saveProfile = async () => {
+    if (!name || !company) return toast.error('Name and Company are required');
     setSaving(true);
     try {
       const res = await fetch('/api/profile', { 
@@ -30,49 +50,113 @@ export default function MyCardPage() {
         headers: { 'Content-Type': 'application/json' }, 
         body: JSON.stringify({ resume_link: resumeLink, phone, bio, name, avatar, company, linkedin }) 
       });
-      if (res.ok) toast.success('Profile saved successfully');
+      if (res.ok) {
+        await updateSession();
+        toast.success('Profile saved successfully');
+        if (isOnboarding) router.push('/app');
+      }
       else toast.error('Failed to save');
     } catch { toast.error('Network error'); }
     setSaving(false);
   };
 
+  const handleDownload = async () => {
+    if (!cardRef.current) return;
+    const t = toast.loading('Generating image...');
+    try {
+      const dataUrl = await toPng(cardRef.current, { pixelRatio: 3, backgroundColor: '#fff' });
+      const img = new Image();
+      img.src = dataUrl;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        // Swapping width/height for 90-degree rotation
+        canvas.width = img.height;
+        canvas.height = img.width;
+        const ctx = canvas.getContext('2d');
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate(90 * Math.PI / 180);
+        ctx.drawImage(img, -img.width / 2, -img.height / 2);
+        
+        const rotatedDataUrl = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.download = `Ethos-ID-${name.replace(/\s+/g, '-')}.png`;
+        link.href = rotatedDataUrl;
+        link.click();
+        toast.success('Downloaded!', { id: t });
+      };
+    } catch (e) {
+      console.error(e);
+      toast.error('Failed to download', { id: t });
+    }
+  };
+
   return (
-    <div className="page-enter">
-      <Topbar title="🎫 My Card" />
+    <div className="page-enter" style={{ paddingBottom: isOnboarding ? 40 : 100 }}>
+      {!isOnboarding && <Topbar title="🎫 My Card" />}
+      
+      {isOnboarding && (
+        <div style={{ padding: '60px 24px 20px', textAlign: 'center' }}>
+          <h1 style={{ fontFamily: 'var(--fh)', fontSize: 32, fontWeight: 800, color: 'var(--text)' }}>Welcome to Ethos! 🌿</h1>
+          <p style={{ fontFamily: 'var(--fb)', fontSize: 16, color: 'var(--sub)', marginTop: 8 }}>
+            Let's get your digital ID card ready for the conference.
+          </p>
+        </div>
+      )}
+
       <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px' }}>
         {/* Badge */}
-        <div style={{
+        <div ref={cardRef} style={{
           background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 'var(--r)',
-          padding: '32px 20px', textAlign: 'center', marginBottom: 16,
+          padding: '40px 24px', textAlign: 'center', marginBottom: 16,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
           animation: 'scaleIn 0.3s ease both',
         }}>
-          <Avatar src={avatar || profile?.avatar} name={name || profile?.name} size={72} />
-          <h2 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 20, color: 'var(--text)', marginTop: 12 }}>
-            {name || profile?.name}
+          <Avatar src={avatar || profile?.avatar} name={name || profile?.name} size={90} />
+          <h2 style={{ fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 26, color: 'var(--text)', marginTop: 16, lineHeight: 1.2 }}>
+            {name || profile?.name || 'Your Name'}
           </h2>
+          <p style={{ fontFamily: 'var(--fb)', fontSize: 16, color: 'var(--g)', fontWeight: 600, marginTop: 4 }}>
+            {company || profile?.company || 'Your Company'}
+          </p>
           <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--muted)', marginTop: 2 }}>
             {profile?.email}
           </p>
 
           {profile?.id ? (
             <div 
-              onClick={() => setQrExpanded(true)}
+              onClick={() => !isOnboarding && setQrExpanded(true)}
               style={{
-                display: 'inline-block', padding: 16, background: 'var(--white)',
-                borderRadius: 16, border: '1px solid var(--s2)', marginTop: 20,
-                cursor: 'zoom-in'
+                display: 'inline-block', padding: 20, background: 'var(--white)',
+                borderRadius: 20, border: '1px solid var(--s2)', marginTop: 24,
+                cursor: isOnboarding ? 'default' : 'zoom-in'
               }}
             >
-              <QRCodeSVG value={profile.id} size={170} level="M" fgColor="#000000" bgColor="#ffffff" />
+              <QRCodeSVG value={profile.id} size={180} level="M" fgColor="#000000" bgColor="#ffffff" />
             </div>
           ) : (
             <div style={{ display: 'inline-block', padding: 16, marginTop: 20 }}>Generating QR...</div>
           )}
-          <p style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--muted)', marginTop: 12 }}>
-            Show this QR code for check-in
+          <p style={{ fontFamily: 'var(--fb)', fontSize: 12, color: 'var(--muted)', marginTop: 16, opacity: 0.8 }}>
+            ETHOS 2026 OFFICIAL ATTENDEE
           </p>
         </div>
 
+        {!isOnboarding && (
+          <button 
+            onClick={handleDownload}
+            style={{
+              width: '100%', padding: '12px', background: 'var(--s1)', border: '1px solid var(--border)',
+              borderRadius: 14, marginBottom: 24, fontFamily: 'var(--fb)', fontSize: 14,
+              fontWeight: 600, color: 'var(--text)', cursor: 'pointer', display: 'flex',
+              alignItems: 'center', justifyContent: 'center', gap: 8
+            }}
+          >
+            📥 Download ID Card
+          </button>
+        )}
+      </div>
+
+      <div style={{ maxWidth: 500, margin: '0 auto', padding: '0 16px 20px' }}>
         {/* Edit Form */}
         <div style={{
           background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 'var(--r)',

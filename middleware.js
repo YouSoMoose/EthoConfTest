@@ -39,8 +39,15 @@ export async function middleware(request) {
       return NextResponse.redirect(new URL('/app', request.url));
     }
   }
-
-
+  // Onboarding check for ALL logged-in users
+  const isPublicPath = pathname.startsWith('/api/auth') || pathname.startsWith('/_next') || pathname === '/favicon.ico' || pathname === '/' || pathname === '/login';
+  
+  if (token && !isPublicPath && pathname !== '/app/my-card') {
+    const profile = token.profile || {};
+    if (!profile.card_made) {
+      return NextResponse.redirect(new URL('/app/my-card?onboarding=1', request.url));
+    }
+  }
 
   return NextResponse.next();
 }
