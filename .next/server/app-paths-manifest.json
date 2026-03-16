@@ -1,3 +1,10 @@
 {
-  "/app/my-card/page": "app/app/my-card/page.js"
+  "/api/announcements/route": "app/api/announcements/route.js",
+  "/api/profile/route": "app/api/profile/route.js",
+  "/api/messages/route": "app/api/messages/route.js",
+  "/api/raffle/route": "app/api/raffle/route.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/api/users/route": "app/api/users/route.js",
+  "/app/my-card/page": "app/app/my-card/page.js",
+  "/admin/page": "app/admin/page.js"
 }

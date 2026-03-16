@@ -22,28 +22,28 @@ export default function MyCardPage() {
   const [phone, setPhone] = useState(profile?.phone || '');
   const [bio, setBio] = useState(profile?.bio || '');
   const [name, setName] = useState(profile?.name || '');
-  const [avatar, setAvatar] = useState(profile?.avatar || '');
-  const [company, setCompany] = useState(profile?.company || '');
-  const [linkedin, setLinkedin] = useState(profile?.linkedin || '');
   const [saving, setSaving] = useState(false);
   const [qrExpanded, setQrExpanded] = useState(false);
   const cardRef = useRef(null);
+  const initialized = useRef(false);
 
   useEffect(() => {
-    if (profile) {
-      setName(profile.name || '');
-      setAvatar(profile.avatar || '');
-      setCompany(profile.company || '');
-      setBio(profile.bio || '');
-      setPhone(profile.phone || '');
-      setLinkedin(profile.linkedin || '');
-      setResumeLink(profile.resume_link || '');
+    if (profile && !initialized.current) {
+      setName(prev => prev || profile.name || '');
+      setAvatar(prev => prev || profile.avatar || '');
+      setCompany(prev => prev || profile.company || '');
+      setBio(prev => prev || profile.bio || '');
+      setPhone(prev => prev || profile.phone || '');
+      setLinkedin(prev => prev || profile.linkedin || '');
+      setResumeLink(prev => prev || profile.resume_link || '');
+      initialized.current = true;
     }
   }, [profile]);
 
   const saveProfile = async () => {
     if (!name || !company) return toast.error('Name and Company are required');
     setSaving(true);
+    const t = toast.loading('Saving profile...');
     try {
       const res = await fetch('/api/profile', { 
         method: 'PUT', 
@@ -51,21 +51,26 @@ export default function MyCardPage() {
         body: JSON.stringify({ resume_link: resumeLink, phone, bio, name, avatar, company, linkedin }) 
       });
       
-      const data = await res.json();
+      let data = {};
+      try {
+        data = await res.json();
+      } catch (e) {
+        console.error('Json parse error:', e);
+      }
       
       if (res.ok) {
         await updateSession();
-        toast.success('Profile saved successfully');
+        toast.success('Profile saved successfully', { id: t });
         if (isOnboarding) {
           const level = data.access_level ?? profile?.access_level ?? 0;
           router.push(level >= 2 ? '/admin' : '/app');
         }
       } else {
-        toast.error(`Failed to save: ${data.error || 'Unknown error'}`);
-        console.error('Save error:', data);
+        toast.error(`Failed to save: ${data.error || res.statusText || 'Server Error'}`, { id: t });
+        console.error('Save error details:', data, res.status);
       }
     } catch (err) { 
-      toast.error('Network error'); 
+      toast.error('Network error - check your connection', { id: t }); 
       console.error('Network error:', err);
     }
     setSaving(false);
