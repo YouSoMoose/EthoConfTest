@@ -50,13 +50,24 @@ export default function MyCardPage() {
         headers: { 'Content-Type': 'application/json' }, 
         body: JSON.stringify({ resume_link: resumeLink, phone, bio, name, avatar, company, linkedin }) 
       });
+      
+      const data = await res.json();
+      
       if (res.ok) {
         await updateSession();
         toast.success('Profile saved successfully');
-        if (isOnboarding) router.push('/app');
+        if (isOnboarding) {
+          const level = data.access_level ?? profile?.access_level ?? 0;
+          router.push(level >= 2 ? '/admin' : '/app');
+        }
+      } else {
+        toast.error(`Failed to save: ${data.error || 'Unknown error'}`);
+        console.error('Save error:', data);
       }
-      else toast.error('Failed to save');
-    } catch { toast.error('Network error'); }
+    } catch (err) { 
+      toast.error('Network error'); 
+      console.error('Network error:', err);
+    }
     setSaving(false);
   };
 
