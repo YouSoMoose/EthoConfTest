@@ -47,8 +47,7 @@ export default function LandingPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [current, setCurrent] = useState(0);
-  const touchStartX = useRef(0);
-  const touchEndX = useRef(0);
+  const scrollRef = useRef(null);
   const isLoading = status === 'loading';
   const isAuthenticated = !!session?.profile;
 
@@ -69,29 +68,34 @@ export default function LandingPage() {
     }
   }, [session, router, isLoading]);
 
+  const onScroll = () => {
+    if (!scrollRef.current) return;
+    const scrollLeft = scrollRef.current.scrollLeft;
+    const width = scrollRef.current.offsetWidth;
+    const index = Math.round(scrollLeft / width);
+    if (index !== current && index >= 0 && index < slides.length) {
+      setCurrent(index);
+    }
+  };
+
   const finishCarousel = () => {
     localStorage.setItem('ethos_seen_carousel', '1');
     router.push('/login');
   };
 
-  const goTo = (i) => setCurrent(i);
-  const next = () => setCurrent(c => Math.min(c + 1, slides.length - 1));
-  const prev = () => setCurrent(c => Math.max(c - 1, 0));
-
-  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
-  const handleTouchEnd = (e) => {
-    touchEndX.current = e.changedTouches[0].clientX;
-    const diff = touchStartX.current - touchEndX.current;
-    if (Math.abs(diff) > 50) {
-      if (diff > 0) next();
-      else prev();
-    }
+  const goTo = (i) => {
+    if (!scrollRef.current) return;
+    scrollRef.current.scrollTo({
+      left: i * scrollRef.current.offsetWidth,
+      behavior: 'smooth'
+    });
   };
+
+  const next = () => goTo(Math.min(current + 1, slides.length - 1));
 
   const slide = slides[current];
   const isLast = current === slides.length - 1;
 
-  // Show a branded loading screen while session loads or user is authenticated
   if (isLoading || isAuthenticated) {
     return (
       <div style={{
@@ -123,15 +127,33 @@ export default function LandingPage() {
   return (
     <div style={{
       minHeight: '100dvh',
-      background: slide.gradient,
-      transition: 'background 0.6s ease',
       display: 'flex',
       flexDirection: 'column',
+      overflow: 'hidden',
+      position: 'relative'
     }}>
+      {/* Layered background for smooth transitions */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        zIndex: -1,
+      }}>
+        {slides.map((s, i) => (
+          <div key={i} style={{
+            position: 'absolute',
+            inset: 0,
+            background: s.gradient,
+            opacity: current === i ? 1 : 0,
+            transition: 'opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1)',
+          }} />
+        ))}
+      </div>
+
       {/* Top branding */}
       <div style={{
         padding: 'max(20px, env(safe-area-inset-top)) 24px 0',
         textAlign: 'center',
+        zIndex: 10
       }}>
         <div style={{
           width: 'clamp(48px, 10vh, 56px)', height: 'clamp(48px, 10vh, 56px)', borderRadius: 28,
@@ -154,107 +176,122 @@ export default function LandingPage() {
         }}>
           Ethos<br />
         </h1>
-        <p style={{
-          fontSize: 'clamp(12px, 2.5vh, 14px)', color: slide.textMode === 'light' ? 'rgba(255,255,255,.7)' : 'var(--sub)', marginTop: 8, lineHeight: 1.6,
-          fontFamily: 'var(--fb)', transition: 'color 0.6s ease'
-        }}>
-          SUSTAINABILITY
-        </p>
       </div>
 
       {/* Feature slider */}
-      <div style={{
-        flex: 1, display: 'flex', flexDirection: 'column',
-        justifyContent: 'center', alignItems: 'center',
-        padding: 'clamp(16px, 4vh, 32px) 24px 0',
-      }}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
+      <div 
+        ref={scrollRef}
+        onScroll={onScroll}
+        style={{
+          flex: 1,
+          display: 'flex',
+          overflowX: 'auto',
+          scrollSnapType: 'x mandatory',
+          scrollBehavior: 'smooth',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none', // Firefox
+          msOverflowStyle: 'none',  // IE/Edge
+        }}
       >
-        <div style={{
-          background: 'rgba(255,255,255,0.08)',
-          backdropFilter: 'blur(20px)',
-          borderRadius: 24,
-          border: '1px solid rgba(255,255,255,0.1)',
-          padding: 'clamp(20px, 5vh, 40px) 24px clamp(20px, 4vh, 36px)',
-          maxWidth: 360,
-          width: '100%',
-          textAlign: 'center',
-          minHeight: 'clamp(180px, 30vh, 220px)',
-          transition: 'all 0.3s ease',
-        }}>
-          <span style={{
-            fontSize: 'clamp(40px, 8vh, 52px)', display: 'block', marginBottom: 'clamp(10px, 2vh, 16px)',
-            animation: 'scaleIn 0.3s ease both',
-          }} key={current + 'icon'}>{slide.icon}</span>
-          <h2 style={{
-            fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 'clamp(20px, 4vh, 24px)',
-            color: slide.textMode === 'light' ? '#fff' : 'var(--text)', marginBottom: 10, transition: 'color 0.6s ease',
-            animation: 'fadeUp 0.3s ease both',
-          }} key={current + 'title'}>{slide.title}</h2>
-          <p style={{
-            fontFamily: 'var(--fb)', fontSize: 'clamp(13px, 2.5vh, 14px)',
-            color: slide.textMode === 'light' ? 'rgba(255,255,255,.65)' : 'var(--sub)', transition: 'color 0.6s ease',
-            lineHeight: 1.6,
-            animation: 'fadeUp 0.3s ease 0.05s both',
-          }} key={current + 'desc'}>{slide.desc}</p>
-        </div>
+        <style dangerouslySetInnerHTML={{ __html: `div::-webkit-scrollbar { display: none; }` }} />
+        
+        {slides.map((s, i) => (
+          <div key={i} style={{
+            minWidth: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            scrollSnapAlign: 'start',
+            padding: '24px',
+          }}>
+            <div style={{
+              background: 'rgba(255,255,255,0.08)',
+              backdropFilter: 'blur(20px)',
+              borderRadius: 32,
+              border: '1px solid rgba(255,255,255,0.1)',
+              padding: 'clamp(30px, 6vh, 48px) 32px',
+              maxWidth: 380,
+              width: '100%',
+              textAlign: 'center',
+              boxShadow: '0 20px 50px rgba(0,0,0,0.1)',
+            }}>
+              <span style={{
+                fontSize: 'clamp(48px, 10vh, 64px)', display: 'block', marginBottom: 'clamp(16px, 3vh, 24px)',
+                filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.1))'
+              }}>{s.icon}</span>
+              <h2 style={{
+                fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 'clamp(24px, 4.5vh, 28px)',
+                color: s.textMode === 'light' ? '#fff' : 'var(--text)', marginBottom: 12, transition: 'color 0.6s ease',
+              }}>{s.title}</h2>
+              <p style={{
+                fontFamily: 'var(--fb)', fontSize: 'clamp(14px, 2.5vh, 15px)',
+                color: s.textMode === 'light' ? 'rgba(255,255,255,.7)' : 'var(--sub)', transition: 'color 0.6s ease',
+                lineHeight: 1.6,
+              }}>{s.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
 
+      {/* Dots and CTA */}
+      <div style={{
+        padding: '0 24px max(24px, env(safe-area-inset-bottom))',
+        maxWidth: 400, width: '100%', margin: '0 auto',
+        zIndex: 10
+      }}>
         {/* Dots */}
         <div style={{
           display: 'flex', gap: 8, justifyContent: 'center',
-          marginTop: 24,
+          marginBottom: 32,
         }}>
           {slides.map((_, i) => (
             <button key={i} onClick={() => goTo(i)} style={{
-              width: current === i ? 24 : 8, height: 8,
+              width: current === i ? 28 : 8, height: 8,
               borderRadius: 4,
               background: current === i
                 ? (slide.textMode === 'light' ? '#fff' : 'var(--text)')
-                : (slide.textMode === 'light' ? 'rgba(255,255,255,.3)' : 'rgba(65, 52, 41, 0.2)'),
+                : (slide.textMode === 'light' ? 'rgba(255,255,255,.3)' : 'rgba(0,0,0,0.1)'),
               border: 'none', cursor: 'pointer', padding: 0,
-              transition: 'all 0.3s ease',
+              transition: 'all 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
             }} />
           ))}
         </div>
-      </div>
 
-      {/* Bottom CTA */}
-      <div style={{
-        padding: '24px 24px max(24px, env(safe-area-inset-bottom))',
-        maxWidth: 360, width: '100%', margin: '0 auto',
-      }}>
         {isLast ? (
           <button onClick={finishCarousel} style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            width: '100%', padding: '16px 24px',
+            width: '100%', padding: '18px 24px',
             background: slide.textMode === 'light' ? '#fff' : 'var(--text)',
             color: slide.textMode === 'light' ? '#1a1814' : '#fff',
-            borderRadius: 14, fontFamily: 'var(--fb)',
+            borderRadius: 18, fontFamily: 'var(--fb)',
             fontSize: 16, fontWeight: 700, cursor: 'pointer',
             border: 'none', transition: 'all 0.3s',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
           }}>
             Get Started 🚀
           </button>
         ) : (
           <div style={{ display: 'flex', gap: 12 }}>
             <button onClick={finishCarousel} style={{
-              flex: 1, padding: '14px 20px', textAlign: 'center',
+              flex: 1, padding: '16px 20px', textAlign: 'center',
               background: slide.textMode === 'light' ? 'rgba(255,255,255,0.1)' : 'transparent',
-              color: slide.textMode === 'light' ? 'rgba(255,255,255,.7)' : 'var(--sub)',
-              borderRadius: 14, fontFamily: 'var(--fb)',
-              fontSize: 14, fontWeight: 600, border: `1px solid ${slide.textMode === 'light' ? 'rgba(255,255,255,.15)' : 'rgba(65, 52, 41, 0.2)'}`, cursor: 'pointer',
+              color: slide.textMode === 'light' ? 'rgba(255,255,255,.8)' : 'var(--sub)',
+              borderRadius: 18, fontFamily: 'var(--fb)',
+              fontSize: 15, fontWeight: 600, border: `1px solid ${slide.textMode === 'light' ? 'rgba(255,255,255,.15)' : 'rgba(0,0,0,0.1)'}`, cursor: 'pointer',
               transition: 'all 0.3s ease'
             }}>
               Skip
             </button>
             <button onClick={next} style={{
-              flex: 2, padding: '14px 20px',
+              flex: 2, padding: '16px 20px',
               background: slide.textMode === 'light' ? 'rgba(255,255,255,0.2)' : 'var(--text)',
-              color: slide.textMode === 'light' ? '#fff' : '#fff',
-              borderRadius: 14, fontFamily: 'var(--fb)',
-              fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer',
-              transition: 'all 0.3s ease'
+              color: '#fff',
+              borderRadius: 18, fontFamily: 'var(--fb)',
+              fontSize: 15, fontWeight: 700, border: 'none', cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
             }}>
               Next →
             </button>
