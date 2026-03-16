@@ -140,7 +140,7 @@ export default function LandingPage() {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           margin: '0 auto clamp(10px, 2vh, 16px)', overflow: 'hidden', padding: 4
         }}>
-          <img src="/EthosLogoInsignia.png" alt="Ethos" style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { e.target.style.display='none'; e.target.parentNode.innerHTML = '<span style="font-size: 28px; font-weight: 800; color: var(--text); font-family: var(--fh)">e</span>'; }} />
+          <img src="/assets/ethos-logo-insignia.png" alt="Ethos" style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span style="font-size: 28px; font-weight: 800; color: var(--text); font-family: var(--fh)">e</span>'; }} />
         </div>
         <p style={{
           fontSize: 'clamp(10px, 2vh, 11px)', fontWeight: 700, letterSpacing: '.2em',
@@ -209,7 +209,7 @@ export default function LandingPage() {
             <button key={i} onClick={() => goTo(i)} style={{
               width: current === i ? 24 : 8, height: 8,
               borderRadius: 4,
-              background: current === i 
+              background: current === i
                 ? (slide.textMode === 'light' ? '#fff' : 'var(--text)')
                 : (slide.textMode === 'light' ? 'rgba(255,255,255,.3)' : 'rgba(65, 52, 41, 0.2)'),
               border: 'none', cursor: 'pointer', padding: 0,
