@@ -17,6 +17,8 @@ export default function MyCardPage() {
   const [bio, setBio] = useState(profile?.bio || '');
   const [name, setName] = useState(profile?.name || '');
   const [avatar, setAvatar] = useState(profile?.avatar || '');
+  const [company, setCompany] = useState(profile?.company || '');
+  const [linkedin, setLinkedin] = useState(profile?.linkedin || '');
   const [saving, setSaving] = useState(false);
   const [qrExpanded, setQrExpanded] = useState(false);
 
@@ -26,7 +28,7 @@ export default function MyCardPage() {
       const res = await fetch('/api/profile', { 
         method: 'PUT', 
         headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify({ resume_link: resumeLink, phone, bio, name, avatar }) 
+        body: JSON.stringify({ resume_link: resumeLink, phone, bio, name, avatar, company, linkedin }) 
       });
       if (res.ok) toast.success('Profile saved successfully');
       else toast.error('Failed to save');
@@ -141,6 +143,40 @@ export default function MyCardPage() {
                 width: '100%', background: 'var(--white)', border: '1.5px solid var(--border)',
                 borderRadius: 10, padding: '11px 14px', fontSize: 14,
                 fontFamily: 'var(--fb)', color: 'var(--text)', outline: 'none', resize: 'none'
+              }}
+            />
+          </div>
+
+          <div>
+            <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 15, color: 'var(--text)', marginBottom: 6 }}>
+              🏢 Company
+            </h3>
+            <input
+              type="text"
+              value={company}
+              onChange={e => setCompany(e.target.value)}
+              placeholder="Where do you work?"
+              style={{
+                width: '100%', background: 'var(--white)', border: '1.5px solid var(--border)',
+                borderRadius: 10, padding: '11px 14px', fontSize: 14,
+                fontFamily: 'var(--fb)', color: 'var(--text)', outline: 'none',
+              }}
+            />
+          </div>
+
+          <div>
+            <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 15, color: 'var(--text)', marginBottom: 6 }}>
+              🔗 LinkedIn URL
+            </h3>
+            <input
+              type="url"
+              value={linkedin}
+              onChange={e => setLinkedin(e.target.value)}
+              placeholder="https://linkedin.com/in/username"
+              style={{
+                width: '100%', background: 'var(--white)', border: '1.5px solid var(--border)',
+                borderRadius: 10, padding: '11px 14px', fontSize: 14,
+                fontFamily: 'var(--fb)', color: 'var(--text)', outline: 'none',
               }}
             />
           </div>

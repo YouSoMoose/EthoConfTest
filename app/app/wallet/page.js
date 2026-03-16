@@ -64,7 +64,7 @@ export default function WalletPage() {
                         {p.name || 'Anonymous User'}
                       </h3>
                       <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--sub)', margin: '2px 0 0', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                        {p.email}
+                        {p.company ? `${p.company} • ` : ''}{p.email}
                       </p>
                     </div>
                     <button onClick={(e) => { e.stopPropagation(); remove(item.id); }} style={{
@@ -98,6 +98,18 @@ export default function WalletPage() {
               <p style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'var(--sub)', margin: '0 0 16px' }}>
                 📞 {activeProfile.phone}
               </p>
+            )}
+            
+            {activeProfile.company && (
+              <p style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'var(--sub)', margin: '0 0 16px' }}>
+                🏢 {activeProfile.company}
+              </p>
+            )}
+
+            {activeProfile.linkedin && (
+              <a href={activeProfile.linkedin} target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'var(--accent)', margin: '0 0 16px', display: 'block', textDecoration: 'none' }}>
+                🔗 LinkedIn Profile
+              </a>
             )}
             
             {activeProfile.bio && (

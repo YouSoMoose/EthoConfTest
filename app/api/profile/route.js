@@ -34,7 +34,9 @@ export async function PUT(request) {
       phone: body.phone,
       bio: body.bio,
       name: body.name,
-      avatar: body.avatar
+      avatar: body.avatar,
+      company: body.company,
+      linkedin: body.linkedin
     })
     .eq('id', session.profile.id)
     .select()
