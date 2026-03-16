@@ -10,8 +10,9 @@ import Topbar from '@/components/Topbar';
 import Avatar from '@/components/Avatar';
 import Btn from '@/components/Btn';
 import Modal from '@/components/Modal';
+import { Suspense } from 'react';
 
-export default function MyCardPage() {
+function MyCardContent() {
   const { data: session, update: updateSession } = useSession();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -22,6 +23,9 @@ export default function MyCardPage() {
   const [phone, setPhone] = useState(profile?.phone || '');
   const [bio, setBio] = useState(profile?.bio || '');
   const [name, setName] = useState(profile?.name || '');
+  const [avatar, setAvatar] = useState(profile?.avatar || '');
+  const [company, setCompany] = useState(profile?.company || '');
+  const [linkedin, setLinkedin] = useState(profile?.linkedin || '');
   const [saving, setSaving] = useState(false);
   const [qrExpanded, setQrExpanded] = useState(false);
   const cardRef = useRef(null);
@@ -308,5 +312,13 @@ export default function MyCardPage() {
         </div>
       </Modal>
     </div>
+  );
+}
+
+export default function MyCardPage() {
+  return (
+    <Suspense fallback={null}>
+      <MyCardContent />
+    </Suspense>
   );
 }

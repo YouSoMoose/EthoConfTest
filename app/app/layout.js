@@ -3,8 +3,9 @@
 import BottomNav from '@/components/BottomNav';
 import PageTransition from '@/components/PageTransition';
 import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
-export default function AttendeeLayout({ children }) {
+function AttendeeLayoutContent({ children }) {
   const searchParams = useSearchParams();
   const isOnboarding = searchParams.get('onboarding') === '1';
 
@@ -13,5 +14,13 @@ export default function AttendeeLayout({ children }) {
       <PageTransition>{children}</PageTransition>
       {!isOnboarding && <BottomNav />}
     </div>
+  );
+}
+
+export default function AttendeeLayout({ children }) {
+  return (
+    <Suspense fallback={null}>
+      <AttendeeLayoutContent>{children}</AttendeeLayoutContent>
+    </Suspense>
   );
 }
