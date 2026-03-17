@@ -5,21 +5,21 @@
 
 :root {
   /* Attendee / Light Theme */
-  --bg: #FFFDF9; /* Brighter, cleaner paper feel */
-  --white: #FFFFFF; 
-  --s1: #F5EFEB; /* Slightly punchier beige */
-  --s2: #FFE2D6; 
-  --border: #E8E2DA;
-  --g: #413429; /* High visibility coffee for icons/labels */
-  --gl: #FDF9F4;
-  --gb: #F5EEE6;
-  --hero: linear-gradient(135deg, #514033 0%, #413429 100%);
+  --bg: #FFFFFF; /* Pure white for maximum brightness */
+  --white: #FFFFFF;
+  --s1: #FAF7F2; /* Subtle paper layer */
+  --s2: #FFEBE3; /* Brighter peach */
+  --border: #F0E9E0;
+  --g: #413429; /* High visibility coffee */
+  --gl: #FFF8F4;
+  --gb: #FAF3EF;
+  --hero: linear-gradient(135deg, #FCBD9D 0%, #D4CCC4 100%);
   --warm: #FCBD9D;
   --warm-dim: #FFE2D6;
-  --warm-border: #D4CCC4;
-  --text: #2D241E;
-  --sub: #5A4D43; /* Darkened for accessibility */
-  --muted: #8E8278; /* Darkened for accessibility */
+  --warm-border: #E8E2DA;
+  --text: #1A1814; /* Darker for better contrast */
+  --sub: #4A3F35; /* Darker for better contrast */
+  --muted: #7D6F63; /* Darker for better contrast */
   --r: 14px;
   --fh: 'Fraunces', Georgia, serif;
   --fb: 'DM Sans', system-ui, sans-serif;
