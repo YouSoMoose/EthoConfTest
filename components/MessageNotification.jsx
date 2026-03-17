@@ -26,7 +26,8 @@ export default function MessageNotification() {
         const res = await fetch('/api/messages?unread=true&latest=true');
         if (res.ok) {
           const msg = await res.json();
-          if (msg && msg.id !== lastNotifiedId) {
+          // Don't notify if the message is from ourselves, or if it's the exact same message
+          if (msg && msg.id !== lastNotifiedId && msg.sender_id !== session.profile.id) {
             setLastNotifiedId(msg.id);
             setActiveMsg(msg);
             setExiting(false);
@@ -34,7 +35,7 @@ export default function MessageNotification() {
             setTimeout(() => {
               setExiting(true);
               setTimeout(() => setActiveMsg(null), 400);
-            }, 6000);
+            }, 6000); // 6s auto-dismiss
           }
         }
       } catch {}

@@ -428,26 +428,28 @@ function AdminIDCardsContent() {
       `}</style>
 
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 32 }}>
-          <Link href="/admin" style={{
-            textDecoration: 'none', color: 'var(--asub)', 
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            width: 42, height: 42, borderRadius: 12, background: 'var(--as1)',
-            border: '1px solid var(--aborder)', transition: 'all 0.2s'
-          }}>
-            <ChevronLeft size={20} />
-          </Link>
-          <div>
-            <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 800, fontSize: 28, color: 'var(--atext)', margin: 0, letterSpacing: '-0.02em' }}>
-              ID Card Designer
-            </h2>
-            <p style={{ margin: 0, fontSize: 13, color: 'var(--asub)', fontWeight: 500 }}>Global Conference Asset Management</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, marginBottom: 32 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+            <Link href="/admin" style={{
+              textDecoration: 'none', color: 'var(--asub)', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: 42, height: 42, borderRadius: 12, background: 'var(--as1)',
+              border: '1px solid var(--aborder)', transition: 'all 0.2s'
+            }}>
+              <ChevronLeft size={20} />
+            </Link>
+            <div>
+              <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 800, fontSize: 28, color: 'var(--atext)', margin: 0, letterSpacing: '-0.02em' }}>
+                ID Card Designer
+              </h2>
+              <p style={{ margin: 0, fontSize: 13, color: 'var(--asub)', fontWeight: 500 }}>Global Conference Asset Management</p>
+            </div>
           </div>
           
-          <div style={{ flex: 1, minWidth: 300, position: 'relative' }}>
-            <div style={{ position: 'relative', width: '100%' }}>
+          <div style={{ width: '100%', position: 'relative' }}>
+            <div style={{ position: 'relative', width: '100%', maxWidth: 640 }}>
               <div style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'var(--accent)', opacity: 0.8, pointerEvents: 'none' }}>
-                <Search size={18} />
+                <Search size={22} />
               </div>
               <input
                 type="text"
@@ -456,27 +458,25 @@ function AdminIDCardsContent() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 style={{
                   width: '100%',
-                  background: 'var(--as1)',
+                  background: 'var(--white)',
                   border: '1.5px solid var(--aborder)',
                   borderRadius: 16,
-                  padding: '14px 20px 14px 48px',
-                  fontSize: 14,
+                  padding: '16px 20px 16px 54px',
+                  fontSize: 16,
                   fontFamily: 'var(--fh)',
                   color: 'var(--atext)',
                   outline: 'none',
                   transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                  boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)',
-                  fontWeight: 500
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.03), inset 0 2px 4px rgba(0,0,0,0.01)',
+                  fontWeight: 600
                 }}
                 onFocus={e => {
                   e.target.style.borderColor = 'var(--accent)';
-                  e.target.style.boxShadow = '0 0 0 4px color-mix(in srgb, var(--accent) 15%, transparent), inset 0 2px 4px rgba(0,0,0,0.02)';
-                  e.target.style.background = 'var(--white)';
+                  e.target.style.boxShadow = '0 0 0 4px color-mix(in srgb, var(--accent) 15%, transparent), 0 4px 12px rgba(0,0,0,0.03)';
                 }}
                 onBlur={e => {
                   e.target.style.borderColor = 'var(--aborder)';
-                  e.target.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.02)';
-                  e.target.style.background = 'var(--as1)';
+                  e.target.style.boxShadow = '0 4px 12px rgba(0,0,0,0.03), inset 0 2px 4px rgba(0,0,0,0.01)';
                 }}
               />
               {searchTerm && (
@@ -484,11 +484,13 @@ function AdminIDCardsContent() {
                   onClick={() => setSearchTerm('')}
                   style={{
                     position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
-                    background: 'var(--as2)', border: 'none', borderRadius: 8, padding: 6,
+                    background: 'var(--as2)', border: 'none', borderRadius: 10, padding: 8,
                     cursor: 'pointer', color: 'var(--asub)', display: 'flex', alignItems: 'center', transition: 'all 0.2s'
                   }}
+                  onMouseOver={e => e.currentTarget.style.color = 'var(--accent)'}
+                  onMouseOut={e => e.currentTarget.style.color = 'var(--asub)'}
                 >
-                  <X size={14} />
+                  <X size={16} />
                 </button>
               )}
             </div>

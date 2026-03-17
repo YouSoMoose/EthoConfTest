@@ -47,7 +47,18 @@ export default function AdminMessagesPage() {
   useEffect(() => {
     // Scroll to bottom when messages or selected chat changes
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, selectedUserId]);
+
+    if (session?.profile?.id) {
+      const hasUnread = messages.some(m => !m.read && m.recipient_id === session.profile.id);
+      if (hasUnread) {
+        fetch('/api/messages', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mark_read: true })
+        }).catch(() => {});
+      }
+    }
+  }, [messages, selectedUserId, session?.profile?.id]);
 
   const handleDelete = async (id) => {
     await fetch(`/api/messages?id=${id}`, { method: 'DELETE' });

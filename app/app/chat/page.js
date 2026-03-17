@@ -58,8 +58,18 @@ export default function ChatPage() {
   useEffect(() => { 
     if (messages.length > 0) {
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); 
+      
+      // Mark as read if any messages are unread and addressed to me
+      const hasUnread = messages.some(m => !m.read && m.recipient_id === myId);
+      if (hasUnread) {
+        fetch('/api/messages', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mark_read: true })
+        }).catch(() => {});
+      }
     }
-  }, [messages]);
+  }, [messages, myId]);
 
   const handleSend = async (e) => {
     e.preventDefault();

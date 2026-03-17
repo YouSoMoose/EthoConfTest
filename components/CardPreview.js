@@ -5,10 +5,10 @@ import Avatar from '@/components/Avatar';
 import { QRCodeSVG } from 'qrcode.react';
 
 export const DEFAULT_STYLE = {
-  nameSize: 22, nameX: 0, nameY: 0, nameVisible: true,
-  roleSize: 14, roleX: 0, roleY: 0, roleVisible: true,
-  companySize: 13, companyX: 0, companyY: 0, companyVisible: true,
-  emailSize: 11, emailX: 0, emailY: 0, emailVisible: true,
+  nameSize: 18, nameX: 0, nameY: 0, nameVisible: true,
+  roleSize: 11, roleX: 0, roleY: 0, roleVisible: true,
+  companySize: 11, companyX: 0, companyY: 0, companyVisible: true,
+  emailSize: 9, emailX: 0, emailY: 0, emailVisible: true,
   qrSize: 64, qrX: 0, qrY: 0, qrVisible: true,
   logoSize: 28, logoX: 0, logoY: 0, logoVisible: true,
   accentColor: '#D49B7A',
@@ -26,7 +26,7 @@ export const CardPreview = memo(function CardPreview({ user = {}, style = DEFAUL
     border: '1px solid var(--border)',
     width: 320, // 9.5 equivalent
     height: 152, // 4.5 equivalent
-    padding: '16px 20px',
+    padding: '16px 24px', // Increased horizontal padding
     textAlign: 'left',
     boxShadow: '0 12px 32px rgba(0,0,0,0.06)',
     position: 'relative',
@@ -49,7 +49,7 @@ export const CardPreview = memo(function CardPreview({ user = {}, style = DEFAUL
       }} />
 
       {/* Text Info Section */}
-      <div style={{ flex: 1, minWidth: 0, zIndex: 1, position: 'relative' }}>
+      <div style={{ flex: 1, minWidth: 0, zIndex: 1, position: 'relative', paddingRight: 8 }}>
         {s.logoVisible && (
           <div ref={el => domRefs.current.logoWrap = el} style={{
             display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6,
@@ -66,9 +66,9 @@ export const CardPreview = memo(function CardPreview({ user = {}, style = DEFAUL
 
         {s.nameVisible && (
           <h2 ref={el => domRefs.current.name = el} style={{
-            fontFamily: 'var(--fh)', fontWeight: 800, fontSize: s.nameSize || 20,
-            color: s.textColor, margin: 0, lineHeight: 1,
-            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+            fontFamily: 'var(--fh)', fontWeight: 800, fontSize: s.nameSize || 18,
+            color: s.textColor, margin: 0, lineHeight: 1.1,
+            whiteSpace: 'normal', wordBreak: 'break-word',
             transform: `translate(${s.nameX || 0}px, ${s.nameY || 0}px)`,
           }}>
             {user?.name || 'Your Name'}
@@ -77,9 +77,10 @@ export const CardPreview = memo(function CardPreview({ user = {}, style = DEFAUL
 
         {s.roleVisible && (
           <p ref={el => domRefs.current.role = el} style={{
-            fontFamily: 'var(--fb)', fontWeight: 700, fontSize: s.roleSize || 13,
-            color: s.accentColor, margin: '2px 0 4px',
+            fontFamily: 'var(--fb)', fontWeight: 700, fontSize: s.roleSize || 11,
+            color: s.accentColor, margin: '4px 0 4px',
             textTransform: 'uppercase', letterSpacing: '0.8px',
+            lineHeight: 1.2,
             transform: `translate(${s.roleX || 0}px, ${s.roleY || 0}px)`,
           }}>
             {user?.role || (user?.access_level === 3 ? 'Super Admin' : user?.access_level === 2 ? 'Event Staff' : 'Attendee')}
@@ -88,8 +89,9 @@ export const CardPreview = memo(function CardPreview({ user = {}, style = DEFAUL
 
         {s.companyVisible && (
           <p ref={el => domRefs.current.company = el} style={{
-            fontFamily: 'var(--fb)', fontWeight: 600, fontSize: s.companySize || 12,
+            fontFamily: 'var(--fb)', fontWeight: 600, fontSize: s.companySize || 11,
             color: s.subColor, margin: 0,
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
             transform: `translate(${s.companyX || 0}px, ${s.companyY || 0}px)`,
           }}>
             {user?.company || 'Ethos Attendee'}
@@ -98,8 +100,9 @@ export const CardPreview = memo(function CardPreview({ user = {}, style = DEFAUL
 
         {s.emailVisible && (
           <p ref={el => domRefs.current.email = el} style={{
-            fontFamily: 'var(--fb)', fontSize: s.emailSize || 10, color: 'var(--muted)',
+            fontFamily: 'var(--fb)', fontSize: s.emailSize || 9, color: 'var(--muted)',
             marginTop: 4, margin: 0, opacity: 0.8,
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
             transform: `translate(${s.emailX || 0}px, ${s.emailY || 0}px)`,
           }}>
             {user?.email}
