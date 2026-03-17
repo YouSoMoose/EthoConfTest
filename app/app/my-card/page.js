@@ -413,8 +413,8 @@ function MyCardContent() {
                     <label className="section-label">{label}</label>
                     <div style={{ 
                       display: 'flex', alignItems: 'center', gap: 12, 
-                      background: 'var(--as1)', padding: '0 16px', borderRadius: 16,
-                      border: 'none', transition: 'all 0.2s'
+                      background: '#f8f5f2', padding: '0 16px', borderRadius: 16,
+                      border: '1px solid var(--border)', transition: 'all 0.2s'
                     }}>
                       {icon}
                       <input
@@ -440,7 +440,7 @@ function MyCardContent() {
                     onChange={e => setBio(e.target.value)}
                     placeholder="Tell us about yourself..."
                     style={{ 
-                      width: '100%', background: 'var(--as1)', border: 'none', 
+                      width: '100%', background: '#f8f5f2', border: '1px solid var(--border)', 
                       padding: '16px', fontSize: 15, outline: 'none', fontWeight: 500,
                       borderRadius: 16, minHeight: 120, fontFamily: 'inherit', resize: 'none',
                       color: 'var(--text)'
@@ -453,8 +453,8 @@ function MyCardContent() {
                   <label className="section-label">Email Address</label>
                   <div style={{ 
                     display: 'flex', alignItems: 'center', gap: 12, 
-                    background: 'var(--as1)', padding: '0 16px', borderRadius: 16, 
-                    opacity: 0.6 
+                    background: '#f8f5f2', padding: '0 16px', borderRadius: 16, 
+                    border: '1px solid var(--border)', opacity: 0.6 
                   }}>
                     <Mail size={18} color="var(--muted)" />
                     <input
