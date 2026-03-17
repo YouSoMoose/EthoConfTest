@@ -34,12 +34,12 @@ export default function BottomNav({ items, admin }) {
     })();
   }, [session?.profile?.id, admin, realtimeTrigger]);
 
-  // Supabase Realtime — bump trigger on new messages
+  // Supabase Realtime — bump trigger on new messages or read updates
   useEffect(() => {
     if (admin) return;
     const channel = supabase
       .channel('unread-badge')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => {
         setRealtimeTrigger(n => n + 1);
       })
       .subscribe();

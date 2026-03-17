@@ -96,15 +96,33 @@ export default function AttendeeDashboard() {
   const cardPreviewRef = useRef(null);
   const notesCardRef = useRef(null);
 
+  const [realtimeTrigger, setRealtimeTrigger] = useState(0);
+
   useEffect(() => {
-    Promise.all([
-      fetch('/api/schedule').then(r => r.json()),
-      fetch('/api/announcements').then(r => r.json()),
-    ]).then(([sched, ann]) => {
+    const fetchSched = fetch('/api/schedule').then(r => r.json());
+    const fetchAnn = fetch('/api/announcements').then(r => r.json());
+    
+    Promise.all([fetchSched, fetchAnn]).then(([sched, ann]) => {
       setSchedule(sched || []);
       setAnnouncements(ann || []);
       setLoading(false);
     }).catch(() => setLoading(false));
+  }, [realtimeTrigger]);
+
+  // Listen for Realtime inserts and trigger a refetch
+  useEffect(() => {
+    const channel = import('@/lib/supabase').then(({ supabase }) => {
+      return supabase
+        .channel('homepage-announcements')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, () => {
+          setRealtimeTrigger(n => n + 1);
+        })
+        .subscribe();
+    });
+
+    return () => {
+      channel.then(c => import('@/lib/supabase').then(({ supabase }) => supabase.removeChannel(c)));
+    };
   }, []);
 
   useEffect(() => {

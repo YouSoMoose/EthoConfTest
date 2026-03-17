@@ -6,15 +6,17 @@ import { supabase } from '@/lib/supabase';
 
 const DISMISSED_KEY = 'ethos_dismissed_announcements';
 
-function getDismissed() {
-  try { return JSON.parse(localStorage.getItem(DISMISSED_KEY)) || []; } catch { return []; }
+function getDismissed(uid) {
+  if (!uid) return [];
+  try { return JSON.parse(localStorage.getItem(`ethos_dismissed_${uid}`)) || []; } catch { return []; }
 }
 
-function addDismissed(id) {
-  const list = getDismissed();
+function addDismissed(uid, id) {
+  if (!uid) return;
+  const list = getDismissed(uid);
   if (!list.includes(id)) {
     list.push(id);
-    localStorage.setItem(DISMISSED_KEY, JSON.stringify(list));
+    localStorage.setItem(`ethos_dismissed_${uid}`, JSON.stringify(list));
   }
 }
 
@@ -30,10 +32,10 @@ export default function AnnouncementBanner() {
     if (!session?.profile) return;
     (async () => {
       try {
-        const res = await fetch('/api/announcements');
+        const res = await fetch(`/api/announcements?_t=${Date.now()}`);
         if (res.ok) {
           const data = await res.json();
-          const dismissed = getDismissed();
+          const dismissed = getDismissed(session.profile.id);
           const fresh = (data || []).filter(a => !dismissed.includes(a.id));
           setAnnouncements(fresh);
           setVisible(prev => {
@@ -60,13 +62,14 @@ export default function AnnouncementBanner() {
   const dismiss = (id) => {
     setExiting(e => [...e, id]);
     setTimeout(() => {
-      addDismissed(id);
+      addDismissed(session?.profile?.id, id);
       setVisible(v => v.filter(x => x !== id));
       setExiting(e => e.filter(x => x !== id));
     }, 300);
   };
 
-  const activeAnnouncements = announcements.filter(a => visible.includes(a.id));
+  // Only show 1 at a time to completely eliminate screen spam on fresh login
+  const activeAnnouncements = announcements.filter(a => visible.includes(a.id)).slice(0, 1);
 
   if (!session?.profile || activeAnnouncements.length === 0) return null;
 

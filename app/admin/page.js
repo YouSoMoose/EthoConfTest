@@ -19,6 +19,8 @@ export default function AdminDashboard() {
   const [annContent, setAnnContent] = useState('');
   const [sending, setSending] = useState(false);
 
+  const [realtimeTrigger, setRealtimeTrigger] = useState(0);
+
   useEffect(() => {
     if (level === 2) { setLoading(false); return; }
     Promise.all([
@@ -37,29 +39,54 @@ export default function AdminDashboard() {
       });
       setLoading(false);
     }).catch(() => setLoading(false));
-  }, []);
+  }, [level, realtimeTrigger]);
 
-  const sendAnnouncement = async () => {
+  useEffect(() => {
+    if (level === 2) return;
+    const channel = import('@/lib/supabase').then(({ supabase }) => {
+      return supabase
+        .channel('admin-dashboard')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => {
+          setRealtimeTrigger(n => n + 1);
+        })
+        .subscribe();
+    });
+    return () => {
+      channel.then(c => import('@/lib/supabase').then(({ supabase }) => supabase.removeChannel(c)));
+    };
+  }, [level]);
+
+  const sendAnnouncement = () => {
     if (!annTitle.trim()) { toast.error('Title is required'); return; }
-    setSending(true);
-    try {
-      const res = await fetch('/api/announcements', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: annTitle.trim(), content: annContent.trim() }),
-      });
+    
+    // Optimistic UI update: instantly close modal
+    const title = annTitle.trim();
+    const content = annContent.trim();
+    setAnnTitle(''); 
+    setAnnContent('');
+    setShowAnnounce(false);
+    
+    // Background fetch
+    const p = fetch('/api/announcements', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, content }),
+    }).then(async (res) => {
       if (res.ok) {
-        toast.success('📢 Announcement sent to all users!');
         const newAnn = await res.json();
         setAnnouncements(prev => [newAnn, ...prev]);
-        setAnnTitle(''); setAnnContent('');
-        setShowAnnounce(false);
+        return "Sent successfully";
       } else {
         const err = await res.json();
-        toast.error(err.error || 'Failed to send');
+        throw new Error(err.error || 'Failed to send');
       }
-    } catch { toast.error('Network error'); }
-    setSending(false);
+    });
+
+    toast.promise(p, {
+      loading: 'Sending announcement...',
+      success: '📢 Announcement sent to all users!',
+      error: err => err.message
+    });
   };
 
   const deleteAnnouncement = async (id) => {

@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   const url = new URL(request.url);
   const fetchAll = url.searchParams.get('all') === 'true';
@@ -13,9 +15,9 @@ export async function GET(request) {
     .order('created_at', { ascending: false });
 
   if (!fetchAll) {
-    // Standard view: only last 24 hours, limit 5
-    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    query = query.gte('created_at', since).limit(5);
+    // Standard view: last 3 days, limit 10
+    const since = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
+    query = query.gte('created_at', since).limit(10);
   } else {
     // Admin view: check session
     const session = await getServerSession(authOptions);

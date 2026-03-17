@@ -44,15 +44,25 @@ export default function MessageNotification() {
 
   // Supabase Realtime — listen for ALL new messages (no filter = works for everyone)
   useEffect(() => {
+    if (!session?.profile) return;
+
     const channel = supabase
       .channel('msg-notif-global')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => {
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
+        const newMsg = payload.new;
+        
+        // Ignore if we sent it
+        if (newMsg.sender_id === session.profile.id) return;
+        
+        // If we're a regular attendee, ignore if it's not explicitly to us
+        if (session.profile.access_level < 2 && newMsg.recipient_id !== session.profile.id) return;
+
         setRealtimeTrigger(n => n + 1);
       })
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, []);
+  }, [session]);
 
   if (!session?.profile || !activeMsg) return null;
 
