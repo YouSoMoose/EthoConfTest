@@ -385,11 +385,11 @@ function MyCardContent() {
                  <UserIcon size={22} color="var(--g)" /> Edit Your Info
                </h3>
                
-               <div style={{ position: 'relative', alignSelf: 'center', marginBottom: 10 }}>
-                 <Avatar src={avatar} name={name} size={110} />
+               <div style={{ position: 'relative', alignSelf: 'center', marginBottom: 10, width: 'clamp(80px, 25vw, 110px)', height: 'clamp(80px, 25vw, 110px)' }}>
+                 <Avatar src={avatar} name={name} size="100%" />
                  <label style={{
                    position: 'absolute', bottom: 0, right: 0,
-                   background: 'var(--g)', color: '#fff', width: 36, height: 36,
+                   background: 'var(--g)', color: '#fff', width: 'clamp(32px, 8vw, 36px)', height: 'clamp(32px, 8vw, 36px)',
                    borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
                    cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.2)', border: '3px solid #fff'
                  }}>
@@ -474,11 +474,20 @@ function MyCardContent() {
 
       <Suspense fallback={null}>
         <Modal center open={qrExpanded} onClose={() => setQrExpanded(false)}>
-          <div style={{ padding: 40, background: '#fff', borderRadius: 32, textAlign: 'center', outline: 'none' }} className="page-enter">
-            <div style={{ padding: 16, background: '#fff', border: '2px solid var(--border)', borderRadius: 24, display: 'inline-block', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}>
-              <QRCodeSVG value={profile.id} size={300} level="H" fgColor="#413429" bgColor="#ffffff" />
+          <div style={{ padding: 'clamp(20px, 5vw, 40px)', background: '#fff', borderRadius: 32, textAlign: 'center', outline: 'none', maxWidth: '90vw' }} className="page-enter">
+            <div style={{ padding: 16, background: '#fff', border: '2px solid var(--border)', borderRadius: 24, display: 'inline-block', boxShadow: '0 10px 40px rgba(0,0,0,0.1)', maxWidth: '100%' }}>
+              <div style={{ width: 'clamp(200px, 80vw, 400px)', height: 'clamp(200px, 80vw, 400px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <QRCodeSVG 
+                  value={profile.id} 
+                  size={500} 
+                  level="H" 
+                  fgColor="#413429" 
+                  bgColor="#ffffff" 
+                  style={{ width: '100%', height: '100%' }}
+                />
+              </div>
             </div>
-            <h2 style={{ marginTop: 24, fontSize: 24, fontWeight: 800 }}>{name}</h2>
+            <h2 style={{ marginTop: 24, fontSize: 'clamp(20px, 5vw, 28px)', fontWeight: 800 }}>{name}</h2>
             <p style={{ color: 'var(--muted)', fontSize: 14 }}>Tap anywhere to close</p>
           </div>
         </Modal>
