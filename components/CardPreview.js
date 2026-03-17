@@ -23,9 +23,9 @@ export const CardPreview = memo(function CardPreview({ user, style = DEFAULT_STY
   const containerStyle = fullSize
     ? {
       background: '#ffffff', borderRadius: 24, border: '1px solid var(--border)',
-      width: 300, height: 430, padding: 28, textAlign: 'center',
+      width: 300, minHeight: 430, padding: '28px 28px 36px', textAlign: 'center',
       boxShadow: '0 20px 60px rgba(0,0,0,0.08)',
-      position: 'relative', overflow: 'hidden', flexShrink: 0,
+      position: 'relative', flexShrink: 0,
       animation: 'scaleIn 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67) both'
     }
     : {
