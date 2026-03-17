@@ -35,9 +35,9 @@
   --ablue: #6aabf7;
   --apurple: #b987f5;
   --ayellow: #f5c842;
-  --atext: #1A1814; /* Darker for visibility */
-  --asub: #413429; /* Darker for visibility */
-  --amuted: #7D6F63;
+  --atext: #eeece8; /* Restored for dark bg visibility */
+  --asub: #9999aa; /* Restored for dark bg visibility */
+  --amuted: #5a5a6a;
   --fhs: 'Syne', sans-serif;
   --liquid: cubic-bezier(0.34, 1.56, 0.64, 1);
 }

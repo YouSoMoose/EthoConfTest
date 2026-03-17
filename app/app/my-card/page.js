@@ -277,6 +277,7 @@ function MyCardContent() {
   const searchParams = useSearchParams();
   const isOnboarding = searchParams.get('onboarding') === '1';
 
+  const [isEditing, setIsEditing] = useState(isOnboarding);
   const [name, setName] = useState('');
   const [avatar, setAvatar] = useState('');
   const [phone, setPhone] = useState('');
@@ -308,6 +309,17 @@ function MyCardContent() {
     }
   }, [profile]);
 
+  const handlePhone = (e) => {
+    let val = e.target.value.replace(/\D/g, '');
+    if (val.length > 10) val = val.slice(0, 10);
+    // Simple auto-format (XXX) XXX-XXXX
+    let formatted = val;
+    if (val.length > 6) formatted = `(${val.slice(0,3)}) ${val.slice(3,6)}-${val.slice(6)}`;
+    else if (val.length > 3) formatted = `(${val.slice(0,3)}) ${val.slice(3)}`;
+    else if (val.length > 0) formatted = `(${val}`;
+    setPhone(formatted);
+  };
+
   const handleUpdate = useCallback((newStyle) => {
     setStyle(newStyle);
     if (profile?.id) localStorage.setItem(`ethos_design_${profile.id}`, JSON.stringify(newStyle));
@@ -319,34 +331,11 @@ function MyCardContent() {
     toast.success('Restored to default');
   };
 
-  const exportID = async () => {
-    if (!cardRef.current) return;
-    const t = toast.loading('Exporting High-Res ID...');
-    try {
-      const dataUrl = await toPng(cardRef.current, { pixelRatio: 3, backgroundColor: '#fff' });
-      const img = new Image();
-      img.src = dataUrl;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.height; canvas.height = img.width;
-        const ctx = canvas.getContext('2d');
-        ctx.translate(canvas.width / 2, canvas.height / 2);
-        ctx.rotate(90 * Math.PI / 180);
-        ctx.drawImage(img, -img.width / 2, -img.height / 2);
-        const link = document.createElement('a');
-        link.download = `Ethos-ID-${(name || profile?.name || 'User').replace(/\s+/g, '-')}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        toast.success('Exported!', { id: t });
-      };
-    } catch (e) {
-      toast.error('Export failed', { id: t });
-    }
-  };
-
   const saveProfile = async () => {
-    if (!name || !company) return toast.error('Name and Company are required');
-    if (phone && !/^\d+$/.test(phone)) return toast.error('Phone must be numeric');
+    if (!name || name.length < 2) return toast.error('Valid Name is required');
+    if (!company || company.length < 2) return toast.error('Company is required');
+    if (!role || role.length < 2) return toast.error('Role is required');
+    
     setSaving(true);
     const t = toast.loading('Saving profile...');
     try {
@@ -358,6 +347,7 @@ function MyCardContent() {
       if (res.ok) {
         await updateSession();
         toast.success('Profile saved', { id: t });
+        setIsEditing(false);
         if (isOnboarding) router.push('/app');
       } else toast.error('Failed to save', { id: t });
     } catch (err) { toast.error('Network error', { id: t }); }
@@ -383,7 +373,7 @@ function MyCardContent() {
         .premium-range-input::-webkit-slider-thumb {
           -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%;
           background: #fff; border: 2px solid var(--g); cursor: grab; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-          margin-top: -1px; /* Center thumb on 4px track */
+          margin-top: -1px;
         }
         .premium-toggle {
           appearance: none; width: 34px; height: 18px; background: var(--s1); border-radius: 20px;
@@ -394,88 +384,114 @@ function MyCardContent() {
         .premium-toggle:checked::before { transform: translateX(16px); }
       `}</style>
 
-      {!isOnboarding && <Topbar title="Badge Designer" />}
+      {!isOnboarding && <Topbar title={isEditing ? "Edit Profile" : "My Digital ID"} />}
       
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '20px 16px', display: 'flex', flexWrap: 'wrap', gap: 32, justifyContent: 'center' }}>
         
+        {/* Card Display Side */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20, alignItems: 'center' }}>
-          <CardPreview user={{ ...profile, name, avatar, role, company }} style={style} cardRef={cardRef} domRefs={domRefs} />
-          <div style={{ display: 'flex', gap: 12 }}>
-            <button onClick={exportID} style={{
-              background: 'var(--g)', color: '#fff', border: 'none', borderRadius: 12, padding: '12px 24px',
-              fontFamily: 'var(--fb)', fontWeight: 700, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
-              boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
-            }}>
-              <Download size={18} /> Export High-Res ID
-            </button>
-            <button onClick={() => setQrExpanded(true)} style={{
-              background: 'var(--white)', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: 12, padding: '12px 24px',
-              fontFamily: 'var(--fb)', fontWeight: 700, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8
-            }}>
-              <Search size={18} /> View QR
-            </button>
+          <div onClick={() => setQrExpanded(true)} style={{ cursor: 'pointer' }}>
+            <CardPreview user={{ ...profile, name, avatar, role, company }} style={style} cardRef={cardRef} domRefs={domRefs} />
           </div>
-        </div>
-
-        <div style={{ flex: 1, minWidth: 320, display: 'flex', flexDirection: 'column', gap: 24 }}>
-          <CardEditor style={style} onUpdate={handleUpdate} onReset={handleReset} cardDOMRefs={domRefs} />
           
-          <div style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 24, padding: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
-             <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 18, margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
-               <UserIcon size={20} color="var(--g)" /> Profile Details
-             </h3>
-             <div style={{ position: 'relative', alignSelf: 'center', marginBottom: 10 }}>
-               <Avatar src={avatar} name={name} size={100} />
-               <label style={{
-                 position: 'absolute', bottom: 0, right: 0,
-                 background: 'var(--g)', color: '#fff', width: 32, height: 32,
-                 borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                 cursor: 'pointer', boxShadow: '0 4px 8px rgba(0,0,0,0.15)', border: '2px solid #fff'
-               }}>
-                 <Camera size={16} />
-                 <input type="file" hidden accept="image/*" onChange={handleAvatarChange} />
-               </label>
-             </div>
-             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-               <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '4px 12px', borderRadius: 12 }}>
-                 <UserIcon size={16} color="var(--muted)" />
-                 <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Full Name" maxLength={40} style={{ flex: 1, background: 'transparent', border: 'none', padding: '10px 0', fontSize: 14, outline: 'none' }} />
-               </div>
-               <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '4px 12px', borderRadius: 12 }}>
-                 <Type size={16} color="var(--muted)" />
-                 <input type="text" value={role} onChange={e => setRole(e.target.value)} placeholder="Role / Position" maxLength={30} style={{ flex: 1, background: 'transparent', border: 'none', padding: '10px 0', fontSize: 14, outline: 'none' }} />
-               </div>
-               <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '4px 12px', borderRadius: 12 }}>
-                 <Building size={16} color="var(--muted)" />
-                 <input type="text" value={company} onChange={e => setCompany(e.target.value)} placeholder="Company" maxLength={30} style={{ flex: 1, background: 'transparent', border: 'none', padding: '10px 0', fontSize: 14, outline: 'none' }} />
-               </div>
-               <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '4px 12px', borderRadius: 12 }}>
-                 <Smartphone size={16} color="var(--muted)" />
-                 <input type="tel" value={phone} onChange={e => setPhone(e.target.value.replace(/\D/g, ''))} placeholder="Phone Number" maxLength={15} style={{ flex: 1, background: 'transparent', border: 'none', padding: '10px 0', fontSize: 14, outline: 'none' }} />
-               </div>
-               <textarea value={bio} onChange={e => setBio(e.target.value)} placeholder="Short Bio" rows={3} maxLength={160} style={{ width: '100%', background: 'var(--s2)', border: 'none', borderRadius: 12, padding: 12, resize: 'none', fontSize: 14, outline: 'none' }} />
-             </div>
-             <button 
-              onClick={saveProfile} 
-              disabled={saving}
-              style={{
-                background: 'var(--g)', color: '#fff', border: 'none', borderRadius: 12, padding: '14px',
-                fontFamily: 'var(--fb)', fontWeight: 700, fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                opacity: saving ? 0.7 : 1, transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
-              }}
-            >
-              {saving ? 'Saving...' : <><Save size={18} /> Update Profile</>}
-            </button>
+          <div style={{ display: 'flex', gap: 12, width: '100%' }}>
+            {!isEditing ? (
+              <button 
+                onClick={() => setIsEditing(true)}
+                className="btn-liquid"
+                style={{
+                  flex: 1, background: 'var(--g)', color: '#fff', border: 'none', borderRadius: 12, padding: '14px',
+                  fontFamily: 'var(--fb)', fontWeight: 700, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
+                }}
+              >
+                <Smartphone size={18} /> Edit Badge Details
+              </button>
+            ) : (
+              <button 
+                onClick={saveProfile}
+                disabled={saving}
+                style={{
+                  flex: 1, background: 'var(--g)', color: '#fff', border: 'none', borderRadius: 12, padding: '14px',
+                  fontFamily: 'var(--fb)', fontWeight: 700, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
+                }}
+              >
+                <Check size={18} /> Save Changes
+              </button>
+            )}
           </div>
         </div>
 
+        {/* Form / Editor Side */}
+        {isEditing && (
+          <div style={{ flex: 1, minWidth: 320, display: 'flex', flexDirection: 'column', gap: 24 }} className="page-enter">
+            <CardEditor style={style} onUpdate={handleUpdate} onReset={handleReset} cardDOMRefs={domRefs} />
+            
+            <div style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 24, padding: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
+               <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 18, margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
+                 <UserIcon size={20} color="var(--g)" /> Identity Verification
+               </h3>
+               
+               <div style={{ position: 'relative', alignSelf: 'center', marginBottom: 10 }}>
+                 <Avatar src={avatar} name={name} size={100} />
+                 <label style={{
+                   position: 'absolute', bottom: 0, right: 0,
+                   background: 'var(--g)', color: '#fff', width: 32, height: 32,
+                   borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                   cursor: 'pointer', boxShadow: '0 4px 8px rgba(0,0,0,0.15)', border: '2px solid #fff'
+                 }}>
+                   <Camera size={16} />
+                   <input type="file" hidden accept="image/*" onChange={handleAvatarChange} />
+                 </label>
+               </div>
+
+               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                 <div className="input-group">
+                   <label className="section-label" style={{ fontSize: 9 }}>Name (Required)</label>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '4px 12px', borderRadius: 12 }}>
+                     <UserIcon size={16} color="var(--muted)" />
+                     <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Full Name" maxLength={40} style={{ flex: 1, background: 'transparent', border: 'none', padding: '10px 0', fontSize: 14, outline: 'none' }} />
+                   </div>
+                 </div>
+
+                 <div className="input-group">
+                   <label className="section-label" style={{ fontSize: 9 }}>Position (Required)</label>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '4px 12px', borderRadius: 12 }}>
+                     <Type size={16} color="var(--muted)" />
+                     <input type="text" value={role} onChange={e => setRole(e.target.value)} placeholder="Role / Position" maxLength={30} style={{ flex: 1, background: 'transparent', border: 'none', padding: '10px 0', fontSize: 14, outline: 'none' }} />
+                   </div>
+                 </div>
+
+                 <div className="input-group">
+                   <label className="section-label" style={{ fontSize: 9 }}>Company (Required)</label>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '4px 12px', borderRadius: 12 }}>
+                     <Building size={16} color="var(--muted)" />
+                     <input type="text" value={company} onChange={e => setCompany(e.target.value)} placeholder="Company Name" maxLength={30} style={{ flex: 1, background: 'transparent', border: 'none', padding: '10px 0', fontSize: 14, outline: 'none' }} />
+                   </div>
+                 </div>
+
+                 <div className="input-group">
+                   <label className="section-label" style={{ fontSize: 9 }}>Contact</label>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '4px 12px', borderRadius: 12 }}>
+                     <Smartphone size={16} color="var(--muted)" />
+                     <input type="tel" value={phone} onChange={handlePhone} placeholder="(555) 000-0000" style={{ flex: 1, background: 'transparent', border: 'none', padding: '10px 0', fontSize: 14, outline: 'none' }} />
+                   </div>
+                 </div>
+
+                 <textarea value={bio} onChange={e => setBio(e.target.value)} placeholder="Short Professional Bio" rows={3} maxLength={160} style={{ width: '100%', background: 'var(--s2)', border: 'none', borderRadius: 12, padding: 12, resize: 'none', fontSize: 14, outline: 'none' }} />
+               </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <Suspense fallback={null}>
         <Modal center open={qrExpanded} onClose={() => setQrExpanded(false)}>
-          <div style={{ padding: 32, background: '#fff', borderRadius: 24, textAlign: 'center' }}>
-            <QRCodeSVG value={profile.id} size={280} level="H" fgColor={style.textColor} bgColor="#ffffff" />
-            <p style={{ marginTop: 24, fontFamily: 'var(--fh)', fontWeight: 700 }}>Your Attendee ID</p>
+          <div style={{ padding: 40, background: '#fff', borderRadius: 32, textAlign: 'center', outline: 'none' }} className="page-enter">
+            <div style={{ padding: 16, background: '#fff', border: '2px solid var(--border)', borderRadius: 24, display: 'inline-block', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}>
+              <QRCodeSVG value={profile.id} size={300} level="H" fgColor={style.textColor} bgColor="#ffffff" />
+            </div>
+            <h2 style={{ marginTop: 24, fontSize: 24, fontWeight: 800 }}>{name}</h2>
+            <p style={{ color: 'var(--muted)', fontSize: 14 }}>Tap anywhere to close</p>
           </div>
         </Modal>
       </Suspense>

@@ -118,7 +118,7 @@ export default function WalletPage() {
               if (!p) return null;
               return (
                 <div key={item.id} style={{ position: 'relative' }}>
-                  <div onClick={() => setActiveProfile(p)} style={{ cursor: 'pointer', transition: 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}>
+                  <div onClick={() => setActiveProfile(p)} style={{ cursor: 'pointer', transition: 'transform 0.2s var(--liquid)' }}>
                     <CardPreview user={p} />
                   </div>
                   <button onClick={(e) => { e.stopPropagation(); remove(item.id); }} style={{
