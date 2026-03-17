@@ -303,7 +303,6 @@ function CardRow({ user, initialStyle, globalUpdate, isPrinting, setPrintingId }
             {editing ? '🛡️ Save Settings' : '✨ Advanced Designer'}
           </Btn>
           <Btn sm onClick={handleDownload}>💾 Export ID</Btn>
-          <Btn sm onClick={() => { setPrintingId(user.id); setTimeout(() => { window.print(); setPrintingId(null); }, 150); }}>🖨️ Direct Print</Btn>
         </div>
 
         {editing && (
