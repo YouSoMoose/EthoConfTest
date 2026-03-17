@@ -3,6 +3,7 @@
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import Link from 'next/link';
+import { Info } from 'lucide-react';
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -26,10 +27,9 @@ export default function LoginPage() {
         width: 32, height: 32, borderRadius: 16,
         background: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.5)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: 'var(--sub)', fontSize: 16, fontFamily: 'var(--fb)',
-        textDecoration: 'none', transition: 'all 0.2s', cursor: 'pointer',
+        color: 'var(--sub)', textDecoration: 'none', transition: 'all 0.2s', cursor: 'pointer',
       }}>
-        ℹ
+        <Info size={18} />
       </Link>
 
       {/* Hero branding — centered in the remaining space */}

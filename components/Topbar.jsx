@@ -1,4 +1,4 @@
-'use client';
+import { ChevronLeft } from 'lucide-react';
 
 export default function Topbar({ title, onBack, rightEl, admin }) {
   const bg = admin ? 'var(--as1)' : 'var(--white)';
@@ -27,13 +27,14 @@ export default function Topbar({ title, onBack, rightEl, admin }) {
             style={{
               background: 'none',
               border: 'none',
-              fontSize: 20,
               cursor: 'pointer',
               color: textColor,
               padding: 4,
+              display: 'flex',
+              alignItems: 'center',
             }}
           >
-            ←
+            <ChevronLeft size={20} />
           </button>
         )}
         <h1 style={{

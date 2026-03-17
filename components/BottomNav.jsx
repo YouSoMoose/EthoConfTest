@@ -4,13 +4,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
+import { Home, Calendar, Wallet, Scan, MessageCircle } from 'lucide-react';
 
 const attendeeTabs = [
-  { label: 'Home', href: '/app', icon: '🏠' },
-  { label: 'Schedule', href: '/app/schedule', icon: '📅' },
-  { label: 'Scanner', href: '/app/scan', icon: '🔍' },
-  { label: 'My Card', href: '/app/my-card', icon: '🎫' },
-  { label: 'Chat', href: '/app/chat', icon: '💬' },
+  { label: 'Home', href: '/app', icon: Home },
+  { label: 'Schedule', href: '/app/schedule', icon: Calendar },
+  { label: 'Wallet', href: '/app/wallet', icon: Wallet },
+  { label: 'Scan', href: '/app/scan', icon: Scan },
+  { label: 'Chat', href: '/app/chat', icon: MessageCircle },
 ];
 
 export default function BottomNav({ items, admin }) {
@@ -40,7 +41,7 @@ export default function BottomNav({ items, admin }) {
 
   return (
     <nav className={admin ? 'admin-bottom-nav' : ''} style={{
-      position: 'fixed',
+      position: 'absolute', // Fixed to bottom of container
       bottom: 0,
       left: 0,
       right: 0,
@@ -51,22 +52,19 @@ export default function BottomNav({ items, admin }) {
     }}>
       <div style={{
         display: 'flex',
-        justifyContent: manyTabs ? 'flex-start' : 'space-around',
+        justifyContent: 'space-around',
         alignItems: 'center',
         maxWidth: admin ? '100%' : 500,
         margin: '0 auto',
         width: '100%',
-        height: 56,
-        overflowX: manyTabs ? 'auto' : 'visible',
-        WebkitOverflowScrolling: 'touch',
-        gap: manyTabs ? 0 : 0,
-        paddingLeft: manyTabs ? 8 : 0,
-        paddingRight: manyTabs ? 8 : 0,
+        height: 64,
       }}>
         {tabs.map((tab) => {
           const isActive = tab.href === (admin ? '/admin' : '/app')
             ? pathname === tab.href
             : pathname.startsWith(tab.href);
+
+          const Icon = tab.icon;
 
           return (
             <Link key={tab.href} href={tab.href} style={{
@@ -74,18 +72,17 @@ export default function BottomNav({ items, admin }) {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 2,
-              padding: manyTabs ? '6px 6px' : '6px 12px',
+              gap: 4,
+              padding: '8px 12px',
               position: 'relative',
               color: isActive ? activeColor : inactiveColor,
               fontFamily: 'var(--fb)',
-              fontSize: manyTabs ? 9 : 10,
-              fontWeight: isActive ? 600 : 400,
-              transition: 'color 0.2s',
-              minWidth: manyTabs ? 48 : 44,
+              fontSize: 10,
+              fontWeight: isActive ? 600 : 500,
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              minWidth: 64,
               flexShrink: 0,
-              minHeight: 44,
-              flex: manyTabs ? '1 0 auto' : undefined,
+              textDecoration: 'none',
             }}>
               {isActive && (
                 <span style={{
@@ -93,29 +90,30 @@ export default function BottomNav({ items, admin }) {
                   top: 0,
                   left: '50%',
                   transform: 'translateX(-50%)',
-                  width: 24,
+                  width: 32,
                   height: 3,
-                  borderRadius: 3,
+                  borderRadius: '0 0 4px 4px',
                   background: activeColor,
                 }} />
               )}
-              <span style={{ fontSize: manyTabs ? 18 : 20 }}>{tab.icon}</span>
-              <span>{tab.label}</span>
+              <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+              <span style={{ opacity: isActive ? 1 : 0.8 }}>{tab.label}</span>
               {!admin && tab.label === 'Chat' && unread > 0 && (
                 <span style={{
                   position: 'absolute',
-                  top: 2,
-                  right: 4,
-                  background: '#e44',
+                  top: 8,
+                  right: 12,
+                  background: '#ef4444',
                   color: '#fff',
                   fontSize: 9,
-                  fontWeight: 700,
+                  fontWeight: 800,
                   borderRadius: 10,
-                  width: 16,
+                  minWidth: 16,
                   height: 16,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  padding: '0 4px',
                   animation: 'pulseGlow 2s ease-in-out infinite',
                 }}>
                   {unread > 9 ? '9+' : unread}

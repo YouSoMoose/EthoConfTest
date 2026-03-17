@@ -1,49 +1,370 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback, memo, Suspense } from 'react';
 import Link from 'next/link';
 import Loader from '@/components/Loader';
 import { QRCodeSVG } from 'qrcode.react';
 import { toPng } from 'html-to-image';
 import toast from 'react-hot-toast';
 
-export default function AdminIDCardsPage() {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [printingId, setPrintingId] = useState(null);
-  const cardRefs = useRef({});
+const DEFAULT_STYLE = {
+  nameSize: 22, nameX: 0, nameY: 0, nameVisible: true,
+  roleSize: 14, roleX: 0, roleY: 0, roleVisible: true,
+  companySize: 13, companyX: 0, companyY: 0, companyVisible: true,
+  emailSize: 11, emailX: 0, emailY: 0, emailVisible: true,
+  qrSize: 80, qrX: 0, qrY: 0, qrVisible: true,
+  logoSize: 28, logoX: 0, logoY: 0, logoVisible: true,
+  accentColor: '#D49B7A',
+  textColor: '#413429',
+  subColor: '#7D6F63',
+};
 
-  useEffect(() => {
-    fetch('/api/users')
-      .then(res => res.json())
-      .then(data => {
-        setUsers(Array.isArray(data) ? data : []);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
+// Direct DOM mutations per attribute — bypasses React entirely during drag
+const LIVE_MAP = {
+  nameSize:    (v, r, s) => r.name    && (r.name.style.fontSize    = v + 'px'),
+  nameX:       (v, r, s) => r.name    && (r.name.style.transform   = `translate(${v}px, ${s.nameY ?? 0}px)`),
+  nameY:       (v, r, s) => r.name    && (r.name.style.transform   = `translate(${s.nameX ?? 0}px, ${v}px)`),
+  roleSize:    (v, r, s) => r.role    && (r.role.style.fontSize    = v + 'px'),
+  roleX:       (v, r, s) => r.role    && (r.role.style.transform   = `translate(${v}px, ${s.roleY ?? 0}px)`),
+  roleY:       (v, r, s) => r.role    && (r.role.style.transform   = `translate(${s.roleX ?? 0}px, ${v}px)`),
+  companySize: (v, r, s) => r.company && (r.company.style.fontSize = v + 'px'),
+  companyX:    (v, r, s) => r.company && (r.company.style.transform = `translate(${v}px, ${s.companyY ?? 0}px)`),
+  companyY:    (v, r, s) => r.company && (r.company.style.transform = `translate(${s.companyX ?? 0}px, ${v}px)`),
+  emailSize:   (v, r, s) => r.email   && (r.email.style.fontSize   = v + 'px'),
+  emailX:      (v, r, s) => r.email   && (r.email.style.transform  = `translate(${v}px, ${s.emailY ?? 0}px)`),
+  emailY:      (v, r, s) => r.email   && (r.email.style.transform  = `translate(${s.emailX ?? 0}px, ${v}px)`),
+  logoSize:    (v, r, s) => r.logoBox  && (r.logoBox.style.width = r.logoBox.style.height = v + 'px'),
+  logoX:       (v, r, s) => r.logoWrap && (r.logoWrap.style.transform = `translate(${v}px, ${s.logoY ?? 0}px)`),
+  logoY:       (v, r, s) => r.logoWrap && (r.logoWrap.style.transform = `translate(${s.logoX ?? 0}px, ${v}px)`),
+  qrX:         (v, r, s) => r.qrWrap  && (r.qrWrap.style.transform  = `translate(${v}px, ${s.qrY ?? 0}px)`),
+  qrY:         (v, r, s) => r.qrWrap  && (r.qrWrap.style.transform  = `translate(${s.qrX ?? 0}px, ${v}px)`),
+};
 
-  const handleDownload = async (user) => {
-    const ref = cardRefs.current[user.id];
-    if (!ref) return;
+function Btn({ children, onClick, variant = 'default', sm = false }) {
+  const isAccent = variant === 'accent';
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        background: isAccent ? 'var(--accent)' : 'var(--as1)',
+        color: isAccent ? 'var(--text)' : 'var(--atext)',
+        border: '1px solid var(--aborder)', borderRadius: 8,
+        padding: sm ? '6px 12px' : '10px 20px',
+        fontSize: sm ? 12 : 14, fontFamily: 'var(--fh)', fontWeight: 600,
+        cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.2s',
+      }}
+      onMouseOver={e => e.currentTarget.style.filter = 'brightness(1.1)'}
+      onMouseOut={e => e.currentTarget.style.filter = 'brightness(1)'}
+    >
+      {children}
+    </button>
+  );
+}
+
+function CardEditor({ style, onUpdate, onReset, onClose, cardDOMRefs }) {
+  const [activeTab, setActiveTab] = useState('size');
+  const [localStyle, setLocalStyle] = useState(style);
+  const localRef = useRef(style);
+  const rafRef = useRef(null);
+
+  // Called on every pixel of movement — mutates DOM directly, no React re-render
+  const handleInput = useCallback((attr, rawVal) => {
+    const val = parseFloat(rawVal);
+
+    // Update pill number instantly
+    const pill = document.getElementById(`pill-${attr}`);
+    if (pill) pill.textContent = Math.round(val);
+
+    // Update track gradient instantly
+    const input = document.getElementById(`slider-${attr}`);
+    if (input) {
+      const pct = ((val - parseFloat(input.min)) / (parseFloat(input.max) - parseFloat(input.min))) * 100;
+      input.style.background = `linear-gradient(to right, var(--accent) ${pct}%, var(--as3) ${pct}%)`;
+    }
+
+    // Mutate card DOM on next animation frame
+    localRef.current = { ...localRef.current, [attr]: val };
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => {
+      if (LIVE_MAP[attr]) LIVE_MAP[attr](val, cardDOMRefs.current, localRef.current);
+    });
+  }, [cardDOMRefs]);
+
+  // Called only on mouseup/touchend — commits to React state
+  const handleCommit = useCallback((attr, rawVal) => {
+    const val = parseFloat(rawVal);
+    const next = { ...localRef.current, [attr]: val };
+    localRef.current = next;
+    setLocalStyle(next);
+    onUpdate(next);
+  }, [onUpdate]);
+
+  // For non-slider inputs
+  const update = useCallback((key, val) => {
+    const next = { ...localRef.current, [key]: val };
+    localRef.current = next;
+    setLocalStyle(next);
+    onUpdate(next);
+  }, [onUpdate]);
+
+  const ControlGroup = ({ label, children }) => (
+    <div style={{ marginBottom: 16 }}>
+      <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--amuted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 8 }}>{label}</label>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>{children}</div>
+    </div>
+  );
+
+  const Slider = ({ label, attr, min, max }) => {
+    const val = localStyle[attr] ?? 0;
+    const pct = ((val - min) / (max - min)) * 100;
+    return (
+      <div className="premium-slider-group">
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, alignItems: 'center' }}>
+          <label style={{ fontSize: 10, fontWeight: 600, color: 'var(--asub)', textTransform: 'uppercase', opacity: 0.8 }}>{label}</label>
+          <span id={`pill-${attr}`} className="slider-value-pill">{Math.round(val)}</span>
+        </div>
+        <input
+          id={`slider-${attr}`}
+          type="range" min={min} max={max} step="1"
+          defaultValue={val}
+          onInput={e => handleInput(attr, e.target.value)}
+          onMouseUp={e => handleCommit(attr, e.target.value)}
+          onTouchEnd={e => handleCommit(attr, e.target.value)}
+          className="premium-range-input"
+          style={{ background: `linear-gradient(to right, var(--accent) ${pct}%, var(--as3) ${pct}%)` }}
+        />
+      </div>
+    );
+  };
+
+  const Toggle = ({ label, attr }) => (
+    <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: 11, color: 'var(--atext)', fontWeight: 500 }}>
+      <input type="checkbox" checked={localStyle[attr]} onChange={e => update(attr, e.target.checked)} className="premium-toggle" />
+      {label}
+    </label>
+  );
+
+  return (
+    <div style={{
+      background: 'var(--as1)', border: '1px solid var(--aborder)', borderRadius: 'var(--r)',
+      padding: 20, display: 'flex', flexDirection: 'column', gap: 16,
+      animation: 'fadeUp 0.15s ease both', boxShadow: '0 12px 40px rgba(0,0,0,0.3)', zIndex: 100
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+        <h4 style={{ fontFamily: 'var(--fhs)', fontSize: 15, color: 'var(--atext)', margin: 0 }}>📐 Design Suite</h4>
+        <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--amuted)', cursor: 'pointer', fontSize: 24, lineHeight: 1 }}>×</button>
+      </div>
+
+      <div style={{ display: 'flex', background: 'var(--as2)', borderRadius: 10, padding: 3, marginBottom: 4 }}>
+        {['size', 'pos', 'vis'].map(t => (
+          <button key={t} onClick={() => setActiveTab(t)} style={{
+            flex: 1, padding: '8px', border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 700,
+            background: activeTab === t ? 'var(--as3)' : 'transparent',
+            color: activeTab === t ? 'var(--accent)' : 'var(--amuted)',
+            cursor: 'pointer', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            textTransform: 'uppercase', letterSpacing: '0.05em'
+          }}>
+            {t === 'size' ? 'Scale' : t === 'pos' ? 'Layout' : 'Toggle'}
+          </button>
+        ))}
+      </div>
+
+      <div style={{ maxHeight: 350, overflowY: 'auto', paddingRight: 6 }}>
+        {activeTab === 'size' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <ControlGroup label="Typography">
+              <Slider label="Name" attr="nameSize" min={5} max={80} />
+              <Slider label="Role" attr="roleSize" min={4} max={50} />
+              <Slider label="Company" attr="companySize" min={4} max={50} />
+              <Slider label="Email" attr="emailSize" min={4} max={40} />
+            </ControlGroup>
+            <ControlGroup label="Visual Components">
+              <Slider label="Logo Scale" attr="logoSize" min={5} max={150} />
+              <Slider label="QR Resolution" attr="qrSize" min={20} max={250} />
+            </ControlGroup>
+            <ControlGroup label="Brand Palette">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--as2)', padding: '10px 14px', borderRadius: 12 }}>
+                <input type="color" value={localStyle.accentColor} onChange={e => update('accentColor', e.target.value)} style={{ width: 28, height: 28, padding: 0, border: '2px solid var(--as1)', borderRadius: 6, cursor: 'pointer', background: 'none' }} />
+                <span style={{ fontSize: 11, color: 'var(--atext)', fontWeight: 600 }}>Accent Color</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--as2)', padding: '10px 14px', borderRadius: 12 }}>
+                <input type="color" value={localStyle.textColor} onChange={e => update('textColor', e.target.value)} style={{ width: 28, height: 28, padding: 0, border: '2px solid var(--as1)', borderRadius: 6, cursor: 'pointer', background: 'none' }} />
+                <span style={{ fontSize: 11, color: 'var(--atext)', fontWeight: 600 }}>Primary Text</span>
+              </div>
+            </ControlGroup>
+          </div>
+        )}
+
+        {activeTab === 'pos' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <ControlGroup label="Logo Position">
+              <Slider label="Horizontal" attr="logoX" min={-300} max={300} />
+              <Slider label="Vertical" attr="logoY" min={-300} max={300} />
+            </ControlGroup>
+            <ControlGroup label="QR Matrix">
+              <Slider label="Horizontal" attr="qrX" min={-300} max={300} />
+              <Slider label="Vertical" attr="qrY" min={-300} max={300} />
+            </ControlGroup>
+            <ControlGroup label="Name Position">
+              <Slider label="Horizontal" attr="nameX" min={-300} max={300} />
+              <Slider label="Vertical" attr="nameY" min={-300} max={300} />
+            </ControlGroup>
+            <ControlGroup label="Professional Info">
+              <Slider label="Role H/V" attr="roleX" min={-300} max={300} />
+              <Slider label="Role Vertical" attr="roleY" min={-300} max={300} />
+              <Slider label="Comp H/V" attr="companyX" min={-300} max={300} />
+              <Slider label="Comp Vertical" attr="companyY" min={-300} max={300} />
+              <Slider label="Email H/V" attr="emailX" min={-300} max={300} />
+              <Slider label="Email Vertical" attr="emailY" min={-300} max={300} />
+            </ControlGroup>
+          </div>
+        )}
+
+        {activeTab === 'vis' && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, background: 'var(--as2)', padding: 16, borderRadius: 12 }}>
+            <Toggle label="Name" attr="nameVisible" />
+            <Toggle label="Role" attr="roleVisible" />
+            <Toggle label="Company" attr="companyVisible" />
+            <Toggle label="Email" attr="emailVisible" />
+            <Toggle label="Full Logo" attr="logoVisible" />
+            <Toggle label="QR Scan" attr="qrVisible" />
+          </div>
+        )}
+      </div>
+
+      <div style={{ display: 'flex', gap: 10, marginTop: 4, borderTop: '1px solid var(--aborder)', paddingTop: 16 }}>
+        <button onClick={onReset} style={{
+          flex: 1, background: 'var(--as2)', border: '1px solid var(--aborder)', borderRadius: 10,
+          padding: '10px', fontSize: 11, fontFamily: 'var(--fh)', fontWeight: 700,
+          cursor: 'pointer', color: 'var(--atext)', textTransform: 'uppercase', letterSpacing: '0.05em'
+        }}>
+          Reset Composition
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Memoized — only re-renders when style commits (mouseup), not during drag
+const CardPreview = memo(function CardPreview({ user, style, cardRef, domRefs }) {
+  return (
+    <div ref={cardRef} style={{
+      background: '#ffffff', borderRadius: 14, border: '1px solid #ddd',
+      width: '87mm', height: '57mm', padding: 20, boxSizing: 'border-box',
+      display: 'flex', alignItems: 'center', gap: 20,
+      boxShadow: '0 15px 45px rgba(0,0,0,0.06)',
+      position: 'relative', overflow: 'hidden', flexShrink: 0,
+    }}>
+      <div style={{
+        position: 'absolute', top: 0, right: 0, width: 160, height: 160,
+        background: `linear-gradient(135deg, ${style.accentColor}25 0%, rgba(168,158,148,0.05) 100%)`,
+        borderRadius: '0 0 0 100%', pointerEvents: 'none'
+      }} />
+
+      <div style={{ flex: 1, minWidth: 0, zIndex: 1, position: 'relative' }}>
+        {style.logoVisible && (
+          <div ref={el => domRefs.current.logoWrap = el} style={{
+            display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12,
+            transform: `translate(${style.logoX || 0}px, ${style.logoY || 0}px)`,
+          }}>
+            <div ref={el => domRefs.current.logoBox = el} style={{ width: style.logoSize, height: style.logoSize, borderRadius: 8, overflow: 'hidden', flexShrink: 0 }}>
+              <img src="/assets/ethos-logo-insignia.png" alt="E" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            </div>
+          </div>
+        )}
+
+        {style.nameVisible && (
+          <h3 ref={el => domRefs.current.name = el} style={{
+            fontFamily: 'var(--fh)', fontWeight: 800, fontSize: style.nameSize,
+            color: style.textColor, margin: 0, lineHeight: 1.05,
+            overflowWrap: 'break-word', wordBreak: 'break-word',
+            transform: `translate(${style.nameX}px, ${style.nameY}px)`,
+          }}>
+            {user.name || 'Anonymous User'}
+          </h3>
+        )}
+
+        {style.roleVisible && (
+          <p ref={el => domRefs.current.role = el} style={{
+            fontFamily: 'var(--fb)', fontWeight: 700, fontSize: style.roleSize,
+            color: style.accentColor, margin: '6px 0',
+            textTransform: 'uppercase', letterSpacing: '1px',
+            transform: `translate(${style.roleX}px, ${style.roleY}px)`,
+          }}>
+            {user.role || (user.access_level === 3 ? 'Super Admin' : user.access_level === 2 ? 'Event Staff' : 'Attendee')}
+          </p>
+        )}
+
+        {style.companyVisible && (
+          <p ref={el => domRefs.current.company = el} style={{
+            fontFamily: 'var(--fb)', fontWeight: 600, fontSize: style.companySize,
+            color: style.subColor, margin: '0 0 6px',
+            transform: `translate(${style.companyX || 0}px, ${style.companyY || 0}px)`,
+          }}>
+            {user.company || 'Ethos Attendee'}
+          </p>
+        )}
+
+        {style.emailVisible && (
+          <p ref={el => domRefs.current.email = el} style={{
+            fontFamily: 'var(--fb)', fontSize: style.emailSize, color: '#948B80', margin: 0, opacity: 0.8,
+            transform: `translate(${style.emailX || 0}px, ${style.emailY || 0}px)`,
+          }}>
+            {user.email}
+          </p>
+        )}
+      </div>
+
+      {style.qrVisible && (
+        <div ref={el => domRefs.current.qrWrap = el} style={{
+          background: '#fff', padding: 8, borderRadius: 12, border: '1px solid #efefef',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+          boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
+          transform: `translate(${style.qrX}px, ${style.qrY}px)`, zIndex: 2
+        }}>
+          <QRCodeSVG value={user.id} size={style.qrSize} level="H" fgColor={style.textColor} bgColor="#ffffff" />
+        </div>
+      )}
+    </div>
+  );
+});
+
+function CardRow({ user, initialStyle, globalUpdate, isPrinting, setPrintingId }) {
+  const [style, setStyle] = useState(initialStyle || DEFAULT_STYLE);
+  const [editing, setEditing] = useState(false);
+  const cardRef = useRef(null);
+  const domRefs = useRef({});
+  const saveTimeout = useRef(null);
+
+  const handleUpdate = useCallback((newStyle) => {
+    setStyle(newStyle);
+    if (saveTimeout.current) clearTimeout(saveTimeout.current);
+    saveTimeout.current = setTimeout(() => globalUpdate(user.id, newStyle), 500);
+  }, [globalUpdate, user.id]);
+
+  const handleReset = useCallback(() => {
+    setStyle(DEFAULT_STYLE);
+    globalUpdate(user.id, null);
+    toast.success('Restored to default');
+  }, [globalUpdate, user.id]);
+
+  const handleDownload = async () => {
+    if (!cardRef.current) return;
     const t = toast.loading('Generating image...');
     try {
-      const dataUrl = await toPng(ref, { pixelRatio: 3, backgroundColor: '#fff' });
+      const dataUrl = await toPng(cardRef.current, { pixelRatio: 3, backgroundColor: '#fff' });
       const img = new Image();
       img.src = dataUrl;
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        canvas.width = img.height;
-        canvas.height = img.width;
+        canvas.width = img.height; canvas.height = img.width;
         const ctx = canvas.getContext('2d');
         ctx.translate(canvas.width / 2, canvas.height / 2);
         ctx.rotate(90 * Math.PI / 180);
         ctx.drawImage(img, -img.width / 2, -img.height / 2);
-        
-        const rotatedDataUrl = canvas.toDataURL('image/png');
         const link = document.createElement('a');
         link.download = `Ethos-ID-${(user.name || 'User').replace(/\s+/g, '-')}.png`;
-        link.href = rotatedDataUrl;
+        link.href = canvas.toDataURL('image/png');
         link.click();
         toast.success('Downloaded!', { id: t });
       };
@@ -53,165 +374,181 @@ export default function AdminIDCardsPage() {
     }
   };
 
+  return (
+    <div style={{
+      display: 'flex', flexWrap: 'wrap', gap: 32, paddingBottom: 32,
+      borderBottom: '1px solid var(--aborder)', alignItems: 'flex-start',
+      animation: 'fadeIn 0.4s ease-out'
+    }}>
+      <CardPreview user={user} style={style} cardRef={cardRef} domRefs={domRefs} />
+
+      <div style={{ flex: 1, minWidth: 340 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
+          <h3 style={{ fontFamily: 'var(--fhs)', fontSize: 20, margin: 0, color: 'var(--atext)', fontWeight: 700 }}>{user.name}</h3>
+          <span style={{ fontSize: 10, fontWeight: 700, background: 'var(--as2)', padding: '4px 12px', borderRadius: 20, color: 'var(--accent)', border: '1px solid var(--aborder)', textTransform: 'uppercase' }}>
+            ID VERIFIED
+          </span>
+        </div>
+
+        <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
+          <Btn sm variant="accent" onClick={() => setEditing(!editing)}>
+            {editing ? '🛡️ Save Settings' : '✨ Advanced Designer'}
+          </Btn>
+          <Btn sm onClick={handleDownload}>💾 Export ID</Btn>
+          <Btn sm onClick={() => { setPrintingId(user.id); setTimeout(() => { window.print(); setPrintingId(null); }, 150); }}>🖨️ Direct Print</Btn>
+        </div>
+
+        {editing && (
+          <CardEditor
+            style={style}
+            onUpdate={handleUpdate}
+            onReset={handleReset}
+            onClose={() => setEditing(false)}
+            cardDOMRefs={domRefs}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function AdminIDCardsContent() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [printingId, setPrintingId] = useState(null);
+  const [customizations, setCustomizations] = useState({});
+
+  useEffect(() => {
+    const saved = localStorage.getItem('ethos_card_customizations');
+    if (saved) { try { setCustomizations(JSON.parse(saved)); } catch (e) {} }
+    fetch('/api/users')
+      .then(res => res.json())
+      .then(data => { setUsers(data || []); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const handleGlobalUpdate = useCallback((userId, newStyle) => {
+    setCustomizations(prev => {
+      const updated = { ...prev };
+      if (newStyle === null) delete updated[userId];
+      else updated[userId] = newStyle;
+      localStorage.setItem('ethos_card_customizations', JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
   if (loading) return <Loader admin />;
 
   return (
-    <div className={`page-enter ${printingId ? 'is-printing-single' : ''}`} style={{ padding: '24px 16px' }}>
+    <div className={`page-enter ${printingId ? 'is-printing-single' : ''}`} style={{ padding: '32px 20px', background: 'var(--as2)' }}>
+      <style>{`
+        @media print {
+          .is-printing-single .hide-when-printing-single { display: none !important; }
+          .is-printing-single .page-enter { padding: 0 !important; }
+        }
+
+        .premium-slider-group { margin-bottom: 20px; }
+
+        .slider-value-pill {
+          font-size: 10px; font-weight: 800; background: var(--as3); color: var(--accent);
+          padding: 2px 8px; border-radius: 20px; border: 1px solid var(--aborder);
+          min-width: 28px; text-align: center; display: inline-block;
+        }
+
+        .premium-range-input {
+          -webkit-appearance: none; appearance: none;
+          width: 100%; height: 4px; border-radius: 10px;
+          border: none;
+          outline: none; cursor: pointer;
+        }
+
+        .premium-range-input::-webkit-slider-thumb {
+          -webkit-appearance: none; appearance: none;
+          width: 18px; height: 18px; border-radius: 50%;
+          background: #fff; border: 2px solid var(--g); cursor: grab;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+          transition: transform 0.08s ease, box-shadow 0.08s ease;
+          margin-top: -7px; /* Align to the center of 4px track */
+        }
+
+        .premium-range-input::-webkit-slider-thumb:hover {
+          transform: scale(1.25);
+          box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 15%, transparent);
+        }
+
+        .premium-range-input::-webkit-slider-thumb:active {
+          cursor: grabbing; transform: scale(1.15);
+          background: var(--accent); border-color: #fff;
+          box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 20%, transparent);
+        }
+
+        .premium-range-input::-webkit-slider-runnable-track { border-radius: 10px; height: 6px; }
+
+        .premium-range-input::-moz-range-thumb {
+          width: 20px; height: 20px; border-radius: 50%;
+          background: #fff; border: 2.5px solid var(--accent);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+        }
+
+        .premium-toggle {
+          appearance: none; width: 34px; height: 18px; background: var(--s1);
+          border-radius: 20px; position: relative; cursor: pointer; transition: background 0.25s;
+          border: 1px solid var(--border);
+        }
+        .premium-toggle:checked { background: var(--g); }
+        .premium-toggle::before {
+          content: ""; position: absolute; width: 14px; height: 14px; border-radius: 50%;
+          top: 1px; left: 1px; background: #fff;
+          transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .premium-toggle:checked::before { transform: translateX(16px); }
+
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(15px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      `}</style>
+
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 32 }}>
           <Link href="/admin" style={{
-            textDecoration: 'none', color: 'var(--asub)', fontSize: 20,
+            textDecoration: 'none', color: 'var(--asub)', fontSize: 24,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            width: 40, height: 40, borderRadius: 20, background: 'var(--as1)', border: '1px solid var(--aborder)'
+            width: 48, height: 48, borderRadius: 24, background: 'var(--as1)',
+            border: '1px solid var(--aborder)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
           }}>←</Link>
-          <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 22, color: 'var(--atext)', margin: 0 }}>
-            🪪 Print ID Cards
-          </h2>
+          <div>
+            <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 800, fontSize: 28, color: 'var(--atext)', margin: 0, letterSpacing: '-0.02em' }}>
+              ID Card Designer
+            </h2>
+            <p style={{ margin: 0, fontSize: 13, color: 'var(--asub)', fontWeight: 500 }}>Global Conference Asset Management</p>
+          </div>
         </div>
 
-        <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--asub)', marginBottom: 24 }}>
-          These digital badges map directly to the Attendee Scanner. Print these out for physical lanyards!
-        </p>
-
-        {users.length === 0 && !loading && (
-          <div className="print-hide" style={{ textAlign: 'center', padding: '60px 0', background: 'var(--as1)', borderRadius: 'var(--r)', border: '1px dashed var(--aborder)' }}>
-            <span style={{ fontSize: 40, display: 'block', marginBottom: 12 }}>😶</span>
-            <p style={{ fontFamily: 'var(--fb)', color: 'var(--asub)' }}>No users found.</p>
-          </div>
-        )}
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
-          gap: 16,
-        }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 40, background: 'var(--as1)', padding: 32, borderRadius: 24, border: '1px solid var(--aborder)', boxShadow: '0 20px 60px rgba(0,0,0,0.05)' }}>
           {users.map(u => (
-            <div key={u.id} className={printingId && printingId !== u.id ? 'hide-when-printing-single' : ''} style={{ position: 'relative' }}>
-              <div 
-                ref={el => cardRefs.current[u.id] = el}
-                style={{
-                  background: '#ffffff',
-                  borderRadius: 12,
-                  border: '1px solid #ccc',
-                  width: '87mm',
-                  height: '57mm',
-                  padding: 16,
-                  boxSizing: 'border-box',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 16,
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}>
-                <div style={{
-                  position: 'absolute', top: 0, right: 0, width: 120, height: 120,
-                  background: 'linear-gradient(135deg, rgba(252,189,157,0.2) 0%, rgba(168,158,148,0.05) 100%)',
-                  borderRadius: '0 0 0 100%', pointerEvents: 'none'
-                }} />
-
-                {/* Details (Left) */}
-                <div style={{ flex: 1, minWidth: 0, zIndex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                    <div style={{ width: 22, height: 22, borderRadius: 4, overflow: 'hidden', flexShrink: 0 }}>
-                      <img src="/assets/ethos-logo.png" alt="E" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                    </div>
-                    <h3 style={{
-                      fontFamily: 'var(--fh)', 
-                      fontWeight: 800, 
-                      fontSize: (u.name || '').length > 20 ? 14 : (u.name || '').length > 15 ? 16 : 18, 
-                      color: '#413429', 
-                      margin: 0,
-                      whiteSpace: 'nowrap', 
-                      overflow: 'hidden', 
-                      textOverflow: 'ellipsis',
-                      lineHeight: 1.2
-                    }}>
-                      {u.name || 'Anonymous User'}
-                    </h3>
-                  </div>
-
-                  <p style={{
-                    fontFamily: 'var(--fb)', 
-                    fontWeight: 700, 
-                    fontSize: 12, 
-                    color: '#D49B7A', 
-                    margin: '0 0 2px',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                    whiteSpace: 'nowrap', 
-                    overflow: 'hidden', 
-                    textOverflow: 'ellipsis'
-                  }}>
-                    {u.role || (u.access_level === 3 ? 'Super Admin' : u.access_level === 2 ? 'Event Staff' : 'Attendee')}
-                  </p>
-
-                  <p style={{
-                    fontFamily: 'var(--fb)', 
-                    fontWeight: 600, 
-                    fontSize: 11, 
-                    color: '#7D6F63', 
-                    margin: '0 0 2px',
-                    whiteSpace: 'nowrap', 
-                    overflow: 'hidden', 
-                    textOverflow: 'ellipsis'
-                  }}>
-                    {u.company || 'Ethos Attendee'}
-                  </p>
-
-                  <p style={{
-                    fontFamily: 'var(--fb)', fontSize: 10, color: '#A89E94', margin: 0,
-                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', opacity: 0.8
-                  }}>
-                    {u.email}
-                  </p>
-                </div>
-
-                {/* QR Code (Right) */}
-                <div style={{
-                  background: '#fff', padding: 6, borderRadius: 10, border: '1px solid #eee',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-                }}>
-                  <QRCodeSVG value={u.id} size={80} level="M" fgColor="#413429" bgColor="#ffffff" />
-                </div>
-              </div>
-
-              {/* Action Buttons Wrapper */}
-              <div className="print-hide" style={{ marginTop: 8, display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-                <button
-                  onClick={() => handleDownload(u)}
-                  style={{
-                    background: 'var(--as1)', border: '1px solid var(--aborder)',
-                    borderRadius: 8, padding: '6px 12px', fontSize: 13,
-                    fontFamily: 'var(--fh)', fontWeight: 600, color: 'var(--atext)',
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6
-                  }}
-                >
-                  📥 Download
-                </button>
-                <button
-                  onClick={() => {
-                    setPrintingId(u.id);
-                    setTimeout(() => {
-                      window.print();
-                      setPrintingId(null);
-                    }, 150);
-                  }}
-                  style={{
-                    background: 'var(--as1)', border: '1px solid var(--aborder)',
-                    borderRadius: 8, padding: '6px 12px', fontSize: 13,
-                    fontFamily: 'var(--fh)', fontWeight: 600, color: 'var(--atext)',
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6
-                  }}
-                >
-                  🖨️ Print
-                </button>
-              </div>
-            </div>
+            <CardRow
+              key={u.id} user={u}
+              initialStyle={customizations[u.id]}
+              globalUpdate={handleGlobalUpdate}
+              isPrinting={printingId === u.id}
+              setPrintingId={setPrintingId}
+            />
           ))}
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AdminIDCardsPage() {
+  return (
+    <Suspense fallback={<Loader admin />}>
+      <AdminIDCardsContent />
+    </Suspense>
   );
 }

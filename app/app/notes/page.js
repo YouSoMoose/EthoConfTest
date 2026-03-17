@@ -7,6 +7,7 @@ import Topbar from '@/components/Topbar';
 import Loader from '@/components/Loader';
 import Btn from '@/components/Btn';
 import Empty from '@/components/Empty';
+import { Plus, Download, Trash2, FileText, Calendar } from 'lucide-react';
 
 export default function NotesPage() {
   const router = useRouter();
@@ -38,7 +39,10 @@ export default function NotesPage() {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `${n.title || 'note'}.txt`;
+    document.body.appendChild(a); // Required for Chrome
     a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
   };
 
   if (loading) return <Loader />;
@@ -46,20 +50,23 @@ export default function NotesPage() {
   return (
     <div className="page-enter">
       <Topbar
-        title="📝 Notes"
+        title="Notes"
         rightEl={
           <button onClick={createNote} style={{
-            background: 'none', border: '1.5px solid var(--border)', borderRadius: 8,
-            padding: '5px 12px', fontFamily: 'var(--fb)', fontSize: 12, fontWeight: 600,
-            color: 'var(--text)', cursor: 'pointer',
-          }}>+ New</button>
+            background: 'var(--g)', border: 'none', borderRadius: 12,
+            padding: '8px 16px', fontFamily: 'var(--fb)', fontSize: 13, fontWeight: 700,
+            color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+            boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
+          }}>
+            <Plus size={16} /> New Note
+          </button>
         }
       />
       <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px' }}>
         {notes.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <Empty icon="📝" text="No notes yet" />
-            <div style={{ marginTop: 16 }}><Btn onClick={createNote}>Create Your First Note</Btn></div>
+          <div style={{ textAlign: 'center', padding: '60px 0' }}>
+            <Empty icon={<FileText size={48} />} text="Your notebook is empty." />
+            <div style={{ marginTop: 20 }}><Btn onClick={createNote}>Create Your First Note</Btn></div>
           </div>
         ) : (
           <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -76,13 +83,20 @@ export default function NotesPage() {
                   <p style={{ fontFamily: 'var(--fb)', fontSize: 12, color: 'var(--muted)', marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {n.content || 'Empty note'}
                   </p>
-                  <p style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--muted)', marginTop: 6 }}>
-                    {new Date(n.updated_at).toLocaleDateString()}
-                  </p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 8, color: 'var(--muted)' }}>
+                    <Calendar size={10} />
+                    <p style={{ fontFamily: 'var(--fb)', fontSize: 11, fontWeight: 600 }}>
+                      {n.updated_at ? new Date(n.updated_at).toLocaleDateString() : 'Just now'}
+                    </p>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', gap: 4, marginLeft: 8, flexShrink: 0 }}>
-                  <button onClick={(e) => downloadNote(n, e)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14 }} title="Download">⬇️</button>
-                  <button onClick={(e) => deleteNote(n.id, e)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14 }} title="Delete">🗑️</button>
+                 <div style={{ display: 'flex', gap: 8, marginLeft: 8, flexShrink: 0 }}>
+                  <button onClick={(e) => downloadNote(n, e)} style={{ background: 'var(--s2)', border: 'none', borderRadius: 8, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--g)' }} title="Download">
+                    <Download size={16} />
+                  </button>
+                  <button onClick={(e) => deleteNote(n.id, e)} style={{ background: 'var(--s1)', border: 'none', borderRadius: 8, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#EF4444' }} title="Delete">
+                    <Trash2 size={16} />
+                  </button>
                 </div>
               </div>
             ))}

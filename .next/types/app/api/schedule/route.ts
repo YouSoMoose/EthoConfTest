@@ -1,4 +1,4 @@
-// File: C:\Users\Akhil.DESKTOP-TV2N8F4\Downloads\ethos-app\ethos-app\app\api\schedule\route.js
+// File: C:\Users\Akhil.DESKTOP-TV2N8F4\Downloads\ethos-app\ethos-app\ethos-app\app\api\schedule\route.js
 import * as entry from '../../../../../app/api/schedule/route.js'
 import type { NextRequest } from 'next/server.js'
 

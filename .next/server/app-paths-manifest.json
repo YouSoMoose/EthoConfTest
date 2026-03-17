@@ -1,11 +1,12 @@
 {
-  "/api/messages/route": "app/api/messages/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/page": "app/page.js",
   "/api/announcements/route": "app/api/announcements/route.js",
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/api/users/route": "app/api/users/route.js",
-  "/api/schedule/route": "app/api/schedule/route.js",
-  "/admin/messages/page": "app/admin/messages/page.js",
-  "/app/page": "app/app/page.js",
-  "/app/chat/page": "app/app/chat/page.js",
-  "/admin/page": "app/admin/page.js"
+  "/api/messages/route": "app/api/messages/route.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/login/page": "app/login/page.js",
+  "/admin/checkin/page": "app/admin/checkin/page.js",
+  "/app/my-card/page": "app/app/my-card/page.js",
+  "/app/page": "app/app/page.js"
 }

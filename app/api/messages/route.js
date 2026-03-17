@@ -46,6 +46,16 @@ export async function GET(request) {
 
   // Staff/admin: get all messages or messages for a specific user
   if (level >= 2 && !asAttendee) {
+    // Restricted Chat logic: level 2 staff shouldn't see sensitive admin messages
+    if (level === 2) {
+       return NextResponse.json([{ 
+         id: 'humor', 
+         content: 'Why are you here? You dont need this.', 
+         sender: { name: 'System', avatar: null },
+         created_at: new Date().toISOString()
+       }]);
+    }
+
     const targetUser = searchParams.get('user_id');
     let query = supabaseAdmin
       .from('messages')

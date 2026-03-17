@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Avatar from '@/components/Avatar';
 import Loader from '@/components/Loader';
+import { Home, Calendar, Wallet, Scan, MessageCircle, FileText, CreditCard, ChevronRight, LogOut, Settings } from 'lucide-react';
 
 function AnnouncementCard({ a }) {
   const [expanded, setExpanded] = useState(false);
@@ -74,12 +75,12 @@ export default function AttendeeDashboard() {
   const upNext = schedule[0];
 
   const quickLinks = [
-    { icon: '📅', label: 'Schedule', href: '/app/schedule?anim=scale' },
-    { icon: '💬', label: 'Chat', href: '/app/chat?anim=scale' },
-    { icon: '📝', label: 'Notes', href: '/app/notes?anim=scale' },
-    { icon: '💼', label: 'Wallet', href: '/app/wallet?anim=scale' },
-    { icon: '🎫', label: 'My Card', href: '/app/my-card?anim=scale' },
-    { icon: '🔍', label: 'Scan', href: '/app/scan?anim=scale' },
+    { icon: Calendar, label: 'Schedule', href: '/app/schedule' },
+    { icon: MessageCircle, label: 'Chat', href: '/app/chat' },
+    { icon: FileText, label: 'Notes', href: '/app/notes' },
+    { icon: Wallet, label: 'Wallet', href: '/app/wallet' },
+    { icon: Scan, label: 'Scan', href: '/app/scan' },
+    { icon: CreditCard, label: 'My Card', href: '/app/my-card' },
   ];
 
   return (
@@ -88,65 +89,46 @@ export default function AttendeeDashboard() {
       <div style={{
         background: 'var(--hero)',
         color: '#fff',
-        padding: 'max(16px, env(safe-area-inset-top)) 16px 24px',
+        padding: 'max(16px, env(safe-area-inset-top)) 16px 32px',
+        boxShadow: '0 4px 20px rgba(65, 52, 41, 0.15)',
       }}>
         <div style={{ maxWidth: 500, margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <Avatar src={profile?.avatar} name={profile?.name} size={48} />
+            <Avatar src={profile?.avatar} name={profile?.name} size={52} />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <h1 style={{ fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 22, margin: 0, color: '#fff' }}>
+              <h1 style={{ fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 24, margin: 0, color: '#fff', letterSpacing: '-0.02em' }}>
                 Hey, {firstName}! 👋
               </h1>
-              <p style={{ fontFamily: 'var(--fb)', fontSize: 13, opacity: 0.8, marginTop: 2, color: '#fff' }}>
+              <p style={{ fontFamily: 'var(--fb)', fontSize: 13, opacity: 0.9, marginTop: 2, color: '#fff', fontWeight: 500 }}>
                 Welcome to Ethos 2026
               </p>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-              {profile?.access_level >= 2 && (
-                <Link href="/admin" style={{
-                  background: 'rgba(255,255,255,0.15)',
-                  border: '1px solid rgba(255,255,255,0.25)',
-                  borderRadius: 8,
-                  padding: '5px 10px',
-                  fontFamily: 'var(--fb)',
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: '#fff',
-                  whiteSpace: 'nowrap',
-                }}>
-                  ⚙️ Admin
-                </Link>
-              )}
-              {profile?.access_level === 1 && (
-                <Link href="/company" style={{
-                  background: 'rgba(255,255,255,0.15)',
-                  border: '1px solid rgba(255,255,255,0.25)',
-                  borderRadius: 8,
-                  padding: '5px 10px',
-                  fontFamily: 'var(--fb)',
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: '#fff',
-                  whiteSpace: 'nowrap',
-                }}>
-                  🏢 Portal
-                </Link>
-              )}
-              <button onClick={() => signOut({ callbackUrl: '/login' })} style={{
-                background: 'rgba(255,255,255,0.12)',
-                border: 'none',
-                color: 'rgba(255,255,255,0.8)',
-                fontSize: 12,
-                fontFamily: 'var(--fb)',
-                padding: '6px 12px',
-                borderRadius: 10,
-                cursor: 'pointer',
-                transition: 'background 0.2s',
-                flexShrink: 0,
+            <img src="/assets/ethos-logo-insignia.png" alt="" style={{ width: 44, height: 44, objectFit: 'contain', filter: 'brightness(1.2)' }} />
+          </div>
+          
+          <div style={{ marginTop: 28, display: 'flex', gap: 12 }}>
+            {profile?.access_level >= 3 && (
+              <Link href="/admin" style={{
+                flex: 1, background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: 14, padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                color: '#fff', fontSize: 13, fontWeight: 700, textDecoration: 'none', transition: 'all 0.2s'
               }}>
-                Sign Out
-              </button>
-            </div>
+                <Settings size={16} /> Admin Panel
+              </Link>
+            )}
+            <button 
+              onClick={() => signOut({ callbackUrl: '/login' })} 
+              className="signout-btn"
+              style={{
+                flex: profile?.access_level >= 3 ? 0.4 : 1, 
+                background: 'rgba(255,255,255,0.08)', 
+                border: '1px solid rgba(255,255,255,0.12)',
+                borderRadius: 14, padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer'
+              }}
+            >
+              <LogOut size={16} /> Sign Out
+            </button>
           </div>
         </div>
       </div>
@@ -202,22 +184,35 @@ export default function AttendeeDashboard() {
             gridTemplateColumns: 'repeat(4, 1fr)',
             gap: 10,
           }}>
-            {quickLinks.map((link) => (
-              <Link key={link.href} href={link.href} style={{
-                background: 'var(--white)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--r)',
-                padding: '14px 8px',
-                textAlign: 'center',
-                cursor: 'pointer',
-                transition: 'background 0.15s',
-              }}>
-                <span style={{ fontSize: 24, display: 'block', marginBottom: 4 }}>{link.icon}</span>
-                <span style={{ fontFamily: 'var(--fb)', fontSize: 10, fontWeight: 500, color: 'var(--sub)' }}>
-                  {link.label}
-                </span>
-              </Link>
-            ))}
+            {quickLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Link key={link.href} href={link.href} style={{
+                  background: 'var(--white)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--r)',
+                  padding: '16px 8px',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 8,
+                  textDecoration: 'none',
+                }}>
+                  <div style={{ 
+                    width: 44, height: 44, borderRadius: 22, background: 'var(--s2)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--g)'
+                  }}>
+                    <Icon size={20} />
+                  </div>
+                  <span style={{ fontFamily: 'var(--fb)', fontSize: 11, fontWeight: 600, color: 'var(--text)' }}>
+                    {link.label}
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         </div>
 

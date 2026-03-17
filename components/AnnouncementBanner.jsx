@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useSession } from 'next-auth/react';
 
 const DISMISSED_KEY = 'ethos_dismissed_announcements';
 
@@ -17,11 +18,13 @@ function addDismissed(id) {
 }
 
 export default function AnnouncementBanner() {
+  const { data: session } = useSession();
   const [announcements, setAnnouncements] = useState([]);
   const [visible, setVisible] = useState([]);
   const [exiting, setExiting] = useState([]);
 
   const fetchAnnouncements = useCallback(async () => {
+    if (!session?.profile) return;
     try {
       const res = await fetch('/api/announcements');
       if (res.ok) {
@@ -54,7 +57,7 @@ export default function AnnouncementBanner() {
 
   const activeAnnouncements = announcements.filter(a => visible.includes(a.id));
 
-  if (activeAnnouncements.length === 0) return null;
+  if (!session?.profile || activeAnnouncements.length === 0) return null;
 
   return (
     <div style={{

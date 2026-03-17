@@ -7,6 +7,10 @@ import AnnouncementBanner from '@/components/AnnouncementBanner';
 export const metadata = {
   title: 'Ethos 2026 — Sustainability Conference',
   description: 'The official app for Ethos 2026, a sustainability and innovation conference.',
+  icons: {
+    icon: '/assets/ethos-logo-insignia.png',
+    apple: '/assets/ethos-logo-insignia.png',
+  }
 };
 
 export const viewport = {
@@ -35,7 +39,9 @@ export default function RootLayout({ children }) {
           />
           <MessageNotification />
           <AnnouncementBanner />
-          {children}
+          <div className="mobile-container">
+            {children}
+          </div>
         </SessionProvider>
       </body>
     </html>

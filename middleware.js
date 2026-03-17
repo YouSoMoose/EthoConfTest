@@ -9,7 +9,8 @@ export async function middleware(request) {
   if (
     pathname.startsWith('/api/auth') ||
     pathname.startsWith('/_next') ||
-    pathname.startsWith('/favicon')
+    pathname.includes('favicon') ||
+    pathname.startsWith('/assets')
   ) {
     return NextResponse.next();
   }
@@ -33,12 +34,26 @@ export async function middleware(request) {
 
   const accessLevel = token.profile?.access_level ?? 0;
 
-  // Protect /admin — requires level >= 2
+  // Protect /admin
   if (pathname.startsWith('/admin')) {
+    // Level 0/1 can't access /admin at all
     if (accessLevel < 2) {
       return NextResponse.redirect(new URL('/app', request.url));
     }
+    
+    // Level 2 (Event Staff) restriction: Redirect away from management pages to QR Scanner
+    // Management pages: /admin/users, /admin/cards, /admin/announcements, /admin/voting-settings
+    const isManagementPage = pathname === '/admin' || 
+                             pathname.startsWith('/admin/users') || 
+                             pathname.startsWith('/admin/cards') ||
+                             pathname.startsWith('/admin/announcements') ||
+                             pathname.startsWith('/admin/voting-settings');
+                             
+    if (accessLevel === 2 && isManagementPage && pathname !== '/admin/qr-scanner') {
+      return NextResponse.redirect(new URL('/admin/qr-scanner', request.url));
+    }
   }
+
   // Onboarding check for ALL logged-in users
   const isPublicPath = pathname.startsWith('/api/auth') || pathname.startsWith('/_next') || pathname === '/favicon.ico' || pathname === '/' || pathname === '/login';
   

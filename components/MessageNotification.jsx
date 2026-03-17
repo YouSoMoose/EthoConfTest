@@ -15,7 +15,6 @@ export default function MessageNotification() {
 
   const checkNewMessages = useCallback(async () => {
     if (!session?.profile?.id) return;
-    // Don't show notifications if we are already in the chat or admin messages page
     if (pathname === '/app/chat' || pathname === '/admin/messages') return;
 
     try {
@@ -27,7 +26,6 @@ export default function MessageNotification() {
           setActiveMsg(msg);
           setExiting(false);
           
-          // Auto-hide after 6 seconds
           setTimeout(() => {
             setExiting(true);
             setTimeout(() => setActiveMsg(null), 400);
@@ -42,7 +40,7 @@ export default function MessageNotification() {
     return () => clearInterval(iv);
   }, [checkNewMessages]);
 
-  if (!activeMsg) return null;
+  if (!session?.profile || !activeMsg) return null;
 
   const sender = activeMsg.sender;
   const isStaff = sender?.access_level >= 2;
@@ -59,48 +57,52 @@ export default function MessageNotification() {
         position: 'fixed',
         top: 0, left: 0, right: 0,
         zIndex: 10000,
-        padding: 'max(16px, env(safe-area-inset-top)) 16px 0',
+        padding: 'max(12px, env(safe-area-inset-top)) 12px 0',
         pointerEvents: 'none',
       }}
     >
       <div style={{
-        background: 'rgba(25, 25, 25, 0.9)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        borderRadius: 20,
-        padding: '12px 16px',
-        display: 'flex', alignItems: 'center', gap: 14,
-        boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
-        border: '1px solid rgba(255,255,255,0.1)',
+        background: 'rgba(30,30,30,0.85)',
+        backdropFilter: 'blur(40px)',
+        WebkitBackdropFilter: 'blur(40px)',
+        borderRadius: 16,
+        padding: '14px 16px',
+        display: 'flex', alignItems: 'flex-start', gap: 12,
+        boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+        border: '0.5px solid rgba(255,255,255,0.12)',
         cursor: 'pointer',
         pointerEvents: 'auto',
-        maxWidth: 450,
+        maxWidth: 420,
         margin: '0 auto',
         width: '100%',
         animation: exiting 
-          ? 'notifExit 0.35s ease forwards' 
-          : 'notifEnter 0.5s cubic-bezier(0.19, 1, 0.22, 1) both',
+          ? 'notifExit 0.3s ease forwards' 
+          : 'notifEnter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both',
       }}>
-        <Avatar src={sender?.avatar} name={sender?.name} size={40} />
+        <div style={{
+          width: 38, height: 38, borderRadius: 10,
+          background: 'linear-gradient(135deg, #2d5016 0%, #1a4a3c 100%)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          flexShrink: 0, fontSize: 16, fontFamily: 'var(--fh)', fontWeight: 800, color: '#fff',
+        }}>E</div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 3 }}>
             <span style={{ 
-              fontFamily: 'var(--fb)', fontWeight: 800, fontSize: 13, color: '#fff' 
+              fontFamily: 'var(--fb)', fontWeight: 800, fontSize: 13, color: 'rgba(255,255,255,0.95)' 
             }}>{sender?.name || 'New Message'}</span>
             {isStaff && (
               <span style={{ 
-                fontSize: 10, background: 'var(--g)', color: '#fff', 
+                fontSize: 10, background: 'var(--g)', color: 'var(--text)', 
                 padding: '1px 5px', borderRadius: 4, fontWeight: 700,
                 textTransform: 'uppercase'
               }}>Staff</span>
             )}
           </div>
           <p style={{
-            fontFamily: 'var(--fb)', fontSize: 14, color: 'rgba(255,255,255,0.8)',
-            margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+            fontFamily: 'var(--fb)', fontSize: 14, color: '#fff',
+            margin: 0, fontWeight: 600, lineHeight: 1.3
           }}>{activeMsg.content}</p>
         </div>
-        <div style={{ fontSize: 18, opacity: 0.5 }}>💬</div>
       </div>
     </div>
   );

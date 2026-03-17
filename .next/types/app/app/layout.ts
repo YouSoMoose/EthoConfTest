@@ -1,4 +1,4 @@
-// File: C:\Users\Akhil.DESKTOP-TV2N8F4\Downloads\ethos-app\ethos-app\app\app\layout.js
+// File: C:\Users\Akhil.DESKTOP-TV2N8F4\Downloads\ethos-app\ethos-app\ethos-app\app\app\layout.js
 import * as entry from '../../../../app/app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

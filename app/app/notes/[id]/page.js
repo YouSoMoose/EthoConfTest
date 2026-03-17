@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import Topbar from '@/components/Topbar';
 import Loader from '@/components/Loader';
 import Spinner from '@/components/Spinner';
+import { Save } from 'lucide-react';
 
 export default function NoteEditorPage() {
   const { id } = useParams();
@@ -43,11 +44,12 @@ export default function NoteEditorPage() {
         onBack={() => router.back()}
         rightEl={
           <button onClick={saveNote} disabled={saving} style={{
-            background: 'none', border: '1.5px solid var(--border)', borderRadius: 8,
-            padding: '5px 12px', fontFamily: 'var(--fb)', fontSize: 12, fontWeight: 600,
-            color: 'var(--text)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+            background: 'var(--g)', border: 'none', borderRadius: 10,
+            padding: '8px 16px', fontFamily: 'var(--fb)', fontSize: 13, fontWeight: 700,
+            color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
+            boxShadow: '0 4px 12px rgba(252, 189, 157, 0.2)'
           }}>
-            {saving ? <Spinner size={12} /> : 'Save'}
+            {saving ? <Spinner size={14} /> : <><Save size={16} /> Save</>}
           </button>
         }
       />

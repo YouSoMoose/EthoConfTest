@@ -5,21 +5,21 @@
 
 :root {
   /* Attendee / Light Theme */
-  --bg: #FFFBF4;
-  --white: #FFFBF4;
-  --s1: #D4CCC4;
-  --s2: #A89E94;
-  --border: #A89E94;
-  --g: #FCBD9D;
-  --gl: #FFE2D6;
-  --gb: rgba(252, 189, 157, 0.4);
-  --hero: linear-gradient(135deg, #FCBD9D 0%, #A89E94 100%);
+  --bg: #FFFDF9; /* Brighter, cleaner paper feel */
+  --white: #FFFFFF; 
+  --s1: #F5EFEB; /* Slightly punchier beige */
+  --s2: #FFE2D6; 
+  --border: #E8E2DA;
+  --g: #413429; /* High visibility coffee for icons/labels */
+  --gl: #FDF9F4;
+  --gb: #F5EEE6;
+  --hero: linear-gradient(135deg, #514033 0%, #413429 100%);
   --warm: #FCBD9D;
   --warm-dim: #FFE2D6;
   --warm-border: #D4CCC4;
-  --text: #413429;
-  --sub: #514033;
-  --muted: #7D6F63;
+  --text: #2D241E;
+  --sub: #5A4D43; /* Darkened for accessibility */
+  --muted: #8E8278; /* Darkened for accessibility */
   --r: 14px;
   --fh: 'Fraunces', Georgia, serif;
   --fb: 'DM Sans', system-ui, sans-serif;
@@ -61,9 +61,22 @@ html, body {
 
 body {
   font-family: var(--fb);
-  background: var(--bg);
+  background: #111; /* Dark background for desktop desktop */
   color: var(--text);
   min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+}
+
+.mobile-container {
+  width: 100%;
+  max-width: 500px;
+  background: var(--bg);
+  min-height: 100dvh;
+  position: relative;
+  box-shadow: 0 0 100px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── Scrollbar hidden ──────────────────────────────────── */
