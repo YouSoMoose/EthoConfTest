@@ -13,13 +13,7 @@ const slides = [
     gradient: 'linear-gradient(135deg, #FFE2D6 0%, #FCBD9D 100%)',
     textMode: 'dark',
   },
-  {
-    icon: '🏢',
-    title: 'Explore Companies',
-    desc: 'Browse and rate participating companies. Discover innovative startups and sustainability leaders.',
-    gradient: 'linear-gradient(135deg, #FCBD9D 0%, #F5F0EA 100%)',
-    textMode: 'dark',
-  },
+
   {
     icon: '🛂',
     title: 'Passport Stamps',

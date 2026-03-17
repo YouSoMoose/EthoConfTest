@@ -9,266 +9,12 @@ import Topbar from '@/components/Topbar';
 import Avatar from '@/components/Avatar';
 import Btn from '@/components/Btn';
 import Modal from '@/components/Modal';
+import { CardPreview, DEFAULT_STYLE } from '@/components/CardPreview';
 import { QRCodeSVG } from 'qrcode.react';
 import { toPng } from 'html-to-image';
 import toast from 'react-hot-toast';
 import { Save, Download, Search, RefreshCcw, Camera, MoreVertical, Check, Smartphone, Building, User as UserIcon, Type, Mail, FileText } from 'lucide-react';
 
-const DEFAULT_STYLE = {
-  nameSize: 22, nameX: 0, nameY: 0, nameVisible: true,
-  roleSize: 14, roleX: 0, roleY: 0, roleVisible: true,
-  companySize: 13, companyX: 0, companyY: 0, companyVisible: true,
-  emailSize: 11, emailX: 0, emailY: 0, emailVisible: true,
-  qrSize: 130, qrX: 0, qrY: 0, qrVisible: true,
-  logoSize: 44, logoX: 0, logoY: 0, logoVisible: true,
-  accentColor: '#D49B7A',
-  textColor: '#413429',
-  subColor: '#7D6F63',
-};
-
-const LIVE_MAP = {
-  nameSize:    (v, r, s) => r.name    && (r.name.style.fontSize    = v + 'px'),
-  nameX:       (v, r, s) => r.name    && (r.name.style.transform   = `translate(${v}px, ${s.nameY ?? 0}px)`),
-  nameY:       (v, r, s) => r.name    && (r.name.style.transform   = `translate(${s.nameX ?? 0}px, ${v}px)`),
-  roleSize:    (v, r, s) => r.role    && (r.role.style.fontSize    = v + 'px'),
-  roleX:       (v, r, s) => r.role    && (r.role.style.transform   = `translate(${v}px, ${s.roleY ?? 0}px)`),
-  roleY:       (v, r, s) => r.role    && (r.role.style.transform   = `translate(${s.roleX ?? 0}px, ${v}px)`),
-  companySize: (v, r, s) => r.company && (r.company.style.fontSize = v + 'px'),
-  companyX:    (v, r, s) => r.company && (r.company.style.transform = `translate(${v}px, ${s.companyY ?? 0}px)`),
-  companyY:    (v, r, s) => r.company && (r.company.style.transform = `translate(${s.companyX ?? 0}px, ${v}px)`),
-  emailSize:   (v, r, s) => r.email   && (r.email.style.fontSize   = v + 'px'),
-  emailX:      (v, r, s) => r.email   && (r.email.style.transform  = `translate(${v}px, ${s.emailY ?? 0}px)`),
-  emailY:      (v, r, s) => r.email   && (r.email.style.transform  = `translate(${s.emailX ?? 0}px, ${v}px)`),
-  logoSize:    (v, r, s) => r.logoBox  && (r.logoBox.style.width = r.logoBox.style.height = v + 'px'),
-  logoX:       (v, r, s) => r.logoWrap && (r.logoWrap.style.transform = `translate(${v}px, ${s.logoY ?? 0}px)`),
-  logoY:       (v, r, s) => r.logoWrap && (r.logoWrap.style.transform = `translate(${s.logoX ?? 0}px, ${v}px)`),
-  qrX:         (v, r, s) => r.qrWrap  && (r.qrWrap.style.transform  = `translate(${v}px, ${s.qrY ?? 0}px)`),
-  qrY:         (v, r, s) => r.qrWrap  && (r.qrWrap.style.transform  = `translate(${s.qrX ?? 0}px, ${v}px)`),
-};
-
-function CardEditor({ style, onUpdate, onReset, cardDOMRefs }) {
-  const [activeTab, setActiveTab] = useState('size');
-  const [localStyle, setLocalStyle] = useState(style);
-  const localRef = useRef(style);
-  const rafRef = useRef(null);
-
-  const handleInput = useCallback((attr, rawVal) => {
-    const val = parseFloat(rawVal);
-    const pill = document.getElementById(`pill-${attr}`);
-    if (pill) pill.textContent = Math.round(val);
-
-    const input = document.getElementById(`slider-${attr}`);
-    if (input) {
-      const pct = ((val - parseFloat(input.min)) / (parseFloat(input.max) - parseFloat(input.min))) * 100;
-      input.style.background = `linear-gradient(to right, var(--accent) ${pct}%, var(--as3) ${pct}%)`;
-    }
-
-    localRef.current = { ...localRef.current, [attr]: val };
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    rafRef.current = requestAnimationFrame(() => {
-      if (LIVE_MAP[attr]) LIVE_MAP[attr](val, cardDOMRefs.current, localRef.current);
-    });
-  }, [cardDOMRefs]);
-
-  const handleCommit = useCallback((attr, rawVal) => {
-    const val = parseFloat(rawVal);
-    const next = { ...localRef.current, [attr]: val };
-    localRef.current = next;
-    setLocalStyle(next);
-    onUpdate(next);
-  }, [onUpdate]);
-
-  const update = useCallback((key, val) => {
-    const next = { ...localRef.current, [key]: val };
-    localRef.current = next;
-    setLocalStyle(next);
-    onUpdate(next);
-  }, [onUpdate]);
-
-  const Slider = ({ label, attr, min, max }) => {
-    const val = localStyle[attr] ?? 0;
-    const pct = ((val - min) / (max - min)) * 100;
-    return (
-      <div className="premium-slider-group" style={{ marginBottom: 16 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, alignItems: 'center' }}>
-          <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--sub)', textTransform: 'uppercase' }}>{label}</label>
-          <span id={`pill-${attr}`} className="slider-value-pill" style={{ fontSize: 10, fontWeight: 800, background: 'var(--as1)', color: 'var(--accent)', padding: '2px 8px', borderRadius: 20, border: '1px solid var(--border)' }}>{Math.round(val)}</span>
-        </div>
-        <input
-          id={`slider-${attr}`}
-          type="range" min={min} max={max} step="1"
-          defaultValue={val}
-          onInput={e => handleInput(attr, e.target.value)}
-          onMouseUp={e => handleCommit(attr, e.target.value)}
-          onTouchEnd={e => handleCommit(attr, e.target.value)}
-          className="premium-range-input"
-          style={{ width: '100%', height: 6, borderRadius: 10, outline: 'none', cursor: 'pointer', background: `linear-gradient(to right, var(--accent) ${pct}%, var(--as3) ${pct}%)`, appearance: 'none' }}
-        />
-      </div>
-    );
-  };
-
-  const Toggle = ({ label, attr }) => (
-    <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: 11, color: 'var(--text)', fontWeight: 600 }}>
-      <input type="checkbox" checked={localStyle[attr]} onChange={e => update(attr, e.target.checked)} className="premium-toggle" />
-      {label}
-    </label>
-  );
-
-  return (
-    <div style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 24, padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div style={{ display: 'flex', background: 'var(--as1)', borderRadius: 12, padding: 4 }}>
-        {['size', 'pos', 'vis'].map(t => (
-          <button key={t} onClick={() => setActiveTab(t)} style={{
-            flex: 1, padding: '8px', border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 700,
-            background: activeTab === t ? 'var(--white)' : 'transparent',
-            color: activeTab === t ? 'var(--accent)' : 'var(--sub)',
-            cursor: 'pointer', transition: 'all 0.2s', textTransform: 'uppercase'
-          }}>
-            {t === 'size' ? 'Scale' : t === 'pos' ? 'Layout' : 'Toggle'}
-          </button>
-        ))}
-      </div>
-
-      <div style={{ maxHeight: 300, overflowY: 'auto', paddingRight: 4 }}>
-        {activeTab === 'size' && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-             <Slider label="Name" attr="nameSize" min={10} max={60} />
-             <Slider label="Role" attr="roleSize" min={8} max={40} />
-             <Slider label="Company" attr="companySize" min={8} max={40} />
-             <Slider label="Email" attr="emailSize" min={8} max={30} />
-             <Slider label="Logo" attr="logoSize" min={10} max={100} />
-             <Slider label="QR" attr="qrSize" min={50} max={200} />
-             <div style={{ gridColumn: 'span 2', display: 'flex', gap: 12 }}>
-                <div style={{ flex: 1 }}>
-                  <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--sub)', display: 'block', marginBottom: 6 }}>ACCENT</label>
-                  <input type="color" value={localStyle.accentColor} onChange={e => update('accentColor', e.target.value)} style={{ width: '100%', height: 32, border: 'none', borderRadius: 8 }} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--sub)', display: 'block', marginBottom: 6 }}>TEXT</label>
-                  <input type="color" value={localStyle.textColor} onChange={e => update('textColor', e.target.value)} style={{ width: '100%', height: 32, border: 'none', borderRadius: 8 }} />
-                </div>
-             </div>
-          </div>
-        )}
-
-        {activeTab === 'pos' && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <Slider label="Name X" attr="nameX" min={-100} max={100} />
-            <Slider label="Name Y" attr="nameY" min={-100} max={100} />
-            <Slider label="Role X" attr="roleX" min={-100} max={100} />
-            <Slider label="Role Y" attr="roleY" min={-100} max={100} />
-            <Slider label="Comp X" attr="companyX" min={-100} max={100} />
-            <Slider label="Comp Y" attr="companyY" min={-100} max={100} />
-            <Slider label="QR X" attr="qrX" min={-150} max={150} />
-            <Slider label="QR Y" attr="qrY" min={-150} max={150} />
-          </div>
-        )}
-
-        {activeTab === 'vis' && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, background: 'var(--as1)', padding: 12, borderRadius: 12 }}>
-            <Toggle label="Name" attr="nameVisible" />
-            <Toggle label="Role" attr="roleVisible" />
-            <Toggle label="Company" attr="companyVisible" />
-            <Toggle label="Email" attr="emailVisible" />
-            <Toggle label="Logo" attr="logoVisible" />
-            <Toggle label="QR" attr="qrVisible" />
-          </div>
-        )}
-      </div>
-
-      <button onClick={onReset} style={{ background: 'var(--as1)', border: 'none', borderRadius: 10, padding: 10, fontSize: 11, fontWeight: 700, color: 'var(--text)', cursor: 'pointer' }}>Reset Composition</button>
-    </div>
-  );
-}
-
-const CardPreview = memo(function CardPreview({ user, style, cardRef, domRefs }) {
-  return (
-    <div ref={cardRef} style={{
-      background: '#ffffff', borderRadius: 24, border: '1px solid var(--border)',
-      width: 340, height: 500, padding: 32, textAlign: 'center',
-      boxShadow: '0 20px 60px rgba(0,0,0,0.08)',
-      position: 'relative', overflow: 'hidden', flexShrink: 0,
-      animation: 'scaleIn 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67) both',
-    }}>
-      <div style={{
-        position: 'absolute', top: 0, right: 0, width: 220, height: 220,
-        background: `linear-gradient(135deg, ${style.accentColor}25 0%, transparent 100%)`,
-        borderRadius: '0 0 0 100%', pointerEvents: 'none'
-      }} />
-
-      <div style={{ zIndex: 1, position: 'relative' }}>
-        {style.logoVisible && (
-          <div ref={el => domRefs.current.logoWrap = el} style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 20,
-            transform: `translate(${style.logoX || 0}px, ${style.logoY || 0}px)`,
-          }}>
-            <div ref={el => domRefs.current.logoBox = el} style={{ width: style.logoSize, height: style.logoSize, margin: '0 auto', borderRadius: 8, overflow: 'hidden' }}>
-              <img src="/assets/ethos-logo.png" alt="E" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-            </div>
-          </div>
-        )}
-
-        <Avatar src={user.avatar} name={user.name} size={110} />
-
-        <div style={{ marginTop: 24 }}>
-          {style.nameVisible && (
-            <h2 ref={el => domRefs.current.name = el} style={{
-              fontFamily: 'var(--fh)', fontWeight: 800, fontSize: style.nameSize,
-              color: style.textColor, margin: 0, lineHeight: 1.1,
-              transform: `translate(${style.nameX}px, ${style.nameY}px)`,
-            }}>
-              {user.name || 'Your Name'}
-            </h2>
-          )}
-
-          {style.roleVisible && (
-            <p ref={el => domRefs.current.role = el} style={{
-              fontFamily: 'var(--fb)', fontWeight: 700, fontSize: style.roleSize,
-              color: style.accentColor, margin: '8px 0', textTransform: 'uppercase', letterSpacing: '1px',
-              transform: `translate(${style.roleX}px, ${style.roleY}px)`,
-            }}>
-              {user.role || 'Attendee'}
-            </p>
-          )}
-
-          {style.companyVisible && (
-            <p ref={el => domRefs.current.company = el} style={{
-              fontFamily: 'var(--fb)', fontWeight: 600, fontSize: style.companySize,
-              color: style.subColor, margin: '4px 0',
-              transform: `translate(${style.companyX || 0}px, ${style.companyY || 0}px)`,
-            }}>
-              {user.company || 'Ethos Attendee'}
-            </p>
-          )}
-
-          {style.emailVisible && (
-            <p ref={el => domRefs.current.email = el} style={{
-              fontFamily: 'var(--fb)', fontSize: style.emailSize, color: 'var(--muted)', margin: 0,
-              transform: `translate(${style.emailX || 0}px, ${style.emailY || 0}px)`,
-            }}>
-              {user.email}
-            </p>
-          )}
-        </div>
-
-        {style.qrVisible && (
-          <div style={{
-            background: '#fff', padding: 12, borderRadius: 16, border: `1.5px solid ${style.accentColor}33`,
-            display: 'inline-block', marginTop: 32,
-            transform: `translate(${style.qrX}px, ${style.qrY}px)`,
-          }} ref={el => domRefs.current.qrWrap = el}>
-            <QRCodeSVG value={user.id || ''} size={style.qrSize} level="M" fgColor={style.textColor} bgColor="#ffffff" />
-          </div>
-        )}
-      </div>
-      
-      <p style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--muted)', marginTop: 32, opacity: 0.6, letterSpacing: '0.1em' }}>
-        ETHOS 2026 OFFICIAL BADGE
-      </p>
-    </div>
-  );
-});
 
 function MyCardContent() {
   const { data: session, update: updateSession } = useSession();
@@ -426,6 +172,14 @@ function MyCardContent() {
                  </div>
 
                  <div className="input-group">
+                   <label className="section-label">Short Bio</label>
+                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, background: 'var(--s2)', padding: '12px 16px', borderRadius: 16 }}>
+                     <Type size={18} color="var(--muted)" style={{ marginTop: 2 }} />
+                     <textarea value={bio} onChange={e => setBio(e.target.value)} placeholder="Tell us about yourself..." maxLength={150} style={{ flex: 1, background: 'transparent', border: 'none', fontSize: 15, outline: 'none', fontWeight: 500, resize: 'none', minHeight: '60px' }} />
+                   </div>
+                 </div>
+
+                 <div className="input-group">
                    <label className="section-label">Email Address</label>
                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16, opacity: 0.7 }}>
                      <Mail size={18} color="var(--muted)" />
@@ -485,7 +239,7 @@ function MyCardContent() {
                   level="H" 
                   fgColor="#413429" 
                   bgColor="#ffffff" 
-                  style={{ width: '100%', height: '100%' }}
+                  style={{ width: '100%', height: 'auto', aspectRatio: '1/1' }}
                 />
               </div>
             </div>

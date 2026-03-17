@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Avatar from '@/components/Avatar';
 import Loader from '@/components/Loader';
 import { Home, Calendar, Wallet, Scan, MessageCircle, FileText, CreditCard, ChevronRight, LogOut, Settings } from 'lucide-react';
+import { CardPreview } from '@/components/CardPreview';
 
 function AnnouncementCard({ a }) {
   const [expanded, setExpanded] = useState(false);
@@ -74,14 +75,21 @@ export default function AttendeeDashboard() {
   const firstName = profile?.name?.split(' ')[0] || 'there';
   const upNext = schedule[0];
 
-  const quickLinks = [
-    { icon: Calendar, label: 'Schedule', href: '/app/schedule' },
-    { icon: MessageCircle, label: 'Chat', href: '/app/chat' },
-    { icon: FileText, label: 'Notes', href: '/app/notes' },
-    { icon: Wallet, label: 'Wallet', href: '/app/wallet' },
-    { icon: Scan, label: 'Scan', href: '/app/scan' },
-    { icon: CreditCard, label: 'My Card', href: '/app/my-card' },
-  ];
+  const [customizations, setCustomizations] = useState(null);
+
+  useEffect(() => {
+    if (session?.profile?.id) {
+      const saved = localStorage.getItem('ethos_card_customizations');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed[session.profile.id]) {
+            setCustomizations(parsed[session.profile.id]);
+          }
+        } catch(e) {}
+      }
+    }
+  }, [session]);
 
   return (
     <div className="page-enter">
@@ -138,10 +146,38 @@ export default function AttendeeDashboard() {
         </div>
       </div>
 
-      <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px' }}>
+      <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+        
+        {/* RESPONSIVE ID CARD PREVIEW */}
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+             <p className="section-label" style={{ margin: 0 }}>MY CARD</p>
+             <Link href="/app/my-card" style={{ fontSize: 13, fontFamily: 'var(--fb)', fontWeight: 600, color: 'var(--accent)', textDecoration: 'none' }}>Virtual ID &rarr;</Link>
+          </div>
+          
+          <Link href="/app/my-card" style={{ textDecoration: 'none', display: 'block', position: 'relative', width: '100%', paddingBottom: '147%' /* (500/340)*100 */ }}>
+            <div style={{ 
+              position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+              display: 'flex', alignItems: 'flex-start', justifyContent: 'center'
+            }}>
+              <div style={{ 
+                transformOrigin: 'top center', 
+                transform: 'scale(calc(min(1, var(--vw-scale, 1))))',
+                width: 340, height: 500, // Fixed physical size of the card component
+              }}>
+                 {/* Internal logic variables for inline VW scale */}
+                 <style dangerouslySetInnerHTML={{__html: `
+                    :root { --vw-scale: calc((100vw - 32px) / 340); }
+                    @media (min-width: 500px) { :root { --vw-scale: calc(468px / 340); } }
+                 `}} />
+                 <CardPreview user={session.profile} style={customizations || undefined} />
+              </div>
+            </div>
+          </Link>
+        </div>
         {/* Up Next */}
         {upNext && (
-          <div style={{ marginBottom: 24 }}>
+          <div>
             <p className="section-label">📍 UP NEXT</p>
             <div style={{
               background: 'var(--gl)',
@@ -181,44 +217,28 @@ export default function AttendeeDashboard() {
           </div>
         )}
 
-        {/* Quick Access */}
-        <div style={{ marginBottom: 24 }}>
-          <p className="section-label">QUICK ACCESS</p>
-          <div className="stagger" style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: 10,
-          }}>
-            {quickLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <Link key={link.href} href={link.href} style={{
-                  background: 'var(--white)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--r)',
-                  padding: '16px 8px',
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: 8,
-                  textDecoration: 'none',
-                }}>
-                  <div style={{ 
-                    width: 44, height: 44, borderRadius: 22, background: 'var(--s2)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--g)'
-                  }}>
-                    <Icon size={20} />
-                  </div>
-                  <span style={{ fontFamily: 'var(--fb)', fontSize: 11, fontWeight: 600, color: 'var(--text)' }}>
-                    {link.label}
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
+        {/* NOTES APP LINK */}
+        <div>
+           <p className="section-label">WORKSPACE</p>
+           <Link href="/app/notes" style={{
+              background: 'var(--white)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--r)',
+              padding: 24,
+              display: 'flex', alignItems: 'center', gap: 16,
+              textDecoration: 'none',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
+              transition: 'all 0.2s',
+           }}>
+              <div style={{ width: 48, height: 48, borderRadius: 14, background: 'var(--s1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--g)' }}>
+                 <FileText size={24} />
+              </div>
+              <div style={{ flex: 1 }}>
+                 <h3 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 16, color: 'var(--text)', margin: 0 }}>Capture Notes</h3>
+                 <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--sub)', margin: '4px 0 0 0' }}>Jot down insights from your current session.</p>
+              </div>
+              <ChevronRight color="var(--muted)" />
+           </Link>
         </div>
 
         {/* Announcements */}

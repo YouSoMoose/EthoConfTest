@@ -24,23 +24,23 @@
   --fh: 'Fraunces', Georgia, serif;
   --fb: 'DM Sans', system-ui, sans-serif;
 
-  /* Admin / Dark Theme */
-  --abg: #0e0e11;
-  --as1: #17171c;
-  --as2: #1f1f27;
-  --as3: #27272f;
-  --aborder: #2e2e3a;
+  /* Admin / Rich Taupe Theme */
+  --abg: #413429; /* Deep Coffee */
+  --as1: #4A3F35; 
+  --as2: #5D5044;
+  --as3: #756658;
+  --aborder: rgba(245, 240, 230, 0.1);
   --accent: #FCBD9D;
-  --ad: rgba(252,189,157,.12);
-  --ab: rgba(252,189,157,.28);
+  --ad: rgba(252, 189, 157, 0.12);
+  --ab: rgba(252, 189, 157, 0.28);
   --agreen: #52d68a;
   --ared: #f07070;
   --ablue: #6aabf7;
   --apurple: #b987f5;
   --ayellow: #f5c842;
-  --atext: #eeece8; /* Restored for dark bg visibility */
-  --asub: #9999aa; /* Restored for dark bg visibility */
-  --amuted: #5a5a6a;
+  --atext: #F5F0E6; /* Light text for dark bg */
+  --asub: rgba(245, 240, 230, 0.75);
+  --amuted: rgba(245, 240, 230, 0.5);
   --fhs: 'Syne', sans-serif;
   --liquid: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
