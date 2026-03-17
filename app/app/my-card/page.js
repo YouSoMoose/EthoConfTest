@@ -352,9 +352,7 @@ function MyCardContent() {
 
   return (
     <div className="page-enter" style={{ paddingBottom: 100 }}>
-      {!isOnboarding && <Topbar title={isEditing ? "Details" : "My Digital ID"} />}
-      
-      <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 32, alignItems: 'center' }}>
+      <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 32, alignItems: 'center', justifyContent: 'center', minHeight: '80dvh' }}>
         
         {/* Card Display Side */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'center', width: '100%' }}>
