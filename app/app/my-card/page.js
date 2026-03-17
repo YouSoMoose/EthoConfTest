@@ -320,7 +320,7 @@ function MyCardContent() {
             style={{ cursor: 'pointer', display: 'flex', justifyContent: 'center', width: '100%' }}
           >
             <div style={{
-              transform: 'scale(min(calc((100vw - 32px) / 300), calc((100dvh - 200px) / 430)))',
+              transform: 'scale(min(1.4, calc((100vw - 32px) / 300)))',
               transformOrigin: 'top center',
               display: 'flex', flexDirection: 'column', alignItems: 'center',
             }}>
