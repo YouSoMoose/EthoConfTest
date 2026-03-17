@@ -23,7 +23,7 @@ export const CardPreview = memo(function CardPreview({ user, style = DEFAULT_STY
   const containerStyle = fullSize 
     ? {
         background: '#ffffff', borderRadius: 24, border: '1px solid var(--border)',
-        width: 340, height: 500, padding: 32, textAlign: 'center',
+        width: 300, height: 430, padding: 28, textAlign: 'center',
         boxShadow: '0 20px 60px rgba(0,0,0,0.08)',
         position: 'relative', overflow: 'hidden', flexShrink: 0,
         animation: 'scaleIn 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67) both'
@@ -62,9 +62,9 @@ export const CardPreview = memo(function CardPreview({ user, style = DEFAULT_STY
           </div>
         )}
 
-        {fullSize && <Avatar src={user.avatar} name={user.name} size={110} />}
+        {fullSize && <Avatar src={user.avatar} name={user.name} size={90} />}
 
-        <div style={fullSize ? { marginTop: 24 } : {}}>
+        <div style={fullSize ? { marginTop: 16 } : {}}>
           {s.nameVisible && (
             fullSize ? (
               <h2 ref={el => domRefs.current.name = el} style={{
@@ -121,7 +121,7 @@ export const CardPreview = memo(function CardPreview({ user, style = DEFAULT_STY
         {fullSize && s.qrVisible && (
           <div style={{
             background: '#fff', padding: 12, borderRadius: 16, border: `1.5px solid ${s.accentColor}33`,
-            display: 'inline-block', marginTop: 32,
+            display: 'inline-block', marginTop: 20,
             transform: `translate(${s.qrX}px, ${s.qrY}px)`,
           }} ref={el => domRefs.current.qrWrap = el}>
             <QRCodeSVG value={user.id || ''} size={s.qrSize} level="M" fgColor={s.textColor} bgColor="#ffffff" />
@@ -141,7 +141,7 @@ export const CardPreview = memo(function CardPreview({ user, style = DEFAULT_STY
       )}
       
       {fullSize && (
-        <p style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--muted)', marginTop: 32, opacity: 0.6, letterSpacing: '0.1em' }}>
+        <p style={{ fontFamily: 'var(--fb)', fontSize: 10, color: 'var(--muted)', marginTop: 16, marginBottom: 8, opacity: 0.6, letterSpacing: '0.1em' }}>
           ETHOS 2026 OFFICIAL BADGE
         </p>
       )}

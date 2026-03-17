@@ -103,9 +103,9 @@ function MyCardContent() {
         {/* Card Display Side */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'center', width: '100%', overflowX: 'hidden' }}>
           <div onClick={() => setQrExpanded(true)} style={{ cursor: 'pointer', transition: 'transform 0.3s var(--liquid)', display: 'flex', justifyContent: 'center', width: '100%' }}>
-            <div style={{ transform: 'scale(min(1, calc(100vw / 400)))', transformOrigin: 'top center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ transform: 'scale(min(1, calc((100vw - 64px) / 300)))', transformOrigin: 'top center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                <CardPreview user={{ ...profile, name, avatar, role, company }} style={DEFAULT_STYLE} cardRef={cardRef} domRefs={domRefs} />
-               <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--muted)', marginTop: 12, fontWeight: 600 }}>Tap ID to enlarge QR</p>
+               <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--muted)', marginTop: 16, fontWeight: 600 }}>Tap ID to enlarge QR</p>
             </div>
           </div>
           

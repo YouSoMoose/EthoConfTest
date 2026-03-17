@@ -147,33 +147,6 @@ export default function AttendeeDashboard() {
 
       <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 24 }}>
         
-        {/* RESPONSIVE ID CARD PREVIEW */}
-        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-             <p className="section-label" style={{ margin: 0 }}>MY CARD</p>
-             <Link href="/app/my-card" style={{ fontSize: 13, fontFamily: 'var(--fb)', fontWeight: 600, color: 'var(--accent)', textDecoration: 'none' }}>Virtual ID &rarr;</Link>
-          </div>
-          
-          <Link href="/app/my-card" style={{ textDecoration: 'none', display: 'block', position: 'relative', width: '100%', paddingBottom: '147%' /* (500/340)*100 */ }}>
-            <div style={{ 
-              position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-              display: 'flex', alignItems: 'flex-start', justifyContent: 'center'
-            }}>
-              <div style={{ 
-                transformOrigin: 'top center', 
-                transform: 'scale(calc(min(1, var(--vw-scale, 1))))',
-                width: 340, height: 500, // Fixed physical size of the card component
-              }}>
-                 {/* Internal logic variables for inline VW scale */}
-                 <style dangerouslySetInnerHTML={{__html: `
-                    :root { --vw-scale: calc((100vw - 32px) / 340); }
-                    @media (min-width: 500px) { :root { --vw-scale: calc(468px / 340); } }
-                 `}} />
-                 <CardPreview user={session.profile} style={customizations || undefined} />
-              </div>
-            </div>
-          </Link>
-        </div>
         {/* Up Next */}
         {upNext && (
           <div>
@@ -215,6 +188,24 @@ export default function AttendeeDashboard() {
             </div>
           </div>
         )}
+
+        {/* RESPONSIVE ID CARD PREVIEW */}
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+             <p className="section-label" style={{ margin: 0 }}>MY CARD</p>
+             <Link href="/app/my-card" style={{ fontSize: 13, fontFamily: 'var(--fb)', fontWeight: 600, color: 'var(--accent)', textDecoration: 'none' }}>Virtual ID &rarr;</Link>
+          </div>
+          
+          <Link href="/app/my-card" style={{ textDecoration: 'none', display: 'flex', justifyContent: 'center', width: '100%' }}>
+            <div style={{ 
+              transformOrigin: 'top center', 
+              transform: 'scale(min(1, calc((100vw - 64px) / 300)))',
+              width: 300, height: 430,
+            }}>
+               <CardPreview user={session.profile} style={customizations || undefined} />
+            </div>
+          </Link>
+        </div>
 
         {/* NOTES APP LINK */}
         <div>

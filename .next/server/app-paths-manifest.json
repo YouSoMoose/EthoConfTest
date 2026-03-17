@@ -1,10 +1,9 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/api/announcements/route": "app/api/announcements/route.js",
-  "/api/schedule/route": "app/api/schedule/route.js",
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/api/messages/route": "app/api/messages/route.js",
-  "/admin/page": "app/admin/page.js",
+  "/login/page": "app/login/page.js",
+  "/page": "app/page.js",
   "/app/page": "app/app/page.js",
+  "/admin/page": "app/admin/page.js",
   "/app/my-card/page": "app/app/my-card/page.js"
 }
