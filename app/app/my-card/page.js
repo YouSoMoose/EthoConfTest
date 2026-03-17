@@ -414,7 +414,7 @@ function MyCardContent() {
                     <div style={{ 
                       display: 'flex', alignItems: 'center', gap: 12, 
                       background: '#f8f5f2', padding: '0 16px', borderRadius: 16,
-                      border: '1px solid var(--border)', transition: 'all 0.2s'
+                      border: 'none', transition: 'all 0.2s'
                     }}>
                       {icon}
                       <input
@@ -440,7 +440,7 @@ function MyCardContent() {
                     onChange={e => setBio(e.target.value)}
                     placeholder="Tell us about yourself..."
                     style={{ 
-                      width: '100%', background: '#f8f5f2', border: '1px solid var(--border)', 
+                      width: '100%', background: '#f8f5f2', border: 'none', 
                       padding: '16px', fontSize: 15, outline: 'none', fontWeight: 500,
                       borderRadius: 16, minHeight: 120, fontFamily: 'inherit', resize: 'none',
                       color: 'var(--text)'
@@ -454,7 +454,7 @@ function MyCardContent() {
                   <div style={{ 
                     display: 'flex', alignItems: 'center', gap: 12, 
                     background: '#f8f5f2', padding: '0 16px', borderRadius: 16, 
-                    border: '1px solid var(--border)', opacity: 0.6 
+                    border: 'none', opacity: 0.6 
                   }}>
                     <Mail size={18} color="var(--muted)" />
                     <input
@@ -473,7 +473,7 @@ function MyCardContent() {
               <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
                 <button
                   onClick={() => setIsEditing(false)}
-                  style={{ flex: 1, background: 'var(--s1)', color: 'var(--text)', border: 'none', borderRadius: 16, padding: '16px', fontFamily: 'var(--fb)', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}
+                  style={{ flex: 1, background: 'rgba(0,0,0,0.05)', color: 'var(--text)', border: 'none', borderRadius: 16, padding: '16px', fontFamily: 'var(--fb)', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}
                 >
                   Cancel
                 </button>
@@ -484,7 +484,7 @@ function MyCardContent() {
                     flex: 2, background: 'var(--g)', color: '#fff', border: 'none', borderRadius: 16, padding: '16px',
                     fontFamily: 'var(--fb)', fontWeight: 800, fontSize: 15, cursor: 'pointer',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                    opacity: saving ? 0.7 : 1, transition: 'all 0.2s', boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
+                    opacity: saving ? 0.7 : 1, transition: 'all 0.2s', boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
                   }}
                 >
                   {saving ? 'Saving...' : 'Save Profile'}

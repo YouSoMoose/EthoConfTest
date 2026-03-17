@@ -48,7 +48,7 @@ export default function BottomNav({ items, admin }) {
       zIndex: 50,
       background: bg,
       borderTop: `1px solid ${border}`,
-      paddingBottom: 'max(8px, env(safe-area-inset-bottom))',
+      paddingBottom: 'calc(max(8px, env(safe-area-inset-bottom)) + 20px)',
     }}>
       <div style={{
         display: 'flex',
