@@ -23,6 +23,7 @@ function MyCardContent() {
   const [phone, setPhone] = useState(profile?.phone || '');
   const [bio, setBio] = useState(profile?.bio || '');
   const [name, setName] = useState(profile?.name || '');
+  const [role, setRole] = useState(profile?.role || '');
   const [avatar, setAvatar] = useState(profile?.avatar || '');
   const [company, setCompany] = useState(profile?.company || '');
   const [linkedin, setLinkedin] = useState(profile?.linkedin || '');
@@ -37,6 +38,7 @@ function MyCardContent() {
       setAvatar(prev => prev || profile.avatar || '');
       setCompany(prev => prev || profile.company || '');
       setBio(prev => prev || profile.bio || '');
+      setRole(prev => prev || profile.role || '');
       setPhone(prev => prev || profile.phone || '');
       setLinkedin(prev => prev || profile.linkedin || '');
       setResumeLink(prev => prev || profile.resume_link || '');
@@ -52,7 +54,7 @@ function MyCardContent() {
       const res = await fetch('/api/profile', { 
         method: 'PUT', 
         headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify({ resume_link: resumeLink, phone, bio, name, avatar, company, linkedin }) 
+        body: JSON.stringify({ resume_link: resumeLink, phone, bio, role, name, avatar, company, linkedin }) 
       });
       
       let data = {};
@@ -80,35 +82,6 @@ function MyCardContent() {
     setSaving(false);
   };
 
-  const handleDownload = async () => {
-    if (!cardRef.current) return;
-    const t = toast.loading('Generating image...');
-    try {
-      const dataUrl = await toPng(cardRef.current, { pixelRatio: 3, backgroundColor: '#fff' });
-      const img = new Image();
-      img.src = dataUrl;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        // Swapping width/height for 90-degree rotation
-        canvas.width = img.height;
-        canvas.height = img.width;
-        const ctx = canvas.getContext('2d');
-        ctx.translate(canvas.width / 2, canvas.height / 2);
-        ctx.rotate(90 * Math.PI / 180);
-        ctx.drawImage(img, -img.width / 2, -img.height / 2);
-        
-        const rotatedDataUrl = canvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.download = `Ethos-ID-${name.replace(/\s+/g, '-')}.png`;
-        link.href = rotatedDataUrl;
-        link.click();
-        toast.success('Downloaded!', { id: t });
-      };
-    } catch (e) {
-      console.error(e);
-      toast.error('Failed to download', { id: t });
-    }
-  };
 
   return (
     <div className="page-enter" style={{ paddingBottom: isOnboarding ? 40 : 100 }}>
@@ -132,10 +105,21 @@ function MyCardContent() {
           animation: 'scaleIn 0.3s ease both',
         }}>
           <Avatar src={avatar || profile?.avatar} name={name || profile?.name} size={90} />
-          <h2 style={{ fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 26, color: 'var(--text)', marginTop: 16, lineHeight: 1.2 }}>
+          <h2 style={{ 
+            fontFamily: 'var(--fh)', 
+            fontWeight: 800, 
+            fontSize: (name || profile?.name || '').length > 20 ? 20 : (name || profile?.name || '').length > 15 ? 22 : 26, 
+            color: 'var(--text)', 
+            marginTop: 16, 
+            lineHeight: 1.2,
+            transition: 'font-size 0.2s ease'
+          }}>
             {name || profile?.name || 'Your Name'}
           </h2>
-          <p style={{ fontFamily: 'var(--fb)', fontSize: 16, color: 'var(--g)', fontWeight: 600, marginTop: 4 }}>
+          <p style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'var(--s2)', fontWeight: 700, marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            {role || profile?.role || 'Attendee'}
+          </p>
+          <p style={{ fontFamily: 'var(--fb)', fontSize: 16, color: 'var(--g)', fontWeight: 600, marginTop: 2 }}>
             {company || profile?.company || 'Your Company'}
           </p>
           <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--muted)', marginTop: 2 }}>
@@ -161,19 +145,6 @@ function MyCardContent() {
           </p>
         </div>
 
-        {!isOnboarding && (
-          <button 
-            onClick={handleDownload}
-            style={{
-              width: '100%', padding: '12px', background: 'var(--s1)', border: '1px solid var(--border)',
-              borderRadius: 14, marginBottom: 24, fontFamily: 'var(--fb)', fontSize: 14,
-              fontWeight: 600, color: 'var(--text)', cursor: 'pointer', display: 'flex',
-              alignItems: 'center', justifyContent: 'center', gap: 8
-            }}
-          >
-            📥 Download ID Card
-          </button>
-        )}
       </div>
 
       <div style={{ maxWidth: 500, margin: '0 auto', padding: '0 16px 20px' }}>
@@ -236,7 +207,24 @@ function MyCardContent() {
 
           <div>
             <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 15, color: 'var(--text)', marginBottom: 6 }}>
-              💼 Job Title (Bio)
+              🏷️ Role / Position
+            </h3>
+            <input
+              type="text"
+              value={role}
+              onChange={e => setRole(e.target.value)}
+              placeholder="e.g. Software Engineer"
+              style={{
+                width: '100%', background: 'var(--white)', border: '1.5px solid var(--border)',
+                borderRadius: 10, padding: '11px 14px', fontSize: 14,
+                fontFamily: 'var(--fb)', color: 'var(--text)', outline: 'none',
+              }}
+            />
+          </div>
+
+          <div>
+            <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 15, color: 'var(--text)', marginBottom: 6 }}>
+              📝 Bio
             </h3>
             <textarea
               value={bio}

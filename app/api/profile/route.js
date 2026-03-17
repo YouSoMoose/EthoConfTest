@@ -33,6 +33,7 @@ export async function PUT(request) {
       resume_link: body.resume_link,
       phone: body.phone,
       bio: body.bio,
+      role: body.role,
       name: body.name,
       avatar: body.avatar,
       company: body.company,

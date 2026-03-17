@@ -61,18 +61,20 @@ export default function ChatPage() {
 
       {level >= 2 ? (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, textAlign: 'center' }}>
-          <span style={{ fontSize: 48, marginBottom: 16 }}>🛠️</span>
-          <h2 style={{ fontFamily: 'var(--fhs)', fontSize: 20, color: 'var(--text)', marginBottom: 8 }}>Admin Mode Active</h2>
-          <p style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'var(--sub)', marginBottom: 24, maxWidth: 300, lineHeight: 1.5 }}>
-            Staff members use the Admin Dashboard to read and respond to attendee messages.
+          <span style={{ fontSize: 48, marginBottom: 16 }}>🙄</span>
+          <h2 style={{ fontFamily: 'var(--fhs)', fontSize: 24, fontWeight: 800, color: 'var(--text)', marginBottom: 8 }}>Why are you here?</h2>
+          <p style={{ fontFamily: 'var(--fb)', fontSize: 16, color: 'var(--sub)', marginBottom: 24, maxWidth: 300, lineHeight: 1.5 }}>
+            You dont need this.
           </p>
-          <a href="/admin/messages" style={{
-            background: 'var(--g)', color: '#fff', textDecoration: 'none',
-            fontFamily: 'var(--fb)', fontSize: 14, fontWeight: 600,
-            padding: '12px 24px', borderRadius: 24, boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-          }}>
-            Go to Admin Messages →
-          </a>
+          {level >= 3 && (
+            <a href="/admin/messages" style={{
+              background: 'var(--g)', color: '#fff', textDecoration: 'none',
+              fontFamily: 'var(--fb)', fontSize: 14, fontWeight: 600,
+              padding: '12px 24px', borderRadius: 24, boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+            }}>
+              Go to Admin Messages →
+            </a>
+          )}
         </div>
       ) : (
         <>

@@ -2,8 +2,8 @@
 
 import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import PageTransition from '@/components/PageTransition';
 
 const tabs = [
@@ -17,9 +17,16 @@ const tabs = [
 export default function AdminLayout({ children }) {
   const { data: session } = useSession();
   const pathname = usePathname();
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const level = session?.profile?.access_level || 0;
   const visibleTabs = tabs.filter(t => t.show(level));
+
+  useEffect(() => {
+    if (level === 2 && pathname !== '/admin') {
+      router.replace('/admin');
+    }
+  }, [level, pathname, router]);
 
   const isActive = (href) => href === '/admin' ? pathname === '/admin' : pathname.startsWith(href);
 
