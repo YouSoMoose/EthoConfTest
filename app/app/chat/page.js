@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -9,6 +9,7 @@ import Avatar from '@/components/Avatar';
 import Topbar from '@/components/Topbar';
 import Loader from '@/components/Loader';
 import { Send, MessageSquare, ShieldAlert, BadgeCheck, MessageCircle } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export default function ChatPage() {
   const { data: session } = useSession();
@@ -29,7 +30,7 @@ export default function ChatPage() {
     }
   }, [session, level, router]);
 
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
     if (!myId || level >= 3) return;
     try {
       // Fetch direct messages with admin
@@ -37,15 +38,22 @@ export default function ChatPage() {
       if (res.ok) setMessages(await res.json());
     } catch { }
     setLoading(false);
-  };
-
-  useEffect(() => {
-    if (level < 3) {
-      fetchMessages();
-      const iv = setInterval(fetchMessages, 10000);
-      return () => clearInterval(iv);
-    }
   }, [myId, level]);
+
+  // Initial fetch + Supabase Realtime subscription
+  useEffect(() => {
+    if (level >= 3) return;
+    fetchMessages();
+
+    const channel = supabase
+      .channel('chat-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => {
+        fetchMessages();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [myId, level, fetchMessages]);
 
   useEffect(() => { 
     if (messages.length > 0) {

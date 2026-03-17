@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { Home, Calendar, Wallet, Scan, MessageCircle } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 const attendeeTabs = [
   { label: 'Home', href: '/app', icon: Home },
@@ -21,18 +22,29 @@ export default function BottomNav({ items, admin }) {
   const tabs = items || attendeeTabs;
   const manyTabs = tabs.length > 5;
 
+  const fetchUnread = useCallback(async () => {
+    try {
+      const res = await fetch('/api/messages?unread=true');
+      if (res.ok) { const d = await res.json(); setUnread(d.unreadCount || 0); }
+    } catch { }
+  }, []);
+
   useEffect(() => {
     if (admin || !session?.profile?.id) return;
-    const fetchUnread = async () => {
-      try {
-        const res = await fetch('/api/messages?unread=true');
-        if (res.ok) { const d = await res.json(); setUnread(d.unreadCount || 0); }
-      } catch { }
-    };
     fetchUnread();
-    const iv = setInterval(fetchUnread, 15000);
-    return () => clearInterval(iv);
-  }, [session?.profile?.id, admin]);
+
+    const channel = supabase
+      .channel(`unread-${session.profile.id}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `recipient_id=eq.${session.profile.id}`,
+      }, () => { fetchUnread(); })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [session?.profile?.id, admin, fetchUnread]);
 
   const bg = admin ? 'var(--as1)' : 'var(--white)';
   const border = admin ? 'var(--aborder)' : 'var(--border)';

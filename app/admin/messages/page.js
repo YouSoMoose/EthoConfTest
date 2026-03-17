@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import toast from 'react-hot-toast';
 import Avatar from '@/components/Avatar';
 import Loader from '@/components/Loader';
+import { supabase } from '@/lib/supabase';
 
 export default function AdminMessagesPage() {
   const { data: session } = useSession();
@@ -17,7 +18,7 @@ export default function AdminMessagesPage() {
   const [sending, setSending] = useState(false);
   const bottomRef = useRef(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const [mRes, uRes] = await Promise.all([
         fetch('/api/messages'),
@@ -27,13 +28,21 @@ export default function AdminMessagesPage() {
       if (uRes.ok) setAllUsers((await uRes.json()) || []);
     } catch { }
     setLoading(false);
-  };
+  }, []);
 
+  // Initial fetch + Supabase Realtime subscription
   useEffect(() => {
     fetchData();
-    const iv = setInterval(fetchData, 10000);
-    return () => clearInterval(iv);
-  }, []);
+
+    const channel = supabase
+      .channel('admin-messages-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => {
+        fetchData();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [fetchData]);
 
   useEffect(() => {
     // Scroll to bottom when messages or selected chat changes

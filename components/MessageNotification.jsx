@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { usePathname, useRouter } from 'next/navigation';
 import Avatar from './Avatar';
+import { supabase } from '@/lib/supabase';
 
 export default function MessageNotification() {
   const { data: session } = useSession();
@@ -13,15 +14,21 @@ export default function MessageNotification() {
   const [activeMsg, setActiveMsg] = useState(null);
   const [exiting, setExiting] = useState(false);
 
+  // Use refs so the callback stays stable
+  const lastNotifiedIdRef = useRef(lastNotifiedId);
+  lastNotifiedIdRef.current = lastNotifiedId;
+  const pathnameRef = useRef(pathname);
+  pathnameRef.current = pathname;
+
   const checkNewMessages = useCallback(async () => {
     if (!session?.profile?.id) return;
-    if (pathname === '/app/chat' || pathname === '/admin/messages') return;
+    if (pathnameRef.current === '/app/chat' || pathnameRef.current === '/admin/messages') return;
 
     try {
       const res = await fetch('/api/messages?unread=true&latest=true');
       if (res.ok) {
         const msg = await res.json();
-        if (msg && msg.id !== lastNotifiedId) {
+        if (msg && msg.id !== lastNotifiedIdRef.current) {
           setLastNotifiedId(msg.id);
           setActiveMsg(msg);
           setExiting(false);
@@ -33,12 +40,24 @@ export default function MessageNotification() {
         }
       }
     } catch {}
-  }, [session?.profile?.id, pathname, lastNotifiedId]);
+  }, [session?.profile?.id]);
 
+  // Supabase Realtime subscription for new messages
   useEffect(() => {
-    const iv = setInterval(checkNewMessages, 5000);
-    return () => clearInterval(iv);
-  }, [checkNewMessages]);
+    if (!session?.profile?.id) return;
+
+    const channel = supabase
+      .channel(`msg-notif-${session.profile.id}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `recipient_id=eq.${session.profile.id}`,
+      }, () => { checkNewMessages(); })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [session?.profile?.id, checkNewMessages]);
 
   if (!session?.profile || !activeMsg) return null;
 

@@ -65,21 +65,42 @@ export async function GET(request) {
   }
 
   // Attendees & Staff (in attendee view): get direct conversation with admin
-  let query = supabaseAdmin
+  if (directAdmin) {
+    // First, get admin IDs (level >= 3)
+    const { data: admins } = await supabaseAdmin
+      .from('profiles')
+      .select('id')
+      .gte('access_level', 3);
+
+    const adminIds = (admins || []).map(a => a.id);
+
+    if (adminIds.length === 0) {
+      return NextResponse.json([]);
+    }
+
+    // Messages where (I sent to an admin) OR (an admin sent to me)
+    const senderFilters = adminIds.map(id => `and(sender_id.eq.${userId},recipient_id.eq.${id})`).join(',');
+    const recipientFilters = adminIds.map(id => `and(sender_id.eq.${id},recipient_id.eq.${userId})`).join(',');
+
+    const { data, error } = await supabaseAdmin
+      .from('messages')
+      .select('*, sender:profiles!sender_id(id, name, email, avatar, access_level), recipient:profiles!recipient_id(id, name, email, avatar, access_level)')
+      .eq('deleted', false)
+      .or(`${senderFilters},${recipientFilters}`)
+      .order('created_at', { ascending: true });
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(data);
+  }
+
+  // Fallback or generic conversation
+  const { data, error } = await supabaseAdmin
     .from('messages')
     .select('*, sender:profiles!sender_id(id, name, email, avatar, access_level), recipient:profiles!recipient_id(id, name, email, avatar, access_level)')
     .eq('deleted', false)
+    .or(`sender_id.eq.${userId},recipient_id.eq.${userId}`)
     .order('created_at', { ascending: true });
 
-  if (directAdmin) {
-    // Show messages between ME and any Level 3 Admin
-    query = query.or(`and(sender_id.eq.${userId},recipient:profiles!recipient_id(access_level.gte.3)),and(recipient_id.eq.${userId},sender:profiles!sender_id(access_level.gte.3))`);
-  } else {
-    // Fallback or generic conversation
-    query = query.or(`sender_id.eq.${userId},recipient_id.eq.${userId}`);
-  }
-
-  const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data);
 }

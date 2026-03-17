@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSession } from 'next-auth/react';
+import { supabase } from '@/lib/supabase';
 
 const DISMISSED_KEY = 'ethos_dismissed_announcements';
 
@@ -22,9 +23,11 @@ export default function AnnouncementBanner() {
   const [announcements, setAnnouncements] = useState([]);
   const [visible, setVisible] = useState([]);
   const [exiting, setExiting] = useState([]);
+  const sessionRef = useRef(session);
+  sessionRef.current = session;
 
   const fetchAnnouncements = useCallback(async () => {
-    if (!session?.profile) return;
+    if (!sessionRef.current?.profile) return;
     try {
       const res = await fetch('/api/announcements');
       if (res.ok) {
@@ -40,10 +43,21 @@ export default function AnnouncementBanner() {
     } catch {}
   }, []);
 
+  // Initial fetch when session becomes available
   useEffect(() => {
-    fetchAnnouncements();
-    const iv = setInterval(fetchAnnouncements, 5000);
-    return () => clearInterval(iv);
+    if (session?.profile) fetchAnnouncements();
+  }, [session?.profile, fetchAnnouncements]);
+
+  // Supabase Realtime subscription (stable — never re-creates)
+  useEffect(() => {
+    const channel = supabase
+      .channel('announcements-realtime')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'announcements' }, () => {
+        fetchAnnouncements();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, [fetchAnnouncements]);
 
   const dismiss = (id) => {
