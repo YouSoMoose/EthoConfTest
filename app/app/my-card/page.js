@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Loader from '@/components/Loader';
 import Avatar from '@/components/Avatar';
 import Modal from '@/components/Modal';
-import CardPreview from '@/components/CardPreview';
+import { CardPreview } from '@/components/CardPreview';
 import { QRCodeSVG } from 'qrcode.react';
 import toast from 'react-hot-toast';
 import {
