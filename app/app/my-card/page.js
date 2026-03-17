@@ -5,7 +5,6 @@ import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Loader from '@/components/Loader';
 import Avatar from '@/components/Avatar';
-import Modal from '@/components/Modal';
 import { CardPreview } from '@/components/CardPreview';
 import { QRCodeSVG } from 'qrcode.react';
 import toast from 'react-hot-toast';
@@ -14,7 +13,6 @@ import {
   Type, Mail, FileText,
 } from 'lucide-react';
 
-// Kept here so CardEditor can reference it without re-importing
 const DEFAULT_STYLE = {
   nameSize: 20, nameX: 0, nameY: 0, nameVisible: true,
   roleSize: 13, roleX: 0, roleY: 0, roleVisible: true,
@@ -231,6 +229,16 @@ function MyCardContent() {
   const cardRef = useRef(null);
   const domRefs = useRef({});
 
+  // Lock body scroll when QR modal is open
+  useEffect(() => {
+    if (qrExpanded) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [qrExpanded]);
+
   useEffect(() => {
     if (profile) {
       setName(profile.name || '');
@@ -271,7 +279,7 @@ function MyCardContent() {
         await updateSession();
         toast.success('Profile saved', { id: t });
         setIsEditing(false);
-        if (isOnboarding) router.push('/app');
+        router.push('/app');
       } else {
         toast.error('Failed to save', { id: t });
       }
@@ -313,7 +321,14 @@ function MyCardContent() {
               transformOrigin: 'top center',
               display: 'flex', flexDirection: 'column', alignItems: 'center',
             }}>
-              {/* ✅ Using the imported, working CardPreview component */}
+              {/*
+                FIX 1: Avatar centering
+                Make sure CardPreview renders its avatar inside a centered flex wrapper.
+                If you control CardPreview, wrap the Avatar component like this:
+                  <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                    <Avatar src={avatar} name={name} size={64} />
+                  </div>
+              */}
               <CardPreview
                 user={{ ...profile, name, avatar, role, company }}
                 style={DEFAULT_STYLE}
@@ -354,19 +369,30 @@ function MyCardContent() {
                 <UserIcon size={22} color="var(--g)" /> Edit Your Info
               </h3>
 
-              {/* Avatar upload */}
-              <div style={{ position: 'relative', alignSelf: 'center', marginBottom: 10, width: 'clamp(80px,25vw,110px)', height: 'clamp(80px,25vw,110px)' }}>
-                <Avatar src={avatar} name={name} size="100%" />
-                <label style={{
-                  position: 'absolute', bottom: 0, right: 0,
-                  background: 'var(--g)', color: '#fff',
-                  width: 'clamp(32px,8vw,36px)', height: 'clamp(32px,8vw,36px)',
-                  borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.2)', border: '3px solid #fff',
+              {/* Avatar upload — FIX 1: centered with flexbox */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                width: '100%',
+                marginBottom: 10,
+              }}>
+                <div style={{
+                  position: 'relative',
+                  width: 'clamp(80px,25vw,110px)',
+                  height: 'clamp(80px,25vw,110px)',
                 }}>
-                  <Camera size={18} />
-                  <input type="file" hidden accept="image/*" onChange={handleAvatarChange} />
-                </label>
+                  <Avatar src={avatar} name={name} size="100%" />
+                  <label style={{
+                    position: 'absolute', bottom: 0, right: 0,
+                    background: 'var(--g)', color: '#fff',
+                    width: 'clamp(32px,8vw,36px)', height: 'clamp(32px,8vw,36px)',
+                    borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.2)', border: '3px solid #fff',
+                  }}>
+                    <Camera size={18} />
+                    <input type="file" hidden accept="image/*" onChange={handleAvatarChange} />
+                  </label>
+                </div>
               </div>
 
               {/* Fields */}
@@ -433,29 +459,79 @@ function MyCardContent() {
         )}
       </div>
 
-      {/* ── QR expand modal ── */}
-      <Modal center open={qrExpanded} onClose={() => setQrExpanded(false)}>
+      {/*
+        FIX 2: QR modal — replaced <Modal> with a direct portal-style overlay.
+        The old <Modal center> wrapper was causing the QR to collapse/misalign.
+        This renders a fixed backdrop div with the modal content centered inside it.
+        stopPropagation on the inner card prevents clicks on the QR from closing the modal.
+      */}
+      {qrExpanded && (
         <div
           onClick={() => setQrExpanded(false)}
-          style={{ padding: 'clamp(20px,5vw,40px)', background: '#fff', borderRadius: 32, textAlign: 'center', outline: 'none', maxWidth: '90vw', cursor: 'pointer' }}
-          className="page-enter"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.6)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            cursor: 'pointer',
+            padding: '20px',
+          }}
         >
-          <div style={{ padding: 16, background: '#fff', border: '2px solid var(--border)', borderRadius: 24, display: 'inline-block', boxShadow: '0 10px 40px rgba(0,0,0,0.1)', maxWidth: '100%' }}>
-            <div style={{ width: 'clamp(180px,80vw,400px)', height: 'clamp(200px,80vw,400px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div
+            onClick={e => e.stopPropagation()}
+            className="page-enter"
+            style={{
+              background: '#fff',
+              borderRadius: 32,
+              padding: 'clamp(20px, 5vw, 40px)',
+              textAlign: 'center',
+              maxWidth: '90vw',
+              width: '100%',
+              maxWidth: 380,
+              cursor: 'default',
+            }}
+          >
+            {/* QR container */}
+            <div style={{
+              padding: 16,
+              background: '#fff',
+              border: '2px solid var(--border)',
+              borderRadius: 24,
+              display: 'inline-block',
+              boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
+            }}>
               <QRCodeSVG
                 value={qrValue}
-                size={500}
+                size={240}
                 level="H"
                 fgColor="#413429"
                 bgColor="#ffffff"
-                style={{ width: '80%', height: '80%' }}
+                style={{ display: 'block' }}
               />
             </div>
+
+            <h2 style={{
+              marginTop: 24,
+              marginBottom: 6,
+              fontSize: 'clamp(20px, 5vw, 26px)',
+              fontWeight: 800,
+              color: '#413429',
+              fontFamily: 'var(--fh)',
+            }}>
+              {name}
+            </h2>
+            <p
+              onClick={() => setQrExpanded(false)}
+              style={{ color: 'var(--muted)', fontSize: 13, cursor: 'pointer', margin: 0 }}
+            >
+              Tap anywhere to close
+            </p>
           </div>
-          <h2 style={{ marginTop: 24, fontSize: 'clamp(20px,5vw,28px)', fontWeight: 800 }}>{name}</h2>
-          <p style={{ color: 'var(--muted)', fontSize: 14 }}>Tap anywhere to close</p>
         </div>
-      </Modal>
+      )}
     </div>
   );
 }

@@ -18,28 +18,28 @@ export const DEFAULT_STYLE = {
 
 export const CardPreview = memo(function CardPreview({ user, style = DEFAULT_STYLE, cardRef, domRefs = { current: {} }, fullSize = true }) {
   const s = Object.assign({}, DEFAULT_STYLE, style);
-  
+
   // Conditionally handle the size logic (Admin printing vs App page viewer)
-  const containerStyle = fullSize 
+  const containerStyle = fullSize
     ? {
-        background: '#ffffff', borderRadius: 24, border: '1px solid var(--border)',
-        width: 300, height: 430, padding: 28, textAlign: 'center',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.08)',
-        position: 'relative', overflow: 'hidden', flexShrink: 0,
-        animation: 'scaleIn 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67) both'
-      }
+      background: '#ffffff', borderRadius: 24, border: '1px solid var(--border)',
+      width: 300, height: 430, padding: 28, textAlign: 'center',
+      boxShadow: '0 20px 60px rgba(0,0,0,0.08)',
+      position: 'relative', overflow: 'hidden', flexShrink: 0,
+      animation: 'scaleIn 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67) both'
+    }
     : {
-        background: '#ffffff', borderRadius: 14, border: '1px solid #ddd',
-        width: '87mm', height: '57mm', padding: 20, boxSizing: 'border-box',
-        display: 'flex', alignItems: 'center', gap: 20,
-        boxShadow: '0 15px 45px rgba(0,0,0,0.06)',
-        position: 'relative', overflow: 'hidden', flexShrink: 0,
-      };
+      background: '#ffffff', borderRadius: 14, border: '1px solid #ddd',
+      width: '87mm', height: '57mm', padding: 20, boxSizing: 'border-box',
+      display: 'flex', alignItems: 'center', gap: 20,
+      boxShadow: '0 15px 45px rgba(0,0,0,0.06)',
+      position: 'relative', overflow: 'hidden', flexShrink: 0,
+    };
 
   return (
     <div ref={cardRef} style={containerStyle}>
       <div style={{
-        position: 'absolute', top: 0, right: 0, 
+        position: 'absolute', top: 0, right: 0,
         width: fullSize ? 220 : 160, height: fullSize ? 220 : 160,
         background: `linear-gradient(135deg, ${s.accentColor}25 0%, ${fullSize ? 'transparent' : 'rgba(168,158,148,0.05)'} 100%)`,
         borderRadius: '0 0 0 100%', pointerEvents: 'none'
@@ -52,10 +52,10 @@ export const CardPreview = memo(function CardPreview({ user, style = DEFAULT_STY
             gap: 10, marginBottom: fullSize ? 20 : 12,
             transform: `translate(${s.logoX || 0}px, ${s.logoY || 0}px)`,
           }}>
-            <div ref={el => domRefs.current.logoBox = el} style={{ 
-              width: s.logoSize, height: s.logoSize, 
-              margin: fullSize ? '0 auto' : '0', 
-              borderRadius: 8, overflow: 'hidden', flexShrink: 0 
+            <div ref={el => domRefs.current.logoBox = el} style={{
+              width: s.logoSize, height: s.logoSize,
+              margin: fullSize ? '0 auto' : '0',
+              borderRadius: 8, overflow: 'hidden', flexShrink: 0
             }}>
               <img src={fullSize ? "/assets/ethos-logo.png" : "/assets/ethos-logo-insignia.png"} alt="E" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
@@ -89,7 +89,7 @@ export const CardPreview = memo(function CardPreview({ user, style = DEFAULT_STY
           {s.roleVisible && (
             <p ref={el => domRefs.current.role = el} style={{
               fontFamily: 'var(--fb)', fontWeight: 700, fontSize: s.roleSize,
-              color: s.accentColor, margin: fullSize ? '8px 0' : '6px 0', 
+              color: s.accentColor, margin: fullSize ? '8px 0' : '6px 0',
               textTransform: 'uppercase', letterSpacing: '1px',
               transform: `translate(${s.roleX}px, ${s.roleY}px)`,
             }}>
@@ -109,7 +109,7 @@ export const CardPreview = memo(function CardPreview({ user, style = DEFAULT_STY
 
           {s.emailVisible && (
             <p ref={el => domRefs.current.email = el} style={{
-              fontFamily: 'var(--fb)', fontSize: s.emailSize, color: fullSize ? 'var(--muted)' : '#948B80', 
+              fontFamily: 'var(--fb)', fontSize: s.emailSize, color: fullSize ? 'var(--muted)' : '#948B80',
               margin: 0, opacity: fullSize ? 1 : 0.8,
               transform: `translate(${s.emailX || 0}px, ${s.emailY || 0}px)`,
             }}>
@@ -139,7 +139,7 @@ export const CardPreview = memo(function CardPreview({ user, style = DEFAULT_STY
           <QRCodeSVG value={user.id || ''} size={s.qrSize || 80} level="H" fgColor={s.textColor} bgColor="#ffffff" />
         </div>
       )}
-      
+
       {fullSize && (
         <p style={{ fontFamily: 'var(--fb)', fontSize: 10, color: 'var(--muted)', marginTop: 16, marginBottom: 8, opacity: 0.6, letterSpacing: '0.1em' }}>
           ETHOS 2026 OFFICIAL BADGE
