@@ -39,7 +39,7 @@ const slides = [
   {
     icon: '📝', title: 'Smart Notes',
     desc: 'Take notes during sessions and save them to your account. Access them anytime, anywhere.',
-    c1: '#A89E94', c2: '#514033', textMode: 'light',
+    c1: '#A89E94', c2: '#514033', textMode: 'dark',
   },
 ];
 

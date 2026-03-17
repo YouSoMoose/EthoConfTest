@@ -97,18 +97,23 @@ function MyCardContent() {
   if (!profile) return <Loader />;
 
   return (
-    <div className="page-enter">
-      <Topbar title="My Card" onBack={() => router.push('/app')} />
+    <div className="page-enter" style={{ paddingBottom: 100 }}>
+      <Topbar title="My Card" onBack={() => {
+        if (typeof window !== 'undefined' && window.history.length > 1) router.back();
+        else router.push('/app');
+      }} />
 
-      <div style={{ maxWidth: 500, margin: '0 auto', padding: '24px 16px 120px', display: 'flex', flexDirection: 'column', gap: 28 }}>
+      <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 40, alignItems: 'center', justifyContent: 'center', minHeight: '80dvh' }}>
         
-        {/* Card Display */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center', width: '100%' }}>
-          <div onClick={() => setQrExpanded(true)} style={{ cursor: 'pointer', width: '100%', maxWidth: 300, margin: '0 auto' }}>
-            <CardPreview user={{ ...profile, name, avatar, role, company }} style={DEFAULT_STYLE} cardRef={cardRef} domRefs={domRefs} />
+        {/* Card Display Side */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'center', width: '100%', overflowX: 'hidden' }}>
+          <div onClick={() => setQrExpanded(true)} style={{ cursor: 'pointer', transition: 'transform 0.3s var(--liquid)', display: 'flex', justifyContent: 'center', width: '100%' }}>
+            <div style={{ transform: 'scale(min(1, calc(100vw / 400)))', transformOrigin: 'top center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+               <CardPreview user={{ ...profile, name, avatar, role, company }} style={DEFAULT_STYLE} cardRef={cardRef} domRefs={domRefs} />
+               <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--muted)', marginTop: 16, fontWeight: 600 }}>Tap ID to enlarge QR</p>
+            </div>
           </div>
-          <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--muted)', fontWeight: 600 }}>Tap card to enlarge QR</p>
-          
+
           <div style={{ display: 'flex', gap: 12, width: '100%' }}>
             {!isEditing ? (
               <button 
@@ -139,7 +144,7 @@ function MyCardContent() {
                    position: 'absolute', bottom: 0, right: 0,
                    background: 'var(--g)', color: '#fff', width: 'clamp(32px, 8vw, 36px)', height: 'clamp(32px, 8vw, 36px)',
                    borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                   cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.2)', border: '3px solid #fff'
+                   cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.16)', border: '2px solid #fff'
                  }}>
                    <Camera size={18} />
                    <input type="file" hidden accept="image/*" onChange={handleAvatarChange} />
@@ -148,31 +153,31 @@ function MyCardContent() {
 
                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                  <div className="input-group">
-                   <label className="section-label">Full Name</label>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16 }}>
+                   <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', display: 'block', marginBottom: 6 }}>Full Name</label>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '10px 16px', borderRadius: 18 }}>
                      <Type size={18} color="var(--muted)" />
-                     <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="e.g. John Doe" maxLength={40} style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none', fontWeight: 500 }} />
+                     <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="e.g. John Doe" maxLength={40} style={{ flex: 1, background: 'transparent', border: 'none', padding: '14px 0', fontSize: 15, outline: 'none', fontWeight: 500 }} />
                    </div>
                  </div>
 
                  <div className="input-group">
-                   <label className="section-label">Position / Role</label>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16 }}>
+                   <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', display: 'block', marginBottom: 6 }}>Position / Role</label>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '10px 16px', borderRadius: 18 }}>
                      <UserIcon size={18} color="var(--muted)" />
-                     <input type="text" value={role} onChange={e => setRole(e.target.value)} placeholder="e.g. Lead Developer" maxLength={30} style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none', fontWeight: 500 }} />
+                     <input type="text" value={role} onChange={e => setRole(e.target.value)} placeholder="e.g. Lead Developer" maxLength={30} style={{ flex: 1, background: 'transparent', border: 'none', padding: '14px 0', fontSize: 15, outline: 'none', fontWeight: 500 }} />
                    </div>
                  </div>
 
                  <div className="input-group">
-                   <label className="section-label">Company</label>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16 }}>
+                   <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', display: 'block', marginBottom: 6 }}>Company</label>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '10px 16px', borderRadius: 18 }}>
                      <Building size={18} color="var(--muted)" />
-                     <input type="text" value={company} onChange={e => setCompany(e.target.value)} placeholder="e.g. Tech Corp" maxLength={30} style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none', fontWeight: 500 }} />
+                     <input type="text" value={company} onChange={e => setCompany(e.target.value)} placeholder="e.g. Tech Corp" maxLength={30} style={{ flex: 1, background: 'transparent', border: 'none', padding: '14px 0', fontSize: 15, outline: 'none', fontWeight: 500 }} />
                    </div>
                  </div>
 
                  <div className="input-group">
-                   <label className="section-label">Short Bio</label>
+                   <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', display: 'block', marginBottom: 6 }}>Short Bio</label>
                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, background: 'var(--s2)', padding: '12px 16px', borderRadius: 16 }}>
                      <Type size={18} color="var(--muted)" style={{ marginTop: 2 }} />
                      <textarea value={bio} onChange={e => setBio(e.target.value)} placeholder="Tell us about yourself..." maxLength={150} style={{ flex: 1, background: 'transparent', border: 'none', fontSize: 15, outline: 'none', fontWeight: 500, resize: 'none', minHeight: '60px' }} />
@@ -180,26 +185,26 @@ function MyCardContent() {
                  </div>
 
                  <div className="input-group">
-                   <label className="section-label">Email Address</label>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16, opacity: 0.7 }}>
+                   <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', display: 'block', marginBottom: 6 }}>Email Address</label>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '10px 16px', borderRadius: 18, opacity: 0.9 }}>
                      <Mail size={18} color="var(--muted)" />
-                     <input type="email" value={profile.email} disabled style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none' }} />
+                     <input type="email" value={profile.email} disabled style={{ flex: 1, background: 'transparent', border: 'none', padding: '14px 0', fontSize: 15, outline: 'none' }} />
                    </div>
                  </div>
 
                  <div className="input-group">
-                   <label className="section-label">Resume Link</label>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16 }}>
+                   <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', display: 'block', marginBottom: 6 }}>Resume Link</label>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '10px 16px', borderRadius: 18 }}>
                      <FileText size={18} color="var(--muted)" />
-                     <input type="url" value={resumeLink} onChange={e => setResumeLink(e.target.value)} placeholder="https://..." style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none', fontWeight: 500 }} />
+                     <input type="url" value={resumeLink} onChange={e => setResumeLink(e.target.value)} placeholder="https://..." style={{ flex: 1, background: 'transparent', border: 'none', padding: '14px 0', fontSize: 15, outline: 'none', fontWeight: 500 }} />
                    </div>
                  </div>
 
                  <div className="input-group">
-                   <label className="section-label">Phone</label>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16 }}>
+                   <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', display: 'block', marginBottom: 6 }}>Phone</label>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '10px 16px', borderRadius: 18 }}>
                      <Smartphone size={18} color="var(--muted)" />
-                     <input type="tel" value={phone} onChange={handlePhone} placeholder="(555) 000-0000" style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none', fontWeight: 500 }} />
+                     <input type="tel" value={phone} onChange={handlePhone} placeholder="(555) 000-0000" style={{ flex: 1, background: 'transparent', border: 'none', padding: '14px 0', fontSize: 15, outline: 'none', fontWeight: 500 }} />
                    </div>
                  </div>
                </div>

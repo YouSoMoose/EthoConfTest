@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Avatar from '@/components/Avatar';
 import Loader from '@/components/Loader';
-import { Home, Calendar, Wallet, Scan, MessageCircle, FileText, CreditCard, ChevronRight, LogOut, Settings } from 'lucide-react';
+import { Home, Calendar, Wallet, Scan, MessageCircle, FileText, CreditCard, ChevronRight, LogOut, Settings, Smile } from 'lucide-react';
 import { CardPreview } from '@/components/CardPreview';
 
 function AnnouncementCard({ a }) {
@@ -104,13 +104,13 @@ export default function AttendeeDashboard() {
             <Avatar src={profile?.avatar} name={profile?.name} size={52} />
             <div style={{ flex: 1, minWidth: 0 }}>
               <h1 style={{ fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 24, margin: 0, color: 'var(--g)', letterSpacing: '-0.02em' }}>
-                Hey, {firstName}! 👋
+                Hey, {firstName}!
               </h1>
               <p style={{ fontFamily: 'var(--fb)', fontSize: 13, opacity: 0.9, marginTop: 2, color: 'var(--sub)', fontWeight: 500 }}>
                 Welcome to Ethos 2026
               </p>
             </div>
-            <img src="/assets/ethos-logo-insignia.png" alt="" style={{ width: 44, height: 44, objectFit: 'contain', filter: 'brightness(0)' }} />
+            <img src="/assets/ethos-logo-insignia.png" alt="" style={{ width: 44, height: 44, objectFit: 'contain'}} />
           </div>
           
           <div style={{ marginTop: 28, display: 'flex', gap: 12 }}>
