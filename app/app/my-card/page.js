@@ -98,39 +98,14 @@ function MyCardContent() {
 
   return (
     <div className="page-enter">
-      {/* Page Header */}
-      <div style={{
-        background: 'var(--hero)',
-        padding: 'max(16px, env(safe-area-inset-top)) 16px 28px',
-        boxShadow: '0 4px 20px rgba(65, 52, 41, 0.15)',
-      }}>
-        <div style={{ maxWidth: 500, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 14 }}>
-          <Link href="/app" style={{
-            width: 40, height: 40, borderRadius: 12, background: 'rgba(0,0,0,0.06)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            textDecoration: 'none', color: 'var(--g)', fontSize: 20, flexShrink: 0,
-            border: '1px solid rgba(0,0,0,0.08)',
-          }}>←</Link>
-          <div style={{ flex: 1 }}>
-            <h1 style={{ fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 22, margin: 0, color: 'var(--g)' }}>
-              My Virtual ID
-            </h1>
-            <p style={{ fontFamily: 'var(--fb)', fontSize: 12, color: 'var(--sub)', marginTop: 2, fontWeight: 500 }}>
-              Your conference identity card
-            </p>
-          </div>
-          <img src="/assets/ethos-logo-insignia.png" alt="" style={{ width: 36, height: 36, objectFit: 'contain', filter: 'brightness(0)', opacity: 0.3 }} />
-        </div>
-      </div>
+      <Topbar title="My Card" onBack={() => router.push('/app')} />
 
       <div style={{ maxWidth: 500, margin: '0 auto', padding: '24px 16px 120px', display: 'flex', flexDirection: 'column', gap: 28 }}>
         
         {/* Card Display */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center', width: '100%' }}>
-          <div onClick={() => setQrExpanded(true)} style={{ cursor: 'pointer', transition: 'transform 0.3s var(--liquid)', display: 'flex', justifyContent: 'center', width: '100%' }}>
-            <div style={{ transform: 'scale(min(1, calc((100vw - 64px) / 300)))', transformOrigin: 'top center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-               <CardPreview user={{ ...profile, name, avatar, role, company }} style={DEFAULT_STYLE} cardRef={cardRef} domRefs={domRefs} />
-            </div>
+          <div onClick={() => setQrExpanded(true)} style={{ cursor: 'pointer', width: '100%', maxWidth: 300, margin: '0 auto' }}>
+            <CardPreview user={{ ...profile, name, avatar, role, company }} style={DEFAULT_STYLE} cardRef={cardRef} domRefs={domRefs} />
           </div>
           <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--muted)', fontWeight: 600 }}>Tap card to enlarge QR</p>
           
