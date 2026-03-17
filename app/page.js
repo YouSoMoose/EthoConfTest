@@ -130,7 +130,8 @@ export default function LandingPage() {
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden',
-      position: 'relative'
+      position: 'relative',
+      transition: 'all 0.8s var(--liquid)'
     }}>
       {/* Layered background for smooth transitions */}
       <div style={{
@@ -144,37 +145,44 @@ export default function LandingPage() {
             inset: 0,
             background: s.gradient,
             opacity: current === i ? 1 : 0,
-            transition: 'opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1)',
+            transition: 'opacity 1s cubic-bezier(0.4, 0, 0.2, 1)',
           }} />
         ))}
       </div>
 
       {/* Top branding */}
       <div style={{
-        padding: 'max(20px, env(safe-area-inset-top)) 24px 0',
+        padding: 'max(24px, env(safe-area-inset-top)) 24px 0',
         textAlign: 'center',
-        zIndex: 10
+        zIndex: 10,
+        transform: `translateY(${current * -2}px)`,
+        transition: 'transform 0.6s var(--liquid)'
       }}>
         <div style={{
-          width: 'clamp(48px, 10vh, 56px)', height: 'clamp(48px, 10vh, 56px)', borderRadius: 28,
-          background: 'rgba(255,255,255,0.4)',
-          backdropFilter: 'blur(10px)',
+          width: 'clamp(56px, 12vh, 64px)', height: 'clamp(56px, 12vh, 64px)', borderRadius: 32,
+          background: 'rgba(255,255,255,0.3)',
+          backdropFilter: 'blur(12px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          margin: '0 auto clamp(10px, 2vh, 16px)', overflow: 'hidden', padding: 4
+          margin: '0 auto clamp(12px, 2.5vh, 20px)', overflow: 'hidden', padding: 6,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
+          border: '1px solid rgba(255,255,255,0.4)'
         }}>
-          <img src="/assets/ethos-logo-insignia.png" alt="Ethos" style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span style="font-size: 28px; font-weight: 800; color: var(--text); font-family: var(--fh)">e</span>'; }} />
+          <img src="/assets/ethos-logo-insignia.png" alt="Ethos" style={{ width: '85%', height: '85%', objectFit: 'contain' }} />
         </div>
         <p style={{
-          fontSize: 'clamp(10px, 2vh, 11px)', fontWeight: 700, letterSpacing: '.2em',
-          color: slide.textMode === 'light' ? 'rgba(255,255,255,.6)' : 'var(--muted)', textTransform: 'uppercase', marginBottom: 8, transition: 'color 0.6s ease'
+          fontSize: 'clamp(10px, 2vh, 11px)', fontWeight: 800, letterSpacing: '.3em',
+          color: slide.textMode === 'light' ? 'rgba(255,255,255,.7)' : 'var(--muted)', 
+          textTransform: 'uppercase', marginBottom: 8, transition: 'color 0.6s ease'
         }}>
           Annual Conference · 2026
         </p>
         <h1 style={{
-          fontFamily: 'var(--fh)', fontSize: 'clamp(32px, 8vh, 42px)', fontWeight: 800,
-          color: slide.textMode === 'light' ? '#fff' : 'var(--text)', lineHeight: 1.05, marginBottom: 6, transition: 'color 0.6s ease'
+          fontFamily: 'var(--fh)', fontSize: 'clamp(36px, 9vh, 48px)', fontWeight: 800,
+          color: slide.textMode === 'light' ? '#fff' : 'var(--g)', 
+          lineHeight: 1, marginBottom: 6, transition: 'color 0.6s ease',
+          textShadow: slide.textMode === 'light' ? '0 2px 10px rgba(0,0,0,0.1)' : 'none'
         }}>
-          Ethos<br />
+          Ethos
         </h1>
       </div>
 
@@ -189,8 +197,8 @@ export default function LandingPage() {
           scrollSnapType: 'x mandatory',
           scrollBehavior: 'smooth',
           WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'none', // Firefox
-          msOverflowStyle: 'none',  // IE/Edge
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
         }}
       >
         <style dangerouslySetInnerHTML={{ __html: `div::-webkit-scrollbar { display: none; }` }} />
@@ -203,32 +211,48 @@ export default function LandingPage() {
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
-            scrollSnapAlign: 'start',
+            scrollSnapAlign: 'center',
             padding: '24px',
+            opacity: current === i ? 1 : 0.4,
+            transform: `scale(${current === i ? 1 : 0.9})`,
+            transition: 'all 0.6s var(--liquid)'
           }}>
             <div style={{
-              background: 'rgba(255,255,255,0.08)',
-              backdropFilter: 'blur(20px)',
-              borderRadius: 32,
-              border: '1px solid rgba(255,255,255,0.1)',
-              padding: 'clamp(30px, 6vh, 48px) 32px',
-              maxWidth: 380,
+              background: 'rgba(255,255,255,0.15)',
+              backdropFilter: 'blur(25px)',
+              borderRadius: 40,
+              border: '1px solid rgba(255,255,255,0.25)',
+              padding: 'clamp(40px, 8vh, 56px) 32px',
+              maxWidth: 400,
               width: '100%',
               textAlign: 'center',
-              boxShadow: '0 20px 50px rgba(0,0,0,0.1)',
+              boxShadow: '0 25px 60px rgba(0,0,0,0.12)',
+              position: 'relative',
+              overflow: 'hidden'
             }}>
+              {/* Subtle liquid glow */}
+              <div style={{
+                position: 'absolute', top: '-50%', left: '-50%', width: '200%', height: '200%',
+                background: `radial-gradient(circle at center, ${s.gradient.split(',').pop().replace(')', ', 0.1)')} 0%, transparent 70%)`,
+                pointerEvents: 'none'
+              }} />
+              
               <span style={{
-                fontSize: 'clamp(48px, 10vh, 64px)', display: 'block', marginBottom: 'clamp(16px, 3vh, 24px)',
-                filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.1))'
+                fontSize: 'clamp(56px, 12vh, 72px)', display: 'block', marginBottom: 'clamp(20px, 4vh, 32px)',
+                filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
+                transform: current === i ? 'translateY(0)' : 'translateY(20px)',
+                transition: 'transform 0.8s var(--liquid)'
               }}>{s.icon}</span>
               <h2 style={{
-                fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 'clamp(24px, 4.5vh, 28px)',
-                color: s.textMode === 'light' ? '#fff' : 'var(--text)', marginBottom: 12, transition: 'color 0.6s ease',
+                fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 'clamp(28px, 5vh, 32px)',
+                color: s.textMode === 'light' ? '#fff' : 'var(--g)', marginBottom: 14, 
+                transition: 'color 0.6s ease',
               }}>{s.title}</h2>
               <p style={{
-                fontFamily: 'var(--fb)', fontSize: 'clamp(14px, 2.5vh, 15px)',
-                color: s.textMode === 'light' ? 'rgba(255,255,255,.7)' : 'var(--sub)', transition: 'color 0.6s ease',
-                lineHeight: 1.6,
+                fontFamily: 'var(--fb)', fontSize: 'clamp(14px, 2.8vh, 16px)',
+                color: s.textMode === 'light' ? 'rgba(255,255,255,.85)' : 'var(--sub)', 
+                transition: 'color 0.6s ease',
+                lineHeight: 1.6, fontWeight: 500
               }}>{s.desc}</p>
             </div>
           </div>
@@ -237,24 +261,24 @@ export default function LandingPage() {
 
       {/* Dots and CTA */}
       <div style={{
-        padding: '0 24px max(24px, env(safe-area-inset-bottom))',
-        maxWidth: 400, width: '100%', margin: '0 auto',
+        padding: '0 24px max(32px, env(safe-area-inset-bottom))',
+        maxWidth: 420, width: '100%', margin: '0 auto',
         zIndex: 10
       }}>
         {/* Dots */}
         <div style={{
-          display: 'flex', gap: 8, justifyContent: 'center',
-          marginBottom: 32,
+          display: 'flex', gap: 10, justifyContent: 'center',
+          marginBottom: 36,
         }}>
           {slides.map((_, i) => (
             <button key={i} onClick={() => goTo(i)} style={{
-              width: current === i ? 28 : 8, height: 8,
-              borderRadius: 4,
+              width: current === i ? 36 : 10, height: 10,
+              borderRadius: 5,
               background: current === i
-                ? (slide.textMode === 'light' ? '#fff' : 'var(--text)')
-                : (slide.textMode === 'light' ? 'rgba(255,255,255,.3)' : 'rgba(0,0,0,0.1)'),
+                ? (slide.textMode === 'light' ? '#fff' : 'var(--g)')
+                : (slide.textMode === 'light' ? 'rgba(255,255,255,.3)' : 'rgba(0,0,0,0.12)'),
               border: 'none', cursor: 'pointer', padding: 0,
-              transition: 'all 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
+              transition: 'all 0.5s var(--liquid)',
             }} />
           ))}
         </div>
@@ -262,38 +286,36 @@ export default function LandingPage() {
         {isLast ? (
           <button onClick={finishCarousel} style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            width: '100%', padding: '18px 24px',
-            background: slide.textMode === 'light' ? '#fff' : 'var(--text)',
+            width: '100%', padding: '20px 24px',
+            background: slide.textMode === 'light' ? '#fff' : 'var(--g)',
             color: slide.textMode === 'light' ? '#1a1814' : '#fff',
-            borderRadius: 18, fontFamily: 'var(--fb)',
-            fontSize: 16, fontWeight: 700, cursor: 'pointer',
-            border: 'none', transition: 'all 0.3s',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+            borderRadius: 20, fontFamily: 'var(--fb)',
+            fontSize: 17, fontWeight: 800, cursor: 'pointer',
+            border: 'none', transition: 'all 0.3s var(--liquid)',
+            boxShadow: '0 12px 35px rgba(0,0,0,0.15)',
           }}>
-            Get Started 🚀
+            Begin the Journey 🚀
           </button>
         ) : (
-          <div style={{ display: 'flex', gap: 12 }}>
+          <div style={{ display: 'flex', gap: 14 }}>
             <button onClick={finishCarousel} style={{
-              flex: 1, padding: '16px 20px', textAlign: 'center',
-              background: slide.textMode === 'light' ? 'rgba(255,255,255,0.1)' : 'transparent',
-              color: slide.textMode === 'light' ? 'rgba(255,255,255,.8)' : 'var(--sub)',
-              borderRadius: 18, fontFamily: 'var(--fb)',
-              fontSize: 15, fontWeight: 600, border: `1px solid ${slide.textMode === 'light' ? 'rgba(255,255,255,.15)' : 'rgba(0,0,0,0.1)'}`, cursor: 'pointer',
-              transition: 'all 0.3s ease'
+              flex: 1, padding: '18px 20px', textAlign: 'center',
+              background: slide.textMode === 'light' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.03)',
+              color: slide.textMode === 'light' ? 'rgba(255,255,255,.8)' : 'var(--muted)',
+              borderRadius: 20, fontFamily: 'var(--fb)',
+              fontSize: 15, fontWeight: 700, border: `1px solid ${slide.textMode === 'light' ? 'rgba(255,255,255,.2)' : 'rgba(0,0,0,0.08)'}`, cursor: 'pointer',
             }}>
               Skip
             </button>
             <button onClick={next} style={{
-              flex: 2, padding: '16px 20px',
-              background: slide.textMode === 'light' ? 'rgba(255,255,255,0.2)' : 'var(--text)',
+              flex: 2, padding: '18px 20px',
+              background: slide.textMode === 'light' ? 'rgba(255,255,255,0.25)' : 'var(--g)',
               color: '#fff',
-              borderRadius: 18, fontFamily: 'var(--fb)',
-              fontSize: 15, fontWeight: 700, border: 'none', cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
+              borderRadius: 20, fontFamily: 'var(--fb)',
+              fontSize: 16, fontWeight: 800, border: 'none', cursor: 'pointer',
+              boxShadow: '0 12px 30px rgba(0,0,0,0.1)',
             }}>
-              Next →
+              Continue →
             </button>
           </div>
         )}

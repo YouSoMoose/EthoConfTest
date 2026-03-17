@@ -12,7 +12,8 @@ export default function LoginPage() {
 
   async function handleGoogle() {
     setLoading(true);
-    signIn('google', { callbackUrl: '/' });
+    // Pass the selected tab as 'intent' in the callbackUrl
+    signIn('google', { callbackUrl: `/?intent=${tab}` });
   }
 
   const requestNotifications = async () => {

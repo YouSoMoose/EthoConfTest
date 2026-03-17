@@ -18,7 +18,17 @@ export async function middleware(request) {
   // If logged in and visiting landing or login → redirect to their dashboard
   if (token && (pathname === '/' || pathname === '/login')) {
     const accessLevel = token.profile?.access_level ?? 0;
-    if (accessLevel >= 2) return NextResponse.redirect(new URL('/admin', request.url));
+    const { searchParams } = request.nextUrl;
+    const intent = searchParams.get('intent');
+
+    // Force Admin portal ONLY if intent is 'admin' AND level >= 2
+    if (intent === 'admin' && accessLevel >= 2) {
+      return NextResponse.redirect(new URL('/admin', request.url));
+    }
+    
+    // Default: Check if they are authorized for Admin and it's a "normal" login
+    // If they logged in as "Staff" but aren't staff, send to /app
+    // If they logged in as "Attendee" but are staff, send to /app anyway (per user request)
     return NextResponse.redirect(new URL('/app', request.url));
   }
 
