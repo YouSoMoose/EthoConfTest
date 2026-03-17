@@ -88,7 +88,7 @@ export default function AttendeeDashboard() {
       {/* Gradient header hero */}
       <div style={{
         background: 'var(--hero)',
-        color: '#fff',
+        color: 'var(--text)',
         padding: 'max(16px, env(safe-area-inset-top)) 16px 32px',
         boxShadow: '0 4px 20px rgba(65, 52, 41, 0.15)',
       }}>
@@ -96,22 +96,22 @@ export default function AttendeeDashboard() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <Avatar src={profile?.avatar} name={profile?.name} size={52} />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <h1 style={{ fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 24, margin: 0, color: '#fff', letterSpacing: '-0.02em' }}>
+              <h1 style={{ fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 24, margin: 0, color: 'var(--g)', letterSpacing: '-0.02em' }}>
                 Hey, {firstName}! 👋
               </h1>
-              <p style={{ fontFamily: 'var(--fb)', fontSize: 13, opacity: 0.9, marginTop: 2, color: '#fff', fontWeight: 500 }}>
+              <p style={{ fontFamily: 'var(--fb)', fontSize: 13, opacity: 0.9, marginTop: 2, color: 'var(--sub)', fontWeight: 500 }}>
                 Welcome to Ethos 2026
               </p>
             </div>
-            <img src="/assets/ethos-logo-insignia.png" alt="" style={{ width: 44, height: 44, objectFit: 'contain', filter: 'brightness(1.2)' }} />
+            <img src="/assets/ethos-logo-insignia.png" alt="" style={{ width: 44, height: 44, objectFit: 'contain', filter: 'brightness(0)' }} />
           </div>
           
           <div style={{ marginTop: 28, display: 'flex', gap: 12 }}>
             {profile?.access_level >= 3 && (
               <Link href="/admin" style={{
-                flex: 1, background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)',
+                flex: 1, background: 'rgba(0,0,0,0.06)', backdropFilter: 'blur(10px)', border: '1px solid rgba(0,0,0,0.1)',
                 borderRadius: 14, padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                color: '#fff', fontSize: 13, fontWeight: 700, textDecoration: 'none', transition: 'all 0.2s'
+                color: 'var(--g)', fontSize: 13, fontWeight: 700, textDecoration: 'none', transition: 'all 0.2s'
               }}>
                 <Settings size={16} /> Admin Panel
               </Link>
@@ -126,10 +126,10 @@ export default function AttendeeDashboard() {
               className="signout-btn"
               style={{
                 flex: profile?.access_level >= 3 ? 0.4 : 1, 
-                background: 'rgba(255,255,255,0.08)', 
-                border: '1px solid rgba(255,255,255,0.12)',
+                background: 'rgba(0,0,0,0.04)', 
+                border: '1px solid rgba(0,0,0,0.08)',
                 borderRadius: 14, padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer'
+                color: 'var(--g)', fontSize: 13, fontWeight: 700, cursor: 'pointer'
               }}
             >
               <LogOut size={16} /> Sign Out

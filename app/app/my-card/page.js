@@ -12,7 +12,7 @@ import Modal from '@/components/Modal';
 import { QRCodeSVG } from 'qrcode.react';
 import { toPng } from 'html-to-image';
 import toast from 'react-hot-toast';
-import { Save, Download, Search, RefreshCcw, Camera, MoreVertical, Check, Smartphone, Building, User as UserIcon, Type } from 'lucide-react';
+import { Save, Download, Search, RefreshCcw, Camera, MoreVertical, Check, Smartphone, Building, User as UserIcon, Type, Mail, FileText } from 'lucide-react';
 
 const DEFAULT_STYLE = {
   nameSize: 22, nameX: 0, nameY: 0, nameVisible: true,
@@ -200,7 +200,7 @@ const CardPreview = memo(function CardPreview({ user, style, cardRef, domRefs })
       <div style={{ zIndex: 1, position: 'relative' }}>
         {style.logoVisible && (
           <div ref={el => domRefs.current.logoWrap = el} style={{
-            display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 20,
             transform: `translate(${style.logoX || 0}px, ${style.logoY || 0}px)`,
           }}>
             <div ref={el => domRefs.current.logoBox = el} style={{ width: style.logoSize, height: style.logoSize, margin: '0 auto', borderRadius: 8, overflow: 'hidden' }}>
@@ -355,10 +355,12 @@ function MyCardContent() {
       <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 32, alignItems: 'center', justifyContent: 'center', minHeight: '80dvh' }}>
         
         {/* Card Display Side */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'center', width: '100%' }}>
-          <div onClick={() => setQrExpanded(true)} style={{ cursor: 'pointer', transition: 'transform 0.3s var(--liquid)' }}>
-            <CardPreview user={{ ...profile, name, avatar, role, company }} style={DEFAULT_STYLE} cardRef={cardRef} domRefs={domRefs} />
-            <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--muted)', marginTop: 12, fontWeight: 600 }}>Tap ID to enlarge QR</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'center', width: '100%', overflowX: 'hidden' }}>
+          <div onClick={() => setQrExpanded(true)} style={{ cursor: 'pointer', transition: 'transform 0.3s var(--liquid)', display: 'flex', justifyContent: 'center', width: '100%' }}>
+            <div style={{ transform: 'scale(min(1, calc(100vw / 400)))', transformOrigin: 'top center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+               <CardPreview user={{ ...profile, name, avatar, role, company }} style={DEFAULT_STYLE} cardRef={cardRef} domRefs={domRefs} />
+               <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--muted)', marginTop: 12, fontWeight: 600 }}>Tap ID to enlarge QR</p>
+            </div>
           </div>
           
           <div style={{ display: 'flex', gap: 12, width: '100%' }}>
@@ -474,7 +476,7 @@ function MyCardContent() {
 
       <Suspense fallback={null}>
         <Modal center open={qrExpanded} onClose={() => setQrExpanded(false)}>
-          <div style={{ padding: 'clamp(20px, 5vw, 40px)', background: '#fff', borderRadius: 32, textAlign: 'center', outline: 'none', maxWidth: '90vw' }} className="page-enter">
+          <div onClick={() => setQrExpanded(false)} style={{ padding: 'clamp(20px, 5vw, 40px)', background: '#fff', borderRadius: 32, textAlign: 'center', outline: 'none', maxWidth: '90vw', cursor: 'pointer' }} className="page-enter">
             <div style={{ padding: 16, background: '#fff', border: '2px solid var(--border)', borderRadius: 24, display: 'inline-block', boxShadow: '0 10px 40px rgba(0,0,0,0.1)', maxWidth: '100%' }}>
               <div style={{ width: 'clamp(200px, 80vw, 400px)', height: 'clamp(200px, 80vw, 400px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <QRCodeSVG 
