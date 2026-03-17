@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useState, useEffect } from 'react';
 import Avatar from '@/components/Avatar';
 import { QRCodeSVG } from 'qrcode.react';
 
@@ -42,6 +42,19 @@ export const CardPreview = memo(function CardPreview({
   };
 
   const qrValue = user?.id || user?.email || 'ethos-placeholder';
+
+  const [logoSrc, setLogoSrc] = useState('/assets/ethos-logo.png');
+  useEffect(() => {
+    let mounted = true;
+    fetch('/assets/ethos-logo.png')
+      .then(r => r.blob())
+      .then(blob => {
+        const reader = new FileReader();
+        reader.onload = () => { if (mounted) setLogoSrc(reader.result); };
+        reader.readAsDataURL(blob);
+      }).catch(() => {});
+    return () => { mounted = false; };
+  }, []);
 
   return (
     <div
@@ -97,8 +110,9 @@ export const CardPreview = memo(function CardPreview({
               style={{ width: s.logoSize, height: s.logoSize, borderRadius: 8, overflow: 'hidden' }}
             >
               <img
-                src="/assets/ethos-logo.png"
+                src={logoSrc}
                 alt="Ethos"
+                crossOrigin="anonymous"
                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
               />
             </div>

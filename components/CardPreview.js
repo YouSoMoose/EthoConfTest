@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useState, useEffect } from 'react';
 import Avatar from '@/components/Avatar';
 import { QRCodeSVG } from 'qrcode.react';
 
@@ -18,6 +18,19 @@ export const DEFAULT_STYLE = {
 
 export const CardPreview = memo(function CardPreview({ user = {}, style = DEFAULT_STYLE, cardRef, domRefs = { current: {} }, fullSize = true }) {
   const s = Object.assign({}, DEFAULT_STYLE, style);
+
+  const [logoSrc, setLogoSrc] = useState('/assets/ethos-logo-insignia.png');
+  useEffect(() => {
+    let mounted = true;
+    fetch('/assets/ethos-logo-insignia.png')
+      .then(r => r.blob())
+      .then(blob => {
+        const reader = new FileReader();
+        reader.onload = () => { if (mounted) setLogoSrc(reader.result); };
+        reader.readAsDataURL(blob);
+      }).catch(() => {});
+    return () => { mounted = false; };
+  }, []);
 
   // Unified Landscape Layout (9.5 x 4.5 implementation)
   const containerStyle = {
@@ -59,7 +72,7 @@ export const CardPreview = memo(function CardPreview({ user = {}, style = DEFAUL
               width: s.logoSize || 28, height: s.logoSize || 28,
               borderRadius: 5, overflow: 'hidden', flexShrink: 0
             }}>
-              <img src="/assets/ethos-logo-insignia.png" alt="E" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              <img src={logoSrc} crossOrigin="anonymous" alt="E" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
           </div>
         )}
