@@ -25,9 +25,7 @@ export default function AnnouncementBanner() {
   const [announcements, setAnnouncements] = useState([]);
   const [visible, setVisible] = useState([]);
   const [exiting, setExiting] = useState([]);
-  const [realtimeTrigger, setRealtimeTrigger] = useState(0);
-
-  // Fetch announcements whenever session loads OR Realtime fires
+  // Fetch announcements ONCE when session loads
   useEffect(() => {
     if (!session?.profile) return;
     (async () => {
@@ -40,24 +38,31 @@ export default function AnnouncementBanner() {
           setAnnouncements(fresh);
           setVisible(prev => {
             const newIds = fresh.map(a => a.id).filter(id => !prev.includes(id));
+            if (newIds.length === 0) return prev;
             return [...prev, ...newIds];
           });
         }
       } catch {}
     })();
-  }, [session?.profile, realtimeTrigger]);
+  }, [session?.profile]);
 
-  // Supabase Realtime — just bump the trigger counter
+  // Supabase Realtime — directly inject new announcements avoiding API race condition
   useEffect(() => {
+    if (!session?.profile) return;
     const channel = supabase
       .channel('announcements-realtime')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'announcements' }, () => {
-        setRealtimeTrigger(n => n + 1);
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'announcements' }, (payload) => {
+        const newAnn = payload.new;
+        setAnnouncements(prev => [newAnn, ...prev]);
+        setVisible(prev => {
+          if (prev.includes(newAnn.id)) return prev;
+          return [...prev, newAnn.id];
+        });
       })
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, []);
+  }, [session?.profile]);
 
   const dismiss = (id) => {
     setExiting(e => [...e, id]);

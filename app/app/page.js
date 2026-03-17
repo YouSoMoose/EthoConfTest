@@ -96,8 +96,6 @@ export default function AttendeeDashboard() {
   const cardPreviewRef = useRef(null);
   const notesCardRef = useRef(null);
 
-  const [realtimeTrigger, setRealtimeTrigger] = useState(0);
-
   useEffect(() => {
     const fetchSched = fetch('/api/schedule').then(r => r.json());
     const fetchAnn = fetch(`/api/announcements?_t=${Date.now()}`).then(r => r.json());
@@ -107,15 +105,15 @@ export default function AttendeeDashboard() {
       setAnnouncements(ann || []);
       setLoading(false);
     }).catch(() => setLoading(false));
-  }, [realtimeTrigger]);
+  }, []);
 
-  // Listen for Realtime inserts and trigger a refetch
+  // Listen for Realtime inserts and update state directly
   useEffect(() => {
     const channel = import('@/lib/supabase').then(({ supabase }) => {
       return supabase
         .channel('homepage-announcements')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, () => {
-          setRealtimeTrigger(n => n + 1);
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'announcements' }, (payload) => {
+          setAnnouncements(prev => [payload.new, ...prev]);
         })
         .subscribe();
     });
