@@ -34,7 +34,8 @@ export default function AdminLayout({ children }) {
     return (
       <div style={{ minHeight: '100vh', background: 'var(--abg)', color: 'var(--atext)', display: 'flex', flexDirection: 'column' }}>
         <header style={{
-          background: 'var(--as1)',
+          background: 'rgba(74, 63, 53, 0.85)',
+          backdropFilter: 'blur(16px)',
           borderBottom: '1px solid var(--aborder)',
           padding: '12px 16px',
           display: 'flex',
@@ -76,7 +77,8 @@ export default function AdminLayout({ children }) {
     <div style={{ minHeight: '100vh', background: 'var(--abg)', color: 'var(--atext)' }}>
       {/* Desktop sidebar */}
       <aside className="admin-sidebar" style={{
-        background: 'var(--as1)',
+        background: 'rgba(74, 63, 53, 0.85)',
+        backdropFilter: 'blur(16px)',
         borderRight: '1px solid var(--aborder)',
         padding: '20px 0',
       }}>
@@ -138,7 +140,8 @@ export default function AdminLayout({ children }) {
       {/* Mobile top bar */}
       <header className="admin-mobile-header" style={{
         display: 'none',
-        background: 'var(--as1)',
+        background: 'rgba(74, 63, 53, 0.85)',
+        backdropFilter: 'blur(16px)',
         borderBottom: '1px solid var(--aborder)',
         padding: '12px 16px',
         alignItems: 'center',
@@ -188,7 +191,9 @@ export default function AdminLayout({ children }) {
           {/* Drawer */}
           <div style={{
             position: 'fixed', top: 0, left: 0, bottom: 0,
-            width: 260, background: 'var(--as1)',
+            width: 260,
+            background: 'rgba(74, 63, 53, 0.95)',
+            backdropFilter: 'blur(20px)',
             borderRight: '1px solid var(--aborder)',
             zIndex: 210, padding: '20px 0',
             display: 'flex', flexDirection: 'column',

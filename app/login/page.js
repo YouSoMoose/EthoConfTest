@@ -4,16 +4,15 @@ import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import Link from 'next/link';
 import { Info } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
-  const [tab, setTab] = useState('attendee');
-
   async function handleGoogle() {
     setLoading(true);
-    // Pass the selected tab as 'intent' in the callbackUrl
-    signIn('google', { callbackUrl: `/?intent=${tab}` });
+    // Single unified login — backend determines role from email
+    signIn('google', { callbackUrl: '/' });
   }
 
   const requestNotifications = async () => {
@@ -28,7 +27,7 @@ export default function LoginPage() {
   return (
     <div style={{
       minHeight: '100dvh',
-      background: tab === 'attendee' ? 'linear-gradient(135deg, #FFE2D6 0%, #FCBD9D 100%)' : 'linear-gradient(135deg, #A89E94 0%, #514033 100%)',
+      background: 'linear-gradient(135deg, #FFE2D6 0%, #FCBD9D 100%)',
       display: 'flex',
       flexDirection: 'column',
       position: 'relative',
@@ -40,7 +39,7 @@ export default function LoginPage() {
         width: 32, height: 32, borderRadius: 16,
         background: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.5)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: tab === 'attendee' ? 'var(--sub)' : '#fff', textDecoration: 'none', transition: 'all 0.2s', cursor: 'pointer',
+        color: 'var(--sub)', textDecoration: 'none', transition: 'all 0.2s', cursor: 'pointer',
       }}>
         <Info size={18} />
       </Link>
@@ -65,18 +64,18 @@ export default function LoginPage() {
         <div style={{ textAlign: 'center' }}>
           <p style={{
             fontSize: 11, fontWeight: 700, letterSpacing: '.25em',
-            color: tab === 'attendee' ? 'var(--sub)' : 'rgba(255,255,255,0.6)', textTransform: 'uppercase', marginBottom: 12,
+            color: 'var(--sub)', textTransform: 'uppercase', marginBottom: 12,
           }}>
             Annual Conference · 2026
           </p>
           <h1 style={{
             fontFamily: 'var(--fh)', fontSize: 'clamp(42px, 10vh, 52px)', fontWeight: 800,
-            color: tab === 'attendee' ? 'var(--text)' : '#fff', lineHeight: 1, marginBottom: 8,
+            color: 'var(--text)', lineHeight: 1, marginBottom: 8,
           }}>
             Ethos
           </h1>
           <p style={{
-            fontSize: 14, color: tab === 'attendee' ? 'var(--sub)' : 'rgba(255,255,255,0.8)',
+            fontSize: 14, color: 'var(--sub)',
             fontFamily: 'var(--fb)', fontWeight: 600, letterSpacing: '0.05em'
           }}>
             SUSTAINABILITY & INNOVATION
@@ -91,29 +90,6 @@ export default function LoginPage() {
         padding: '32px 24px max(32px, env(safe-area-inset-bottom))',
         boxShadow: '0 -15px 50px rgba(0,0,0,0.12)',
       }}>
-        {/* Attendee / Admin Toggle */}
-        <div style={{
-          display: 'flex', background: '#F5F5F7', borderRadius: 16, padding: 4, marginBottom: 24,
-          border: '1px solid #EDEDF0'
-        }}>
-          {['attendee', 'admin'].map(t => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              style={{
-                flex: 1, padding: '12px', borderRadius: 12, border: 'none',
-                fontFamily: 'var(--fb)', fontSize: 13, fontWeight: 700,
-                background: tab === t ? '#fff' : 'transparent',
-                color: tab === t ? 'var(--text)' : '#8E8E93',
-                boxShadow: tab === t ? '0 4px 12px rgba(0,0,0,0.06)' : 'none',
-                cursor: 'pointer', transition: 'all 0.2s', textTransform: 'capitalize'
-              }}
-            >
-              {t} Login
-            </button>
-          ))}
-        </div>
-
         <button
           onClick={handleGoogle}
           disabled={loading}
@@ -121,7 +97,7 @@ export default function LoginPage() {
             width: '100%',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
             padding: '18px 24px',
-            background: tab === 'attendee' ? 'var(--text)' : '#111',
+            background: 'var(--text)',
             color: '#fff',
             border: 'none',
             borderRadius: 18,
@@ -141,7 +117,7 @@ export default function LoginPage() {
             <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
             <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
           </svg>
-          {loading ? 'Processing…' : `Join as ${tab === 'attendee' ? 'Attendee' : 'Staff'}`}
+          {loading ? 'Processing…' : 'Sign in with Google'}
         </button>
 
         <button 
@@ -160,9 +136,7 @@ export default function LoginPage() {
           fontSize: 12, color: '#8E8E93', textAlign: 'center',
           lineHeight: 1.6, fontFamily: 'var(--fb)',
         }}>
-          {tab === 'attendee' 
-            ? 'Sign in to access your digital passport, schedule, and network.' 
-            : 'Access restricted to authorized Ethos staff and administration.'}
+          Sign in with your organizational Google account — staff/admin access is assigned automatically based on your email.
         </p>
       </div>
     </div>

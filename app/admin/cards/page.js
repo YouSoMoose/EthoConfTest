@@ -3,21 +3,10 @@
 import { useEffect, useState, useRef, useCallback, memo, Suspense } from 'react';
 import Link from 'next/link';
 import Loader from '@/components/Loader';
-import { QRCodeSVG } from 'qrcode.react';
+import { CardPreview, DEFAULT_STYLE } from '@/components/CardPreview';
 import { toPng } from 'html-to-image';
 import toast from 'react-hot-toast';
 
-const DEFAULT_STYLE = {
-  nameSize: 22, nameX: 0, nameY: 0, nameVisible: true,
-  roleSize: 14, roleX: 0, roleY: 0, roleVisible: true,
-  companySize: 13, companyX: 0, companyY: 0, companyVisible: true,
-  emailSize: 11, emailX: 0, emailY: 0, emailVisible: true,
-  qrSize: 80, qrX: 0, qrY: 0, qrVisible: true,
-  logoSize: 28, logoX: 0, logoY: 0, logoVisible: true,
-  accentColor: '#D49B7A',
-  textColor: '#413429',
-  subColor: '#7D6F63',
-};
 
 // Direct DOM mutations per attribute — bypasses React entirely during drag
 const LIVE_MAP = {
@@ -245,89 +234,7 @@ function CardEditor({ style, onUpdate, onReset, onClose, cardDOMRefs }) {
   );
 }
 
-// Memoized — only re-renders when style commits (mouseup), not during drag
-const CardPreview = memo(function CardPreview({ user, style, cardRef, domRefs }) {
-  return (
-    <div ref={cardRef} style={{
-      background: '#ffffff', borderRadius: 14, border: '1px solid #ddd',
-      width: '87mm', height: '57mm', padding: 20, boxSizing: 'border-box',
-      display: 'flex', alignItems: 'center', gap: 20,
-      boxShadow: '0 15px 45px rgba(0,0,0,0.06)',
-      position: 'relative', overflow: 'hidden', flexShrink: 0,
-    }}>
-      <div style={{
-        position: 'absolute', top: 0, right: 0, width: 160, height: 160,
-        background: `linear-gradient(135deg, ${style.accentColor}25 0%, rgba(168,158,148,0.05) 100%)`,
-        borderRadius: '0 0 0 100%', pointerEvents: 'none'
-      }} />
 
-      <div style={{ flex: 1, minWidth: 0, zIndex: 1, position: 'relative' }}>
-        {style.logoVisible && (
-          <div ref={el => domRefs.current.logoWrap = el} style={{
-            display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12,
-            transform: `translate(${style.logoX || 0}px, ${style.logoY || 0}px)`,
-          }}>
-            <div ref={el => domRefs.current.logoBox = el} style={{ width: style.logoSize, height: style.logoSize, borderRadius: 8, overflow: 'hidden', flexShrink: 0 }}>
-              <img src="/assets/ethos-logo-insignia.png" alt="E" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-            </div>
-          </div>
-        )}
-
-        {style.nameVisible && (
-          <h3 ref={el => domRefs.current.name = el} style={{
-            fontFamily: 'var(--fh)', fontWeight: 800, fontSize: style.nameSize,
-            color: style.textColor, margin: 0, lineHeight: 1.05,
-            overflowWrap: 'break-word', wordBreak: 'break-word',
-            transform: `translate(${style.nameX}px, ${style.nameY}px)`,
-          }}>
-            {user.name || 'Anonymous User'}
-          </h3>
-        )}
-
-        {style.roleVisible && (
-          <p ref={el => domRefs.current.role = el} style={{
-            fontFamily: 'var(--fb)', fontWeight: 700, fontSize: style.roleSize,
-            color: style.accentColor, margin: '6px 0',
-            textTransform: 'uppercase', letterSpacing: '1px',
-            transform: `translate(${style.roleX}px, ${style.roleY}px)`,
-          }}>
-            {user.role || (user.access_level === 3 ? 'Super Admin' : user.access_level === 2 ? 'Event Staff' : 'Attendee')}
-          </p>
-        )}
-
-        {style.companyVisible && (
-          <p ref={el => domRefs.current.company = el} style={{
-            fontFamily: 'var(--fb)', fontWeight: 600, fontSize: style.companySize,
-            color: style.subColor, margin: '0 0 6px',
-            transform: `translate(${style.companyX || 0}px, ${style.companyY || 0}px)`,
-          }}>
-            {user.company || 'Ethos Attendee'}
-          </p>
-        )}
-
-        {style.emailVisible && (
-          <p ref={el => domRefs.current.email = el} style={{
-            fontFamily: 'var(--fb)', fontSize: style.emailSize, color: '#948B80', margin: 0, opacity: 0.8,
-            transform: `translate(${style.emailX || 0}px, ${style.emailY || 0}px)`,
-          }}>
-            {user.email}
-          </p>
-        )}
-      </div>
-
-      {style.qrVisible && (
-        <div ref={el => domRefs.current.qrWrap = el} style={{
-          background: '#fff', padding: 8, borderRadius: 12, border: '1px solid #efefef',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-          boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
-          transform: `translate(${style.qrX}px, ${style.qrY}px)`, zIndex: 2
-        }}>
-          <QRCodeSVG value={user.id} size={style.qrSize} level="H" fgColor={style.textColor} bgColor="#ffffff" />
-        </div>
-      )}
-    </div>
-  );
-});
 
 function CardRow({ user, initialStyle, globalUpdate, isPrinting, setPrintingId }) {
   const [style, setStyle] = useState(initialStyle || DEFAULT_STYLE);
@@ -380,7 +287,7 @@ function CardRow({ user, initialStyle, globalUpdate, isPrinting, setPrintingId }
       borderBottom: '1px solid var(--aborder)', alignItems: 'flex-start',
       animation: 'fadeIn 0.4s ease-out'
     }}>
-      <CardPreview user={user} style={style} cardRef={cardRef} domRefs={domRefs} />
+      <CardPreview user={user} style={style} cardRef={cardRef} domRefs={domRefs} fullSize={false} />
 
       <div style={{ flex: 1, minWidth: 340 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>

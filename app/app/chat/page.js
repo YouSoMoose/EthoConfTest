@@ -81,7 +81,7 @@ export default function ChatPage() {
 
   return (
     <div className="page-enter" style={{ display: 'flex', flexDirection: 'column', height: '100dvh', paddingBottom: 100 }}>
-      <Topbar title="Event Support" onBack={() => router.back()} />
+      <Topbar title="Ask Admins & Speakers" onBack={() => router.back()} />
 
       <div style={{ 
         background: 'var(--s1)', 
@@ -99,8 +99,8 @@ export default function ChatPage() {
           <BadgeCheck size={20} />
         </div>
         <div>
-          <h4 style={{ margin: 0, fontSize: 13, fontWeight: 800 }}>Ethos Concierge</h4>
-          <p style={{ margin: 0, fontSize: 11, color: 'var(--sub)', fontWeight: 600 }}>Help is usually available within minutes.</p>
+          <h4 style={{ margin: 0, fontSize: 13, fontWeight: 800 }}>Audience Q&A</h4>
+          <p style={{ margin: 0, fontSize: 11, color: 'var(--sub)', fontWeight: 600 }}>Use this to ask questions to admins or speakers during sessions.</p>
         </div>
       </div>
 
@@ -121,7 +121,7 @@ export default function ChatPage() {
               <MessageSquare size={32} />
             </div>
             <p style={{ fontFamily: 'var(--fb)', fontSize: 15, fontWeight: 600, color: 'var(--text)' }}>Start a conversation</p>
-            <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--sub)', marginTop: 4 }}>Ask about the schedule, venue, or access.</p>
+            <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--sub)', marginTop: 4 }}>Ask a question for admins or speakers during talks.</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
