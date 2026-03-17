@@ -164,7 +164,7 @@ export default function AttendeeDashboard() {
                 Welcome to Ethos 2026
               </p>
             </div>
-            <img src="/assets/ethos-logo-insignia.png" alt="" style={{ width: 44, height: 44, objectFit: 'contain', filter: 'brightness(0)' }} />
+            <img src="/assets/ethos-logo-insignia.png" alt="" style={{ width: 44, height: 44, objectFit: 'contain' }} />
           </div>
           
           <div style={{ marginTop: 28, display: 'flex', gap: 12 }}>
