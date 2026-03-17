@@ -52,6 +52,8 @@ export default function BottomNav({ items, admin }) {
   const activeColor = admin ? 'var(--accent)' : 'var(--g)';
   const inactiveColor = admin ? 'var(--amuted)' : 'var(--muted)';
 
+  if (!admin && !session?.profile?.id) return null;
+
   return (
     <nav className={admin ? 'admin-bottom-nav' : ''} style={{
       position: 'absolute', // Fixed to bottom of container
