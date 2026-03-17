@@ -322,7 +322,7 @@ function MyCardContent() {
             style={{ cursor: 'pointer', display: 'flex', justifyContent: 'center', width: '100%' }}
           >
             <div style={{
-              transform: 'scale(calc((100vw - 32px) / 320))',
+              transform: 'scale(calc((100vw - 32px) / 280))',
               transformOrigin: 'top center',
               display: 'flex', flexDirection: 'column', alignItems: 'center',
             }}>
@@ -411,7 +411,7 @@ function MyCardContent() {
                 ].map(({ label, icon, value, setter, placeholder, type, maxLength }) => (
                   <div key={label} className="input-group">
                     <label className="section-label">{label}</label>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--as1)', padding: '6px 16px', borderRadius: 16, border: '1px solid var(--border)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'transparent', padding: '0 4px' }}>
                       {icon}
                       <input
                         type={type}
@@ -419,20 +419,42 @@ function MyCardContent() {
                         onChange={e => setter(e.target.value)}
                         placeholder={placeholder}
                         maxLength={maxLength}
-                        style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none', fontWeight: 500 }}
+                        style={{ 
+                          flex: 1, background: 'var(--as1)', border: '1px solid var(--border)', 
+                          padding: '12px 16px', fontSize: 15, outline: 'none', fontWeight: 500,
+                          borderRadius: 14
+                        }}
                       />
                     </div>
                   </div>
                 ))}
+                {/* Bio */}
+                <div className="input-group">
+                  <label className="section-label">Bio</label>
+                  <textarea
+                    value={bio}
+                    onChange={e => setBio(e.target.value)}
+                    placeholder="Tell us about yourself..."
+                    style={{ 
+                      width: '100%', background: 'var(--as1)', border: '1px solid var(--border)', 
+                      padding: '12px 16px', fontSize: 15, outline: 'none', fontWeight: 500,
+                      borderRadius: 14, minHeight: 100, fontFamily: 'inherit', resize: 'none'
+                    }}
+                  />
+                </div>
 
                 {/* Email — disabled */}
                 <div className="input-group">
                   <label className="section-label">Email Address</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16, opacity: 0.7 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'transparent', padding: '0 4px', opacity: 0.7 }}>
                     <Mail size={18} color="var(--muted)" />
                     <input
                       type="email" value={profile.email} disabled
-                      style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none' }}
+                      style={{ 
+                        flex: 1, background: 'var(--s2)', border: '1px solid var(--border)', 
+                        padding: '12px 16px', fontSize: 15, outline: 'none',
+                        borderRadius: 14
+                      }}
                     />
                   </div>
                 </div>
