@@ -11,7 +11,6 @@ const slides = [
     title: 'Live Schedule',
     desc: 'Stay on track with the real-time event timeline. Never miss a session, workshop, or keynote.',
     gradient: 'linear-gradient(135deg, #FFE2D6 0%, #FCBD9D 100%)',
-    cardGradient: 'linear-gradient(160deg, rgba(255,180,130,0.35) 0%, rgba(252,189,157,0.18) 100%)',
     textMode: 'dark',
   },
   {
@@ -19,7 +18,6 @@ const slides = [
     title: 'Passport Stamps',
     desc: 'Visit booths and collect stamps on your digital passport. Complete your journey through Ethos.',
     gradient: 'linear-gradient(135deg, #F5F0EA 0%, #D4CCC4 100%)',
-    cardGradient: 'linear-gradient(160deg, rgba(212,204,196,0.4) 0%, rgba(245,240,234,0.2) 100%)',
     textMode: 'dark',
   },
   {
@@ -27,7 +25,6 @@ const slides = [
     title: 'Live Chat',
     desc: 'Message event staff in real-time. Get answers, share feedback, and stay connected.',
     gradient: 'linear-gradient(135deg, #D4CCC4 0%, #A89E94 100%)',
-    cardGradient: 'linear-gradient(160deg, rgba(168,158,148,0.4) 0%, rgba(212,204,196,0.2) 100%)',
     textMode: 'dark',
   },
   {
@@ -35,7 +32,6 @@ const slides = [
     title: 'Smart Notes',
     desc: 'Take notes during sessions and save them to your account. Access them anytime, anywhere.',
     gradient: 'linear-gradient(135deg, #A89E94 0%, #514033 100%)',
-    cardGradient: 'linear-gradient(160deg, rgba(81,64,51,0.5) 0%, rgba(168,158,148,0.25) 100%)',
     textMode: 'light',
   },
 ];
@@ -148,7 +144,8 @@ export default function LandingPage() {
             backgroundSize: '200% 200%',
             animation: 'gradientMove 12s ease infinite',
             opacity: current === i ? 1 : 0,
-            transition: 'opacity 1s cubic-bezier(0.4, 0, 0.2, 1)',
+            transition: 'opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1)',
+            filter: current === i ? 'blur(0px)' : 'blur(8px)',
           }} />
         ))}
       </div>
@@ -221,10 +218,11 @@ export default function LandingPage() {
             transition: 'all 0.6s var(--liquid)'
           }}>
             <div style={{
-              background: s.cardGradient,
+              background: 'rgba(255,255,255,0.15)',
               backdropFilter: 'blur(25px)',
+              WebkitBackdropFilter: 'blur(25px)',
               borderRadius: 40,
-              border: '1px solid rgba(255,255,255,0.3)',
+              border: '1px solid rgba(255,255,255,0.25)',
               padding: 'clamp(40px, 8vh, 56px) 32px',
               maxWidth: 400,
               width: '100%',
@@ -232,7 +230,6 @@ export default function LandingPage() {
               boxShadow: '0 25px 60px rgba(0,0,0,0.12)',
               position: 'relative',
               overflow: 'hidden',
-              transition: 'background 0.8s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.8s ease',
             }}>
               {/* Subtle liquid glow */}
               <div style={{

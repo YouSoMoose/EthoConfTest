@@ -1,6 +1,14 @@
 {
+  "/login/page": "app/login/page.js",
   "/page": "app/page.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/api/announcements/route": "app/api/announcements/route.js",
+  "/api/schedule/route": "app/api/schedule/route.js",
+  "/api/messages/route": "app/api/messages/route.js",
+  "/api/connections/route": "app/api/connections/route.js",
   "/app/page": "app/app/page.js",
   "/app/my-card/page": "app/app/my-card/page.js",
-  "/admin/page": "app/admin/page.js"
+  "/app/schedule/page": "app/app/schedule/page.js",
+  "/app/wallet/page": "app/app/wallet/page.js",
+  "/app/scan/page": "app/app/scan/page.js"
 }
