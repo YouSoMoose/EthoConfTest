@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { Home, Calendar, Wallet, Scan, MessageCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -21,30 +21,31 @@ export default function BottomNav({ items, admin }) {
   const [unread, setUnread] = useState(0);
   const tabs = items || attendeeTabs;
   const manyTabs = tabs.length > 5;
+  const [realtimeTrigger, setRealtimeTrigger] = useState(0);
 
-  const fetchUnread = useCallback(async () => {
-    try {
-      const res = await fetch('/api/messages?unread=true');
-      if (res.ok) { const d = await res.json(); setUnread(d.unreadCount || 0); }
-    } catch { }
-  }, []);
-
+  // Fetch unread count on mount + whenever Realtime fires
   useEffect(() => {
     if (admin || !session?.profile?.id) return;
-    fetchUnread();
+    (async () => {
+      try {
+        const res = await fetch('/api/messages?unread=true');
+        if (res.ok) { const d = await res.json(); setUnread(d.unreadCount || 0); }
+      } catch { }
+    })();
+  }, [session?.profile?.id, admin, realtimeTrigger]);
 
+  // Supabase Realtime — bump trigger on new messages
+  useEffect(() => {
+    if (admin) return;
     const channel = supabase
-      .channel(`unread-${session.profile.id}`)
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages',
-        filter: `recipient_id=eq.${session.profile.id}`,
-      }, () => { fetchUnread(); })
+      .channel('unread-badge')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => {
+        setRealtimeTrigger(n => n + 1);
+      })
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [session?.profile?.id, admin, fetchUnread]);
+  }, [admin]);
 
   const bg = admin ? 'var(--as1)' : 'var(--white)';
   const border = admin ? 'var(--aborder)' : 'var(--border)';

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { usePathname, useRouter } from 'next/navigation';
 import Avatar from './Avatar';
@@ -13,51 +13,45 @@ export default function MessageNotification() {
   const [lastNotifiedId, setLastNotifiedId] = useState(null);
   const [activeMsg, setActiveMsg] = useState(null);
   const [exiting, setExiting] = useState(false);
+  const [realtimeTrigger, setRealtimeTrigger] = useState(0);
 
-  // Use refs so the callback stays stable
-  const lastNotifiedIdRef = useRef(lastNotifiedId);
-  lastNotifiedIdRef.current = lastNotifiedId;
-  const pathnameRef = useRef(pathname);
-  pathnameRef.current = pathname;
-
-  const checkNewMessages = useCallback(async () => {
-    if (!session?.profile?.id) return;
-    if (pathnameRef.current === '/app/chat' || pathnameRef.current === '/admin/messages') return;
-
-    try {
-      const res = await fetch('/api/messages?unread=true&latest=true');
-      if (res.ok) {
-        const msg = await res.json();
-        if (msg && msg.id !== lastNotifiedIdRef.current) {
-          setLastNotifiedId(msg.id);
-          setActiveMsg(msg);
-          setExiting(false);
-          
-          setTimeout(() => {
-            setExiting(true);
-            setTimeout(() => setActiveMsg(null), 400);
-          }, 6000);
-        }
-      }
-    } catch {}
-  }, [session?.profile?.id]);
-
-  // Supabase Realtime subscription for new messages
+  // Check for new messages whenever Realtime fires
   useEffect(() => {
     if (!session?.profile?.id) return;
+    if (pathname === '/app/chat' || pathname === '/admin/messages') return;
+    if (realtimeTrigger === 0) return; // Skip initial mount, only respond to Realtime
 
+    (async () => {
+      try {
+        const res = await fetch('/api/messages?unread=true&latest=true');
+        if (res.ok) {
+          const msg = await res.json();
+          if (msg && msg.id !== lastNotifiedId) {
+            setLastNotifiedId(msg.id);
+            setActiveMsg(msg);
+            setExiting(false);
+            
+            setTimeout(() => {
+              setExiting(true);
+              setTimeout(() => setActiveMsg(null), 400);
+            }, 6000);
+          }
+        }
+      } catch {}
+    })();
+  }, [realtimeTrigger]);
+
+  // Supabase Realtime — listen for ALL new messages (no filter = works for everyone)
+  useEffect(() => {
     const channel = supabase
-      .channel(`msg-notif-${session.profile.id}`)
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages',
-        filter: `recipient_id=eq.${session.profile.id}`,
-      }, () => { checkNewMessages(); })
+      .channel('msg-notif-global')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => {
+        setRealtimeTrigger(n => n + 1);
+      })
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [session?.profile?.id, checkNewMessages]);
+  }, []);
 
   if (!session?.profile || !activeMsg) return null;
 

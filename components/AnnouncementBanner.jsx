@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { supabase } from '@/lib/supabase';
 
@@ -23,42 +23,39 @@ export default function AnnouncementBanner() {
   const [announcements, setAnnouncements] = useState([]);
   const [visible, setVisible] = useState([]);
   const [exiting, setExiting] = useState([]);
-  const sessionRef = useRef(session);
-  sessionRef.current = session;
+  const [realtimeTrigger, setRealtimeTrigger] = useState(0);
 
-  const fetchAnnouncements = useCallback(async () => {
-    if (!sessionRef.current?.profile) return;
-    try {
-      const res = await fetch('/api/announcements');
-      if (res.ok) {
-        const data = await res.json();
-        const dismissed = getDismissed();
-        const fresh = (data || []).filter(a => !dismissed.includes(a.id));
-        setAnnouncements(fresh);
-        setVisible(prev => {
-          const newIds = fresh.map(a => a.id).filter(id => !prev.includes(id));
-          return [...prev, ...newIds];
-        });
-      }
-    } catch {}
-  }, []);
-
-  // Initial fetch when session becomes available
+  // Fetch announcements whenever session loads OR Realtime fires
   useEffect(() => {
-    if (session?.profile) fetchAnnouncements();
-  }, [session?.profile, fetchAnnouncements]);
+    if (!session?.profile) return;
+    (async () => {
+      try {
+        const res = await fetch('/api/announcements');
+        if (res.ok) {
+          const data = await res.json();
+          const dismissed = getDismissed();
+          const fresh = (data || []).filter(a => !dismissed.includes(a.id));
+          setAnnouncements(fresh);
+          setVisible(prev => {
+            const newIds = fresh.map(a => a.id).filter(id => !prev.includes(id));
+            return [...prev, ...newIds];
+          });
+        }
+      } catch {}
+    })();
+  }, [session?.profile, realtimeTrigger]);
 
-  // Supabase Realtime subscription (stable — never re-creates)
+  // Supabase Realtime — just bump the trigger counter
   useEffect(() => {
     const channel = supabase
       .channel('announcements-realtime')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'announcements' }, () => {
-        fetchAnnouncements();
+        setRealtimeTrigger(n => n + 1);
       })
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [fetchAnnouncements]);
+  }, []);
 
   const dismiss = (id) => {
     setExiting(e => [...e, id]);
