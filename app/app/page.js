@@ -1,26 +1,52 @@
 'use client';
 
 import { signOut, useSession } from 'next-auth/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import Avatar from '@/components/Avatar';
 import Loader from '@/components/Loader';
 import { Home, Calendar, Wallet, Scan, MessageCircle, FileText, CreditCard, ChevronRight, LogOut, Settings } from 'lucide-react';
+import { CardPreview } from '@/components/CardPreview';
+import { useScrollHero } from '@/lib/animations';
 
-function AnnouncementCard({ a }) {
+const APPLE = 'cubic-bezier(0.32, 0.72, 0, 1)';
+const SPRING = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
+
+function AnnouncementCard({ a, index }) {
   const [expanded, setExpanded] = useState(false);
+  const cardRef = useRef(null);
   const timeSince = Math.round((Date.now() - new Date(a.created_at).getTime()) / 60000);
   const timeLabel = timeSince < 1 ? 'just now' : timeSince < 60 ? `${timeSince}m ago` : `${Math.round(timeSince / 60)}h ago`;
 
+  // Spring press on the card
+  const handlePointerDown = () => {
+    if (!cardRef.current) return;
+    cardRef.current.style.transition = 'transform 0.12s ease-out';
+    cardRef.current.style.transform = 'scale(0.97)';
+  };
+  const handlePointerUp = () => {
+    if (!cardRef.current) return;
+    cardRef.current.style.transition = `transform 0.4s ${SPRING}`;
+    cardRef.current.style.transform = 'scale(1)';
+  };
+
   return (
-    <div onClick={() => a.content && setExpanded(!expanded)} style={{
-      background: 'var(--white)',
-      border: '1px solid var(--border)',
-      borderRadius: 'var(--r)',
-      padding: '16px',
-      cursor: a.content ? 'pointer' : 'default',
-      transition: 'all 0.2s',
-    }}>
+    <div
+      ref={cardRef}
+      onClick={() => a.content && setExpanded(!expanded)}
+      onPointerDown={a.content ? handlePointerDown : undefined}
+      onPointerUp={a.content ? handlePointerUp : undefined}
+      onPointerLeave={a.content ? handlePointerUp : undefined}
+      style={{
+        background: 'var(--white)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--r)',
+        padding: '16px',
+        cursor: a.content ? 'pointer' : 'default',
+        transform: 'scale(1)',
+        WebkitTapHighlightColor: 'transparent',
+      }}
+    >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
         <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 15, color: 'var(--text)', margin: 0 }}>
           {a.title}
@@ -29,10 +55,11 @@ function AnnouncementCard({ a }) {
           {timeLabel}
         </span>
       </div>
+      {/* Animated content expand — never display:none */}
       {a.content && (
         <div style={{
           overflow: 'hidden',
-          transition: 'max-height 0.3s ease, margin 0.3s ease, opacity 0.3s ease',
+          transition: `max-height 0.4s ${APPLE}, margin 0.4s ${APPLE}, opacity 0.35s ${APPLE}`,
           maxHeight: expanded ? 500 : 0,
           marginTop: expanded ? 8 : 0,
           opacity: expanded ? 1 : 0,
@@ -43,7 +70,11 @@ function AnnouncementCard({ a }) {
         </div>
       )}
       {a.content && !expanded && (
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 8 }}>
+        <div style={{
+          display: 'flex', justifyContent: 'center', marginTop: 8,
+          transition: `opacity 0.3s ${APPLE}`,
+          opacity: expanded ? 0 : 1,
+        }}>
           <div style={{ width: 32, height: 4, background: 'var(--s1)', borderRadius: 2 }} />
         </div>
       )}
@@ -56,6 +87,14 @@ export default function AttendeeDashboard() {
   const [schedule, setSchedule] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [customizations, setCustomizations] = useState(null);
+
+  // Scroll-linked hero scale effect
+  const heroRef = useScrollHero({ minScale: 0.96, distance: 180 });
+
+  // Spring press refs for interactive cards
+  const cardPreviewRef = useRef(null);
+  const notesCardRef = useRef(null);
 
   useEffect(() => {
     Promise.all([
@@ -68,30 +107,52 @@ export default function AttendeeDashboard() {
     }).catch(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    if (session?.profile?.id) {
+      const saved = localStorage.getItem('ethos_card_customizations');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed[session.profile.id]) {
+            setCustomizations(parsed[session.profile.id]);
+          }
+        } catch(e) {}
+      }
+    }
+  }, [session]);
+
+  // Spring press helpers
+  const springDown = (ref) => {
+    if (!ref.current) return;
+    ref.current.style.transition = 'transform 0.12s ease-out';
+    ref.current.style.transform = 'scale(0.97)';
+  };
+  const springUp = (ref) => {
+    if (!ref.current) return;
+    ref.current.style.transition = `transform 0.45s ${SPRING}`;
+    ref.current.style.transform = 'scale(1)';
+  };
+
   if (loading) return <Loader />;
 
   const profile = session?.profile;
   const firstName = profile?.name?.split(' ')[0] || 'there';
   const upNext = schedule[0];
 
-  const quickLinks = [
-    { icon: Calendar, label: 'Schedule', href: '/app/schedule' },
-    { icon: MessageCircle, label: 'Chat', href: '/app/chat' },
-    { icon: FileText, label: 'Notes', href: '/app/notes' },
-    { icon: Wallet, label: 'Wallet', href: '/app/wallet' },
-    { icon: Scan, label: 'Scan', href: '/app/scan' },
-    { icon: CreditCard, label: 'My Card', href: '/app/my-card' },
-  ];
-
   return (
     <div className="page-enter">
-      {/* Gradient header hero */}
-      <div style={{
-        background: 'var(--hero)',
-        color: 'var(--text)',
-        padding: 'max(16px, env(safe-area-inset-top)) 16px 32px',
-        boxShadow: '0 4px 20px rgba(65, 52, 41, 0.15)',
-      }}>
+      {/* Gradient header hero — scales down on scroll */}
+      <div
+        ref={heroRef}
+        style={{
+          background: 'var(--hero)',
+          color: 'var(--text)',
+          padding: 'max(16px, env(safe-area-inset-top)) 16px 32px',
+          boxShadow: '0 4px 20px rgba(65, 52, 41, 0.15)',
+          transformOrigin: 'top center',
+          willChange: 'transform, opacity',
+        }}
+      >
         <div style={{ maxWidth: 500, margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <Avatar src={profile?.avatar} name={profile?.name} size={52} />
@@ -111,7 +172,9 @@ export default function AttendeeDashboard() {
               <Link href="/admin" style={{
                 flex: 1, background: 'rgba(0,0,0,0.06)', backdropFilter: 'blur(10px)', border: '1px solid rgba(0,0,0,0.1)',
                 borderRadius: 14, padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                color: 'var(--g)', fontSize: 13, fontWeight: 700, textDecoration: 'none', transition: 'all 0.2s'
+                color: 'var(--g)', fontSize: 13, fontWeight: 700, textDecoration: 'none',
+                transition: `transform 0.4s ${SPRING}`,
+                WebkitTapHighlightColor: 'transparent',
               }}>
                 <Settings size={16} /> Admin Panel
               </Link>
@@ -129,7 +192,8 @@ export default function AttendeeDashboard() {
                 background: 'rgba(0,0,0,0.04)', 
                 border: '1px solid rgba(0,0,0,0.08)',
                 borderRadius: 14, padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                color: 'var(--g)', fontSize: 13, fontWeight: 700, cursor: 'pointer'
+                color: 'var(--g)', fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                WebkitTapHighlightColor: 'transparent',
               }}
             >
               <LogOut size={16} /> Sign Out
@@ -138,10 +202,11 @@ export default function AttendeeDashboard() {
         </div>
       </div>
 
-      <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px' }}>
+      <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+        
         {/* Up Next */}
         {upNext && (
-          <div style={{ marginBottom: 24 }}>
+          <div>
             <p className="section-label">📍 UP NEXT</p>
             <div style={{
               background: 'var(--gl)',
@@ -181,52 +246,73 @@ export default function AttendeeDashboard() {
           </div>
         )}
 
-        {/* Quick Access */}
-        <div style={{ marginBottom: 24 }}>
-          <p className="section-label">QUICK ACCESS</p>
-          <div className="stagger" style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: 10,
-          }}>
-            {quickLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <Link key={link.href} href={link.href} style={{
-                  background: 'var(--white)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--r)',
-                  padding: '16px 8px',
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: 8,
-                  textDecoration: 'none',
-                }}>
-                  <div style={{ 
-                    width: 44, height: 44, borderRadius: 22, background: 'var(--s2)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--g)'
-                  }}>
-                    <Icon size={20} />
-                  </div>
-                  <span style={{ fontFamily: 'var(--fb)', fontSize: 11, fontWeight: 600, color: 'var(--text)' }}>
-                    {link.label}
-                  </span>
-                </Link>
-              );
-            })}
+        {/* RESPONSIVE ID CARD PREVIEW — with spring press */}
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+             <p className="section-label" style={{ margin: 0 }}>MY CARD</p>
+             <Link href="/app/my-card" style={{ fontSize: 13, fontFamily: 'var(--fb)', fontWeight: 600, color: 'var(--accent)', textDecoration: 'none' }}>Virtual ID &rarr;</Link>
           </div>
+          
+          <Link
+            href="/app/my-card"
+            style={{ textDecoration: 'none', display: 'flex', justifyContent: 'center', width: '100%' }}
+            onPointerDown={() => springDown(cardPreviewRef)}
+            onPointerUp={() => springUp(cardPreviewRef)}
+            onPointerLeave={() => springUp(cardPreviewRef)}
+          >
+            <div
+              ref={cardPreviewRef}
+              style={{ 
+                transformOrigin: 'top center', 
+                transform: 'scale(min(1, calc((100vw - 64px) / 300)))',
+                width: 300, height: 430,
+                transition: `transform 0.4s ${SPRING}`,
+              }}
+            >
+               <CardPreview user={session.profile} style={customizations || undefined} />
+            </div>
+          </Link>
         </div>
 
-        {/* Announcements */}
+        {/* NOTES APP LINK — with spring press */}
+        <div>
+           <p className="section-label">WORKSPACE</p>
+           <Link
+             href="/app/notes"
+             ref={notesCardRef}
+             onPointerDown={() => springDown(notesCardRef)}
+             onPointerUp={() => springUp(notesCardRef)}
+             onPointerLeave={() => springUp(notesCardRef)}
+             style={{
+               background: 'var(--white)',
+               border: '1px solid var(--border)',
+               borderRadius: 'var(--r)',
+               padding: 24,
+               display: 'flex', alignItems: 'center', gap: 16,
+               textDecoration: 'none',
+               boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
+               transform: 'scale(1)',
+               transition: `transform 0.4s ${SPRING}`,
+               WebkitTapHighlightColor: 'transparent',
+            }}
+           >
+              <div style={{ width: 48, height: 48, borderRadius: 14, background: 'var(--s1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--g)' }}>
+                 <FileText size={24} />
+              </div>
+              <div style={{ flex: 1 }}>
+                 <h3 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 16, color: 'var(--text)', margin: 0 }}>Capture Notes</h3>
+                 <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--sub)', margin: '4px 0 0 0' }}>Jot down insights from your current session.</p>
+              </div>
+              <ChevronRight color="var(--muted)" />
+           </Link>
+        </div>
+
+        {/* Announcements — staggered */}
         {announcements.length > 0 && (
           <div>
             <p className="section-label">📢 ANNOUNCEMENTS</p>
             <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {announcements.map((a) => <AnnouncementCard key={a.id} a={a} />)}
+              {announcements.map((a, i) => <AnnouncementCard key={a.id} a={a} index={i} />)}
             </div>
           </div>
         )}

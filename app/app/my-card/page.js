@@ -1,51 +1,55 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback, memo, Suspense } from 'react';
+import { useEffect, useState, useRef, useCallback, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 import Loader from '@/components/Loader';
-import Topbar from '@/components/Topbar';
 import Avatar from '@/components/Avatar';
-import Btn from '@/components/Btn';
 import Modal from '@/components/Modal';
+import CardPreview from '@/components/CardPreview';
 import { QRCodeSVG } from 'qrcode.react';
-import { toPng } from 'html-to-image';
 import toast from 'react-hot-toast';
-import { Save, Download, Search, RefreshCcw, Camera, MoreVertical, Check, Smartphone, Building, User as UserIcon, Type, Mail, FileText } from 'lucide-react';
+import {
+  Camera, Smartphone, Building, User as UserIcon,
+  Type, Mail, FileText,
+} from 'lucide-react';
 
+// Kept here so CardEditor can reference it without re-importing
 const DEFAULT_STYLE = {
-  nameSize: 22, nameX: 0, nameY: 0, nameVisible: true,
-  roleSize: 14, roleX: 0, roleY: 0, roleVisible: true,
-  companySize: 13, companyX: 0, companyY: 0, companyVisible: true,
-  emailSize: 11, emailX: 0, emailY: 0, emailVisible: true,
-  qrSize: 130, qrX: 0, qrY: 0, qrVisible: true,
-  logoSize: 44, logoX: 0, logoY: 0, logoVisible: true,
+  nameSize: 20, nameX: 0, nameY: 0, nameVisible: true,
+  roleSize: 13, roleX: 0, roleY: 0, roleVisible: true,
+  companySize: 12, companyX: 0, companyY: 0, companyVisible: true,
+  emailSize: 10, emailX: 0, emailY: 0, emailVisible: true,
+  qrSize: 90, qrX: 0, qrY: 0, qrVisible: true,
+  logoSize: 36, logoX: 0, logoY: 0, logoVisible: true,
   accentColor: '#D49B7A',
   textColor: '#413429',
   subColor: '#7D6F63',
 };
 
 const LIVE_MAP = {
-  nameSize:    (v, r, s) => r.name    && (r.name.style.fontSize    = v + 'px'),
-  nameX:       (v, r, s) => r.name    && (r.name.style.transform   = `translate(${v}px, ${s.nameY ?? 0}px)`),
-  nameY:       (v, r, s) => r.name    && (r.name.style.transform   = `translate(${s.nameX ?? 0}px, ${v}px)`),
-  roleSize:    (v, r, s) => r.role    && (r.role.style.fontSize    = v + 'px'),
-  roleX:       (v, r, s) => r.role    && (r.role.style.transform   = `translate(${v}px, ${s.roleY ?? 0}px)`),
-  roleY:       (v, r, s) => r.role    && (r.role.style.transform   = `translate(${s.roleX ?? 0}px, ${v}px)`),
-  companySize: (v, r, s) => r.company && (r.company.style.fontSize = v + 'px'),
-  companyX:    (v, r, s) => r.company && (r.company.style.transform = `translate(${v}px, ${s.companyY ?? 0}px)`),
-  companyY:    (v, r, s) => r.company && (r.company.style.transform = `translate(${s.companyX ?? 0}px, ${v}px)`),
-  emailSize:   (v, r, s) => r.email   && (r.email.style.fontSize   = v + 'px'),
-  emailX:      (v, r, s) => r.email   && (r.email.style.transform  = `translate(${v}px, ${s.emailY ?? 0}px)`),
-  emailY:      (v, r, s) => r.email   && (r.email.style.transform  = `translate(${s.emailX ?? 0}px, ${v}px)`),
-  logoSize:    (v, r, s) => r.logoBox  && (r.logoBox.style.width = r.logoBox.style.height = v + 'px'),
-  logoX:       (v, r, s) => r.logoWrap && (r.logoWrap.style.transform = `translate(${v}px, ${s.logoY ?? 0}px)`),
-  logoY:       (v, r, s) => r.logoWrap && (r.logoWrap.style.transform = `translate(${s.logoX ?? 0}px, ${v}px)`),
-  qrX:         (v, r, s) => r.qrWrap  && (r.qrWrap.style.transform  = `translate(${v}px, ${s.qrY ?? 0}px)`),
-  qrY:         (v, r, s) => r.qrWrap  && (r.qrWrap.style.transform  = `translate(${s.qrX ?? 0}px, ${v}px)`),
+  nameSize: (v, r) => r.name && (r.name.style.fontSize = v + 'px'),
+  nameX: (v, r, s) => r.name && (r.name.style.transform = `translate(${v}px, ${s.nameY ?? 0}px)`),
+  nameY: (v, r, s) => r.name && (r.name.style.transform = `translate(${s.nameX ?? 0}px, ${v}px)`),
+  roleSize: (v, r) => r.role && (r.role.style.fontSize = v + 'px'),
+  roleX: (v, r, s) => r.role && (r.role.style.transform = `translate(${v}px, ${s.roleY ?? 0}px)`),
+  roleY: (v, r, s) => r.role && (r.role.style.transform = `translate(${s.roleX ?? 0}px, ${v}px)`),
+  companySize: (v, r) => r.company && (r.company.style.fontSize = v + 'px'),
+  companyX: (v, r, s) => r.company && (r.company.style.transform = `translate(${v}px, ${s.companyY ?? 0}px)`),
+  companyY: (v, r, s) => r.company && (r.company.style.transform = `translate(${s.companyX ?? 0}px, ${v}px)`),
+  emailSize: (v, r) => r.email && (r.email.style.fontSize = v + 'px'),
+  emailX: (v, r, s) => r.email && (r.email.style.transform = `translate(${v}px, ${s.emailY ?? 0}px)`),
+  emailY: (v, r, s) => r.email && (r.email.style.transform = `translate(${s.emailX ?? 0}px, ${v}px)`),
+  logoSize: (v, r) => r.logoBox && (r.logoBox.style.width = r.logoBox.style.height = v + 'px'),
+  logoX: (v, r, s) => r.logoWrap && (r.logoWrap.style.transform = `translate(${v}px, ${s.logoY ?? 0}px)`),
+  logoY: (v, r, s) => r.logoWrap && (r.logoWrap.style.transform = `translate(${s.logoX ?? 0}px, ${v}px)`),
+  qrX: (v, r, s) => r.qrWrap && (r.qrWrap.style.transform = `translate(${v}px, ${s.qrY ?? 0}px)`),
+  qrY: (v, r, s) => r.qrWrap && (r.qrWrap.style.transform = `translate(${s.qrX ?? 0}px, ${v}px)`),
 };
 
+// ─────────────────────────────────────────────
+// CardEditor
+// ─────────────────────────────────────────────
 function CardEditor({ style, onUpdate, onReset, cardDOMRefs }) {
   const [activeTab, setActiveTab] = useState('size');
   const [localStyle, setLocalStyle] = useState(style);
@@ -92,7 +96,13 @@ function CardEditor({ style, onUpdate, onReset, cardDOMRefs }) {
       <div className="premium-slider-group" style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, alignItems: 'center' }}>
           <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--sub)', textTransform: 'uppercase' }}>{label}</label>
-          <span id={`pill-${attr}`} className="slider-value-pill" style={{ fontSize: 10, fontWeight: 800, background: 'var(--as1)', color: 'var(--accent)', padding: '2px 8px', borderRadius: 20, border: '1px solid var(--border)' }}>{Math.round(val)}</span>
+          <span
+            id={`pill-${attr}`}
+            className="slider-value-pill"
+            style={{ fontSize: 10, fontWeight: 800, background: 'var(--as1)', color: 'var(--accent)', padding: '2px 8px', borderRadius: 20, border: '1px solid var(--border)' }}
+          >
+            {Math.round(val)}
+          </span>
         </div>
         <input
           id={`slider-${attr}`}
@@ -102,7 +112,11 @@ function CardEditor({ style, onUpdate, onReset, cardDOMRefs }) {
           onMouseUp={e => handleCommit(attr, e.target.value)}
           onTouchEnd={e => handleCommit(attr, e.target.value)}
           className="premium-range-input"
-          style={{ width: '100%', height: 6, borderRadius: 10, outline: 'none', cursor: 'pointer', background: `linear-gradient(to right, var(--accent) ${pct}%, var(--as3) ${pct}%)`, appearance: 'none' }}
+          style={{
+            width: '100%', height: 6, borderRadius: 10, outline: 'none', cursor: 'pointer',
+            background: `linear-gradient(to right, var(--accent) ${pct}%, var(--as3) ${pct}%)`,
+            appearance: 'none',
+          }}
         />
       </div>
     );
@@ -117,14 +131,19 @@ function CardEditor({ style, onUpdate, onReset, cardDOMRefs }) {
 
   return (
     <div style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 24, padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* Tabs */}
       <div style={{ display: 'flex', background: 'var(--as1)', borderRadius: 12, padding: 4 }}>
         {['size', 'pos', 'vis'].map(t => (
-          <button key={t} onClick={() => setActiveTab(t)} style={{
-            flex: 1, padding: '8px', border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 700,
-            background: activeTab === t ? 'var(--white)' : 'transparent',
-            color: activeTab === t ? 'var(--accent)' : 'var(--sub)',
-            cursor: 'pointer', transition: 'all 0.2s', textTransform: 'uppercase'
-          }}>
+          <button
+            key={t}
+            onClick={() => setActiveTab(t)}
+            style={{
+              flex: 1, padding: '8px', border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 700,
+              background: activeTab === t ? 'var(--white)' : 'transparent',
+              color: activeTab === t ? 'var(--accent)' : 'var(--sub)',
+              cursor: 'pointer', transition: 'all 0.2s', textTransform: 'uppercase',
+            }}
+          >
             {t === 'size' ? 'Scale' : t === 'pos' ? 'Layout' : 'Toggle'}
           </button>
         ))}
@@ -133,22 +152,22 @@ function CardEditor({ style, onUpdate, onReset, cardDOMRefs }) {
       <div style={{ maxHeight: 300, overflowY: 'auto', paddingRight: 4 }}>
         {activeTab === 'size' && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-             <Slider label="Name" attr="nameSize" min={10} max={60} />
-             <Slider label="Role" attr="roleSize" min={8} max={40} />
-             <Slider label="Company" attr="companySize" min={8} max={40} />
-             <Slider label="Email" attr="emailSize" min={8} max={30} />
-             <Slider label="Logo" attr="logoSize" min={10} max={100} />
-             <Slider label="QR" attr="qrSize" min={50} max={200} />
-             <div style={{ gridColumn: 'span 2', display: 'flex', gap: 12 }}>
-                <div style={{ flex: 1 }}>
-                  <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--sub)', display: 'block', marginBottom: 6 }}>ACCENT</label>
-                  <input type="color" value={localStyle.accentColor} onChange={e => update('accentColor', e.target.value)} style={{ width: '100%', height: 32, border: 'none', borderRadius: 8 }} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--sub)', display: 'block', marginBottom: 6 }}>TEXT</label>
-                  <input type="color" value={localStyle.textColor} onChange={e => update('textColor', e.target.value)} style={{ width: '100%', height: 32, border: 'none', borderRadius: 8 }} />
-                </div>
-             </div>
+            <Slider label="Name" attr="nameSize" min={10} max={60} />
+            <Slider label="Role" attr="roleSize" min={8} max={40} />
+            <Slider label="Company" attr="companySize" min={8} max={40} />
+            <Slider label="Email" attr="emailSize" min={8} max={30} />
+            <Slider label="Logo" attr="logoSize" min={10} max={100} />
+            <Slider label="QR" attr="qrSize" min={50} max={200} />
+            <div style={{ gridColumn: 'span 2', display: 'flex', gap: 12 }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--sub)', display: 'block', marginBottom: 6 }}>ACCENT</label>
+                <input type="color" value={localStyle.accentColor} onChange={e => update('accentColor', e.target.value)} style={{ width: '100%', height: 32, border: 'none', borderRadius: 8 }} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--sub)', display: 'block', marginBottom: 6 }}>TEXT</label>
+                <input type="color" value={localStyle.textColor} onChange={e => update('textColor', e.target.value)} style={{ width: '100%', height: 32, border: 'none', borderRadius: 8 }} />
+              </div>
+            </div>
           </div>
         )}
 
@@ -177,99 +196,19 @@ function CardEditor({ style, onUpdate, onReset, cardDOMRefs }) {
         )}
       </div>
 
-      <button onClick={onReset} style={{ background: 'var(--as1)', border: 'none', borderRadius: 10, padding: 10, fontSize: 11, fontWeight: 700, color: 'var(--text)', cursor: 'pointer' }}>Reset Composition</button>
+      <button
+        onClick={onReset}
+        style={{ background: 'var(--as1)', border: 'none', borderRadius: 10, padding: 10, fontSize: 11, fontWeight: 700, color: 'var(--text)', cursor: 'pointer' }}
+      >
+        Reset Composition
+      </button>
     </div>
   );
 }
 
-const CardPreview = memo(function CardPreview({ user, style, cardRef, domRefs }) {
-  return (
-    <div ref={cardRef} style={{
-      background: '#ffffff', borderRadius: 24, border: '1px solid var(--border)',
-      width: 340, height: 500, padding: 32, textAlign: 'center',
-      boxShadow: '0 20px 60px rgba(0,0,0,0.08)',
-      position: 'relative', overflow: 'hidden', flexShrink: 0,
-      animation: 'scaleIn 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67) both',
-    }}>
-      <div style={{
-        position: 'absolute', top: 0, right: 0, width: 220, height: 220,
-        background: `linear-gradient(135deg, ${style.accentColor}25 0%, transparent 100%)`,
-        borderRadius: '0 0 0 100%', pointerEvents: 'none'
-      }} />
-
-      <div style={{ zIndex: 1, position: 'relative' }}>
-        {style.logoVisible && (
-          <div ref={el => domRefs.current.logoWrap = el} style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 20,
-            transform: `translate(${style.logoX || 0}px, ${style.logoY || 0}px)`,
-          }}>
-            <div ref={el => domRefs.current.logoBox = el} style={{ width: style.logoSize, height: style.logoSize, margin: '0 auto', borderRadius: 8, overflow: 'hidden' }}>
-              <img src="/assets/ethos-logo.png" alt="E" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-            </div>
-          </div>
-        )}
-
-        <Avatar src={user.avatar} name={user.name} size={110} />
-
-        <div style={{ marginTop: 24 }}>
-          {style.nameVisible && (
-            <h2 ref={el => domRefs.current.name = el} style={{
-              fontFamily: 'var(--fh)', fontWeight: 800, fontSize: style.nameSize,
-              color: style.textColor, margin: 0, lineHeight: 1.1,
-              transform: `translate(${style.nameX}px, ${style.nameY}px)`,
-            }}>
-              {user.name || 'Your Name'}
-            </h2>
-          )}
-
-          {style.roleVisible && (
-            <p ref={el => domRefs.current.role = el} style={{
-              fontFamily: 'var(--fb)', fontWeight: 700, fontSize: style.roleSize,
-              color: style.accentColor, margin: '8px 0', textTransform: 'uppercase', letterSpacing: '1px',
-              transform: `translate(${style.roleX}px, ${style.roleY}px)`,
-            }}>
-              {user.role || 'Attendee'}
-            </p>
-          )}
-
-          {style.companyVisible && (
-            <p ref={el => domRefs.current.company = el} style={{
-              fontFamily: 'var(--fb)', fontWeight: 600, fontSize: style.companySize,
-              color: style.subColor, margin: '4px 0',
-              transform: `translate(${style.companyX || 0}px, ${style.companyY || 0}px)`,
-            }}>
-              {user.company || 'Ethos Attendee'}
-            </p>
-          )}
-
-          {style.emailVisible && (
-            <p ref={el => domRefs.current.email = el} style={{
-              fontFamily: 'var(--fb)', fontSize: style.emailSize, color: 'var(--muted)', margin: 0,
-              transform: `translate(${style.emailX || 0}px, ${style.emailY || 0}px)`,
-            }}>
-              {user.email}
-            </p>
-          )}
-        </div>
-
-        {style.qrVisible && (
-          <div style={{
-            background: '#fff', padding: 12, borderRadius: 16, border: `1.5px solid ${style.accentColor}33`,
-            display: 'inline-block', marginTop: 32,
-            transform: `translate(${style.qrX}px, ${style.qrY}px)`,
-          }} ref={el => domRefs.current.qrWrap = el}>
-            <QRCodeSVG value={user.id || ''} size={style.qrSize} level="M" fgColor={style.textColor} bgColor="#ffffff" />
-          </div>
-        )}
-      </div>
-      
-      <p style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--muted)', marginTop: 32, opacity: 0.6, letterSpacing: '0.1em' }}>
-        ETHOS 2026 OFFICIAL BADGE
-      </p>
-    </div>
-  );
-});
-
+// ─────────────────────────────────────────────
+// Main page content
+// ─────────────────────────────────────────────
 function MyCardContent() {
   const { data: session, update: updateSession } = useSession();
   const profile = session?.user;
@@ -288,7 +227,7 @@ function MyCardContent() {
   const [resumeLink, setResumeLink] = useState('');
   const [saving, setSaving] = useState(false);
   const [qrExpanded, setQrExpanded] = useState(false);
-  
+
   const cardRef = useRef(null);
   const domRefs = useRef({});
 
@@ -309,8 +248,8 @@ function MyCardContent() {
     let val = e.target.value.replace(/\D/g, '');
     if (val.length > 10) val = val.slice(0, 10);
     let formatted = val;
-    if (val.length > 6) formatted = `(${val.slice(0,3)}) ${val.slice(3,6)}-${val.slice(6)}`;
-    else if (val.length > 3) formatted = `(${val.slice(0,3)}) ${val.slice(3)}`;
+    if (val.length > 6) formatted = `(${val.slice(0, 3)}) ${val.slice(3, 6)}-${val.slice(6)}`;
+    else if (val.length > 3) formatted = `(${val.slice(0, 3)}) ${val.slice(3)}`;
     else if (val.length > 0) formatted = `(${val}`;
     setPhone(formatted);
   };
@@ -319,185 +258,211 @@ function MyCardContent() {
     if (!name || name.length < 2) return toast.error('Valid Name is required');
     if (!company || company.length < 2) return toast.error('Company is required');
     if (!role || role.length < 2) return toast.error('Role is required');
-    
+
     setSaving(true);
     const t = toast.loading('Saving profile...');
     try {
-      const res = await fetch('/api/profile', { 
-        method: 'PUT', 
-        headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify({ resume_link: resumeLink, phone, bio, role, name, avatar, company, linkedin }) 
+      const res = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resume_link: resumeLink, phone, bio, role, name, avatar, company, linkedin }),
       });
       if (res.ok) {
         await updateSession();
         toast.success('Profile saved', { id: t });
         setIsEditing(false);
         if (isOnboarding) router.push('/app');
-      } else toast.error('Failed to save', { id: t });
-    } catch (err) { toast.error('Network error', { id: t }); }
+      } else {
+        toast.error('Failed to save', { id: t });
+      }
+    } catch {
+      toast.error('Network error', { id: t });
+    }
     setSaving(false);
   };
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      if (file.size > 2 * 1024 * 1024) return toast.error('File too large (max 2MB)');
-      const reader = new FileReader();
-      reader.onload = (e) => setAvatar(e.target.result);
-      reader.readAsDataURL(file);
-    }
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) return toast.error('File too large (max 2MB)');
+    const reader = new FileReader();
+    reader.onload = (ev) => setAvatar(ev.target.result);
+    reader.readAsDataURL(file);
   };
 
   if (!profile) return <Loader />;
 
+  const qrValue = profile.id || profile.email || 'ethos-placeholder';
+
   return (
     <div className="page-enter" style={{ paddingBottom: 100 }}>
-      <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 32, alignItems: 'center', justifyContent: 'center', minHeight: '80dvh' }}>
-        
-        {/* Card Display Side */}
+      <div style={{
+        maxWidth: 500, margin: '0 auto', padding: '20px 16px',
+        display: 'flex', flexDirection: 'column', gap: 32,
+        alignItems: 'center', justifyContent: 'center', minHeight: '80dvh',
+      }}>
+
+        {/* ── Card display ── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'center', width: '100%', overflowX: 'hidden' }}>
-          <div onClick={() => setQrExpanded(true)} style={{ cursor: 'pointer', transition: 'transform 0.3s var(--liquid)', display: 'flex', justifyContent: 'center', width: '100%' }}>
-            <div style={{ transform: 'scale(min(1, calc(100vw / 400)))', transformOrigin: 'top center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-               <CardPreview user={{ ...profile, name, avatar, role, company }} style={DEFAULT_STYLE} cardRef={cardRef} domRefs={domRefs} />
-               <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--muted)', marginTop: 12, fontWeight: 600 }}>Tap ID to enlarge QR</p>
+          <div
+            onClick={() => setQrExpanded(true)}
+            style={{ cursor: 'pointer', display: 'flex', justifyContent: 'center', width: '100%' }}
+          >
+            <div style={{
+              transform: 'scale(min(1, calc(100vw / 400)))',
+              transformOrigin: 'top center',
+              display: 'flex', flexDirection: 'column', alignItems: 'center',
+            }}>
+              {/* ✅ Using the imported, working CardPreview component */}
+              <CardPreview
+                user={{ ...profile, name, avatar, role, company }}
+                style={DEFAULT_STYLE}
+                cardRef={cardRef}
+                domRefs={domRefs}
+              />
+              <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--muted)', marginTop: 12, fontWeight: 600 }}>
+                Tap ID to enlarge QR
+              </p>
             </div>
           </div>
-          
-          <div style={{ display: 'flex', gap: 12, width: '100%' }}>
-            {!isEditing ? (
-              <button 
-                onClick={() => setIsEditing(true)}
-                style={{
-                  flex: 1, background: 'var(--g)', color: '#fff', border: 'none', borderRadius: 16, padding: '16px',
-                  fontFamily: 'var(--fb)', fontWeight: 800, fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)'
-                }}
-              >
-                <Smartphone size={18} /> Edit Profile Info
-              </button>
-            ) : null}
-          </div>
+
+          {!isEditing && (
+            <button
+              onClick={() => setIsEditing(true)}
+              style={{
+                width: '100%', background: 'var(--g)', color: '#fff',
+                border: 'none', borderRadius: 16, padding: '16px',
+                fontFamily: 'var(--fb)', fontWeight: 800, fontSize: 16,
+                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              }}
+            >
+              <Smartphone size={18} /> Edit Profile Info
+            </button>
+          )}
         </div>
 
-        {/* Form / Editor Side */}
+        {/* ── Edit form ── */}
         {isEditing && (
           <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 24 }} className="page-enter">
-            <div style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 28, padding: 28, display: 'flex', flexDirection: 'column', gap: 24, boxShadow: '0 12px 40px rgba(0,0,0,0.06)' }}>
-               <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 20, margin: 0, display: 'flex', alignItems: 'center', gap: 12 }}>
-                 <UserIcon size={22} color="var(--g)" /> Edit Your Info
-               </h3>
-               
-               <div style={{ position: 'relative', alignSelf: 'center', marginBottom: 10, width: 'clamp(80px, 25vw, 110px)', height: 'clamp(80px, 25vw, 110px)' }}>
-                 <Avatar src={avatar} name={name} size="100%" />
-                 <label style={{
-                   position: 'absolute', bottom: 0, right: 0,
-                   background: 'var(--g)', color: '#fff', width: 'clamp(32px, 8vw, 36px)', height: 'clamp(32px, 8vw, 36px)',
-                   borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                   cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.2)', border: '3px solid #fff'
-                 }}>
-                   <Camera size={18} />
-                   <input type="file" hidden accept="image/*" onChange={handleAvatarChange} />
-                 </label>
-               </div>
+            <div style={{
+              background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 28,
+              padding: 28, display: 'flex', flexDirection: 'column', gap: 24,
+              boxShadow: '0 12px 40px rgba(0,0,0,0.06)',
+            }}>
+              <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 20, margin: 0, display: 'flex', alignItems: 'center', gap: 12 }}>
+                <UserIcon size={22} color="var(--g)" /> Edit Your Info
+              </h3>
 
-               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                 <div className="input-group">
-                   <label className="section-label">Full Name</label>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16 }}>
-                     <Type size={18} color="var(--muted)" />
-                     <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="e.g. John Doe" maxLength={40} style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none', fontWeight: 500 }} />
-                   </div>
-                 </div>
+              {/* Avatar upload */}
+              <div style={{ position: 'relative', alignSelf: 'center', marginBottom: 10, width: 'clamp(80px,25vw,110px)', height: 'clamp(80px,25vw,110px)' }}>
+                <Avatar src={avatar} name={name} size="100%" />
+                <label style={{
+                  position: 'absolute', bottom: 0, right: 0,
+                  background: 'var(--g)', color: '#fff',
+                  width: 'clamp(32px,8vw,36px)', height: 'clamp(32px,8vw,36px)',
+                  borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.2)', border: '3px solid #fff',
+                }}>
+                  <Camera size={18} />
+                  <input type="file" hidden accept="image/*" onChange={handleAvatarChange} />
+                </label>
+              </div>
 
-                 <div className="input-group">
-                   <label className="section-label">Position / Role</label>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16 }}>
-                     <UserIcon size={18} color="var(--muted)" />
-                     <input type="text" value={role} onChange={e => setRole(e.target.value)} placeholder="e.g. Lead Developer" maxLength={30} style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none', fontWeight: 500 }} />
-                   </div>
-                 </div>
+              {/* Fields */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                {[
+                  { label: 'Full Name', icon: <Type size={18} color="var(--muted)" />, value: name, setter: setName, placeholder: 'e.g. John Doe', type: 'text', maxLength: 40 },
+                  { label: 'Position / Role', icon: <UserIcon size={18} color="var(--muted)" />, value: role, setter: setRole, placeholder: 'e.g. Lead Developer', type: 'text', maxLength: 30 },
+                  { label: 'Company', icon: <Building size={18} color="var(--muted)" />, value: company, setter: setCompany, placeholder: 'e.g. Tech Corp', type: 'text', maxLength: 30 },
+                  { label: 'Resume Link', icon: <FileText size={18} color="var(--muted)" />, value: resumeLink, setter: setResumeLink, placeholder: 'https://...', type: 'url', maxLength: undefined },
+                  { label: 'Phone', icon: <Smartphone size={18} color="var(--muted)" />, value: phone, setter: null, placeholder: '(555) 000-0000', type: 'tel', maxLength: undefined },
+                ].map(({ label, icon, value, setter, placeholder, type, maxLength }) => (
+                  <div key={label} className="input-group">
+                    <label className="section-label">{label}</label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16 }}>
+                      {icon}
+                      <input
+                        type={type}
+                        value={value}
+                        onChange={label === 'Phone' ? handlePhone : e => setter(e.target.value)}
+                        placeholder={placeholder}
+                        maxLength={maxLength}
+                        style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none', fontWeight: 500 }}
+                      />
+                    </div>
+                  </div>
+                ))}
 
-                 <div className="input-group">
-                   <label className="section-label">Company</label>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16 }}>
-                     <Building size={18} color="var(--muted)" />
-                     <input type="text" value={company} onChange={e => setCompany(e.target.value)} placeholder="e.g. Tech Corp" maxLength={30} style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none', fontWeight: 500 }} />
-                   </div>
-                 </div>
+                {/* Email — disabled */}
+                <div className="input-group">
+                  <label className="section-label">Email Address</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16, opacity: 0.7 }}>
+                    <Mail size={18} color="var(--muted)" />
+                    <input
+                      type="email" value={profile.email} disabled
+                      style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none' }}
+                    />
+                  </div>
+                </div>
+              </div>
 
-                 <div className="input-group">
-                   <label className="section-label">Email Address</label>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16, opacity: 0.7 }}>
-                     <Mail size={18} color="var(--muted)" />
-                     <input type="email" value={profile.email} disabled style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none' }} />
-                   </div>
-                 </div>
-
-                 <div className="input-group">
-                   <label className="section-label">Resume Link</label>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16 }}>
-                     <FileText size={18} color="var(--muted)" />
-                     <input type="url" value={resumeLink} onChange={e => setResumeLink(e.target.value)} placeholder="https://..." style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none', fontWeight: 500 }} />
-                   </div>
-                 </div>
-
-                 <div className="input-group">
-                   <label className="section-label">Phone</label>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16 }}>
-                     <Smartphone size={18} color="var(--muted)" />
-                     <input type="tel" value={phone} onChange={handlePhone} placeholder="(555) 000-0000" style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none', fontWeight: 500 }} />
-                   </div>
-                 </div>
-               </div>
-
-               <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
-                 <button 
+              {/* Action buttons */}
+              <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
+                <button
                   onClick={() => setIsEditing(false)}
                   style={{ flex: 1, background: 'var(--s1)', color: 'var(--text)', border: 'none', borderRadius: 16, padding: '16px', fontFamily: 'var(--fb)', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}
-                 >
-                   Cancel
-                 </button>
-                 <button 
-                  onClick={saveProfile} 
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveProfile}
                   disabled={saving}
                   style={{
                     flex: 2, background: 'var(--g)', color: '#fff', border: 'none', borderRadius: 16, padding: '16px',
-                    fontFamily: 'var(--fb)', fontWeight: 800, fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                    opacity: saving ? 0.7 : 1, transition: 'all 0.2s', boxShadow: '0 8px 20px rgba(0,0,0,0.15)'
+                    fontFamily: 'var(--fb)', fontWeight: 800, fontSize: 15, cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                    opacity: saving ? 0.7 : 1, transition: 'all 0.2s', boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
                   }}
                 >
                   {saving ? 'Saving...' : 'Save Profile'}
                 </button>
-               </div>
+              </div>
             </div>
           </div>
         )}
       </div>
 
-      <Suspense fallback={null}>
-        <Modal center open={qrExpanded} onClose={() => setQrExpanded(false)}>
-          <div onClick={() => setQrExpanded(false)} style={{ padding: 'clamp(20px, 5vw, 40px)', background: '#fff', borderRadius: 32, textAlign: 'center', outline: 'none', maxWidth: '90vw', cursor: 'pointer' }} className="page-enter">
-            <div style={{ padding: 16, background: '#fff', border: '2px solid var(--border)', borderRadius: 24, display: 'inline-block', boxShadow: '0 10px 40px rgba(0,0,0,0.1)', maxWidth: '100%' }}>
-              <div style={{ width: 'clamp(200px, 80vw, 400px)', height: 'clamp(200px, 80vw, 400px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <QRCodeSVG 
-                  value={profile.id} 
-                  size={500} 
-                  level="H" 
-                  fgColor="#413429" 
-                  bgColor="#ffffff" 
-                  style={{ width: '100%', height: '100%' }}
-                />
-              </div>
+      {/* ── QR expand modal ── */}
+      <Modal center open={qrExpanded} onClose={() => setQrExpanded(false)}>
+        <div
+          onClick={() => setQrExpanded(false)}
+          style={{ padding: 'clamp(20px,5vw,40px)', background: '#fff', borderRadius: 32, textAlign: 'center', outline: 'none', maxWidth: '90vw', cursor: 'pointer' }}
+          className="page-enter"
+        >
+          <div style={{ padding: 16, background: '#fff', border: '2px solid var(--border)', borderRadius: 24, display: 'inline-block', boxShadow: '0 10px 40px rgba(0,0,0,0.1)', maxWidth: '100%' }}>
+            <div style={{ width: 'clamp(180px,80vw,400px)', height: 'clamp(200px,80vw,400px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <QRCodeSVG
+                value={qrValue}
+                size={500}
+                level="H"
+                fgColor="#413429"
+                bgColor="#ffffff"
+                style={{ width: '80%', height: '80%' }}
+              />
             </div>
-            <h2 style={{ marginTop: 24, fontSize: 'clamp(20px, 5vw, 28px)', fontWeight: 800 }}>{name}</h2>
-            <p style={{ color: 'var(--muted)', fontSize: 14 }}>Tap anywhere to close</p>
           </div>
-        </Modal>
-      </Suspense>
+          <h2 style={{ marginTop: 24, fontSize: 'clamp(20px,5vw,28px)', fontWeight: 800 }}>{name}</h2>
+          <p style={{ color: 'var(--muted)', fontSize: 14 }}>Tap anywhere to close</p>
+        </div>
+      </Modal>
     </div>
   );
 }
 
+// ─────────────────────────────────────────────
+// Export
+// ─────────────────────────────────────────────
 export default function MyCardPage() {
   return (
     <Suspense fallback={<Loader />}>
