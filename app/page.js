@@ -105,12 +105,16 @@ export default function LandingPage() {
         alignItems: 'center', justifyContent: 'center',
       }}>
         <div style={{
-          width: 56, height: 56, borderRadius: 16,
-          background: 'rgba(255,255,255,0.12)',
+          width: 'clamp(56px, 12vh, 64px)', height: 'clamp(56px, 12vh, 64px)', borderRadius: 32,
+          background: 'rgba(255,255,255,0.3)',
+          backdropFilter: 'blur(12px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          margin: '0 auto 20px',
-          fontSize: 28, fontFamily: 'var(--fh)', fontWeight: 800, color: '#fff',
-        }}>E</div>
+          margin: '0 auto 20px', overflow: 'hidden', padding: 6,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
+          border: '1px solid rgba(255,255,255,0.4)'
+        }}>
+          <img src="/assets/ethos-logo-insignia.png" alt="Ethos" style={{ width: '85%', height: '85%', objectFit: 'contain' }} />
+        </div>
         <div style={{
           width: 24, height: 24, border: '3px solid rgba(255,255,255,.2)',
           borderTopColor: '#fff', borderRadius: '50%',
