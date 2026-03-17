@@ -57,6 +57,7 @@ export default function AttendeeDashboard() {
   const [schedule, setSchedule] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [customizations, setCustomizations] = useState(null);
 
   useEffect(() => {
     Promise.all([
@@ -68,14 +69,6 @@ export default function AttendeeDashboard() {
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
-
-  if (loading) return <Loader />;
-
-  const profile = session?.profile;
-  const firstName = profile?.name?.split(' ')[0] || 'there';
-  const upNext = schedule[0];
-
-  const [customizations, setCustomizations] = useState(null);
 
   useEffect(() => {
     if (session?.profile?.id) {
@@ -90,6 +83,12 @@ export default function AttendeeDashboard() {
       }
     }
   }, [session]);
+
+  if (loading) return <Loader />;
+
+  const profile = session?.profile;
+  const firstName = profile?.name?.split(' ')[0] || 'there';
+  const upNext = schedule[0];
 
   return (
     <div className="page-enter">
