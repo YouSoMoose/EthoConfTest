@@ -314,7 +314,7 @@ export default function AttendeeDashboard() {
                 transition: `transform 0.4s ${SPRING}`,
               }}
             >
-               <CardPreview user={session.profile} style={customizations || undefined} />
+               <CardPreview user={profile || {}} style={customizations || undefined} />
             </div>
           </Link>
         </div>

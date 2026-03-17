@@ -209,7 +209,7 @@ function CardEditor({ style, onUpdate, onReset, cardDOMRefs }) {
 // ─────────────────────────────────────────────
 function MyCardContent() {
   const { data: session, update: updateSession } = useSession();
-  const profile = session?.user;
+  const profile = session?.profile;
   const router = useRouter();
   const searchParams = useSearchParams();
   const isOnboarding = searchParams.get('onboarding') === '1';
