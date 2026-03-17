@@ -204,7 +204,7 @@ export default function AttendeeDashboard() {
 
       <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 24 }}>
         
-        {/* Up Next */}
+        {/* 1. Schedule (Up Next) */}
         {upNext && (
           <div>
             <p className="section-label">📍 UP NEXT</p>
@@ -246,7 +246,17 @@ export default function AttendeeDashboard() {
           </div>
         )}
 
-        {/* RESPONSIVE ID CARD PREVIEW — with spring press */}
+        {/* 2. Announcements */}
+        {announcements.length > 0 && (
+          <div>
+            <p className="section-label">📢 ANNOUNCEMENTS</p>
+            <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {announcements.map((a, i) => <AnnouncementCard key={a.id} a={a} index={i} />)}
+            </div>
+          </div>
+        )}
+
+        {/* 3. RESPONSIVE ID CARD PREVIEW — with spring press */}
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
              <p className="section-label" style={{ margin: 0 }}>MY CARD</p>
@@ -274,7 +284,7 @@ export default function AttendeeDashboard() {
           </Link>
         </div>
 
-        {/* NOTES APP LINK — with spring press */}
+        {/* 4. NOTES APP LINK — with spring press */}
         <div>
            <p className="section-label">WORKSPACE</p>
            <Link
@@ -306,16 +316,6 @@ export default function AttendeeDashboard() {
               <ChevronRight color="var(--muted)" />
            </Link>
         </div>
-
-        {/* Announcements — staggered */}
-        {announcements.length > 0 && (
-          <div>
-            <p className="section-label">📢 ANNOUNCEMENTS</p>
-            <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {announcements.map((a, i) => <AnnouncementCard key={a.id} a={a} index={i} />)}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
