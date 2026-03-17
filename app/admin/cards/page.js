@@ -324,6 +324,7 @@ function AdminIDCardsContent() {
   const [loading, setLoading] = useState(true);
   const [printingId, setPrintingId] = useState(null);
   const [customizations, setCustomizations] = useState({});
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     const saved = localStorage.getItem('ethos_card_customizations');
@@ -434,10 +435,34 @@ function AdminIDCardsContent() {
             </h2>
             <p style={{ margin: 0, fontSize: 13, color: 'var(--asub)', fontWeight: 500 }}>Global Conference Asset Management</p>
           </div>
+          <div style={{ flex: 1, maxWidth: 400, marginLeft: 'auto' }}>
+            <div style={{ position: 'relative' }}>
+              <input
+                type="text"
+                placeholder="Search attendees (name, email, company)..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                style={{
+                  width: '100%', background: 'var(--as1)', border: '1px solid var(--aborder)',
+                  borderRadius: 12, padding: '12px 16px', fontSize: 14,
+                  fontFamily: 'var(--fb)', color: 'var(--atext)', outline: 'none',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.05)', transition: 'all 0.2s'
+                }}
+                onFocus={e => e.target.style.borderColor = 'var(--accent)'}
+                onBlur={e => e.target.style.borderColor = 'var(--aborder)'}
+              />
+              <span style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', opacity: 0.4, pointerEvents: 'none' }}>🔍</span>
+            </div>
+          </div>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 40, background: 'var(--as1)', padding: 32, borderRadius: 24, border: '1px solid var(--aborder)', boxShadow: '0 20px 60px rgba(0,0,0,0.05)' }}>
-          {users.map(u => (
+          {users.filter(u => 
+            !search || 
+            u.name?.toLowerCase().includes(search.toLowerCase()) || 
+            u.email?.toLowerCase().includes(search.toLowerCase()) || 
+            u.company?.toLowerCase().includes(search.toLowerCase())
+          ).map(u => (
             <CardRow
               key={u.id} user={u}
               initialStyle={customizations[u.id]}
@@ -446,6 +471,16 @@ function AdminIDCardsContent() {
               setPrintingId={setPrintingId}
             />
           ))}
+          {users.length > 0 && users.filter(u => 
+            u.name?.toLowerCase().includes(search.toLowerCase()) || 
+            u.email?.toLowerCase().includes(search.toLowerCase()) || 
+            u.company?.toLowerCase().includes(search.toLowerCase())
+          ).length === 0 && (
+            <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--asub)' }}>
+              <p style={{ fontSize: 16, fontWeight: 600 }}>No attendees found matching "{search}"</p>
+              <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontWeight: 700, fontSize: 14 }}>Clear search</button>
+            </div>
+          )}
         </div>
       </div>
     </div>
