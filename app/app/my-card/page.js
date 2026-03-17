@@ -288,7 +288,6 @@ function MyCardContent() {
   const [resumeLink, setResumeLink] = useState('');
   const [saving, setSaving] = useState(false);
   const [qrExpanded, setQrExpanded] = useState(false);
-  const [style, setStyle] = useState(DEFAULT_STYLE);
   
   const cardRef = useRef(null);
   const domRefs = useRef({});
@@ -303,32 +302,17 @@ function MyCardContent() {
       setCompany(profile.company || '');
       setLinkedin(profile.linkedin || '');
       setResumeLink(profile.resume_link || '');
-      
-      const saved = localStorage.getItem(`ethos_design_${profile.id}`);
-      if (saved) { try { setStyle(JSON.parse(saved)); } catch (e) {} }
     }
   }, [profile]);
 
   const handlePhone = (e) => {
     let val = e.target.value.replace(/\D/g, '');
     if (val.length > 10) val = val.slice(0, 10);
-    // Simple auto-format (XXX) XXX-XXXX
     let formatted = val;
     if (val.length > 6) formatted = `(${val.slice(0,3)}) ${val.slice(3,6)}-${val.slice(6)}`;
     else if (val.length > 3) formatted = `(${val.slice(0,3)}) ${val.slice(3)}`;
     else if (val.length > 0) formatted = `(${val}`;
     setPhone(formatted);
-  };
-
-  const handleUpdate = useCallback((newStyle) => {
-    setStyle(newStyle);
-    if (profile?.id) localStorage.setItem(`ethos_design_${profile.id}`, JSON.stringify(newStyle));
-  }, [profile?.id]);
-
-  const handleReset = () => {
-    setStyle(DEFAULT_STYLE);
-    if (profile?.id) localStorage.removeItem(`ethos_design_${profile.id}`);
-    toast.success('Restored to default');
   };
 
   const saveProfile = async () => {
@@ -368,116 +352,122 @@ function MyCardContent() {
 
   return (
     <div className="page-enter" style={{ paddingBottom: 100 }}>
-       <style>{`
-        .premium-slider-group input { -webkit-appearance: none; appearance: none; height: 4px; background: var(--s2); border-radius: 2px; }
-        .premium-range-input::-webkit-slider-thumb {
-          -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%;
-          background: #fff; border: 2px solid var(--g); cursor: grab; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-          margin-top: -1px;
-        }
-        .premium-toggle {
-          appearance: none; width: 34px; height: 18px; background: var(--s1); border-radius: 20px;
-          position: relative; cursor: pointer; border: 1px solid var(--border);
-        }
-        .premium-toggle:checked { background: var(--g); }
-        .premium-toggle::before { content: ""; position: absolute; width: 14px; height: 14px; border-radius: 50%; top: 1px; left: 1px; background: #fff; transition: transform 0.2s; }
-        .premium-toggle:checked::before { transform: translateX(16px); }
-      `}</style>
-
-      {!isOnboarding && <Topbar title={isEditing ? "Edit Profile" : "My Digital ID"} />}
+      {!isOnboarding && <Topbar title={isEditing ? "Details" : "My Digital ID"} />}
       
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '20px 16px', display: 'flex', flexWrap: 'wrap', gap: 32, justifyContent: 'center' }}>
+      <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 32, alignItems: 'center' }}>
         
         {/* Card Display Side */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20, alignItems: 'center' }}>
-          <div onClick={() => setQrExpanded(true)} style={{ cursor: 'pointer' }}>
-            <CardPreview user={{ ...profile, name, avatar, role, company }} style={style} cardRef={cardRef} domRefs={domRefs} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'center', width: '100%' }}>
+          <div onClick={() => setQrExpanded(true)} style={{ cursor: 'pointer', transition: 'transform 0.3s var(--liquid)' }}>
+            <CardPreview user={{ ...profile, name, avatar, role, company }} style={DEFAULT_STYLE} cardRef={cardRef} domRefs={domRefs} />
+            <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--muted)', marginTop: 12, fontWeight: 600 }}>Tap ID to enlarge QR</p>
           </div>
           
           <div style={{ display: 'flex', gap: 12, width: '100%' }}>
             {!isEditing ? (
               <button 
                 onClick={() => setIsEditing(true)}
-                className="btn-liquid"
                 style={{
-                  flex: 1, background: 'var(--g)', color: '#fff', border: 'none', borderRadius: 12, padding: '14px',
-                  fontFamily: 'var(--fb)', fontWeight: 700, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
+                  flex: 1, background: 'var(--g)', color: '#fff', border: 'none', borderRadius: 16, padding: '16px',
+                  fontFamily: 'var(--fb)', fontWeight: 800, fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)'
                 }}
               >
-                <Smartphone size={18} /> Edit Badge Details
+                <Smartphone size={18} /> Edit Profile Info
               </button>
-            ) : (
-              <button 
-                onClick={saveProfile}
-                disabled={saving}
-                style={{
-                  flex: 1, background: 'var(--g)', color: '#fff', border: 'none', borderRadius: 12, padding: '14px',
-                  fontFamily: 'var(--fb)', fontWeight: 700, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
-                }}
-              >
-                <Check size={18} /> Save Changes
-              </button>
-            )}
+            ) : null}
           </div>
         </div>
 
         {/* Form / Editor Side */}
         {isEditing && (
-          <div style={{ flex: 1, minWidth: 320, display: 'flex', flexDirection: 'column', gap: 24 }} className="page-enter">
-            <CardEditor style={style} onUpdate={handleUpdate} onReset={handleReset} cardDOMRefs={domRefs} />
-            
-            <div style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 24, padding: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
-               <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 18, margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
-                 <UserIcon size={20} color="var(--g)" /> Identity Verification
+          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 24 }} className="page-enter">
+            <div style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 28, padding: 28, display: 'flex', flexDirection: 'column', gap: 24, boxShadow: '0 12px 40px rgba(0,0,0,0.06)' }}>
+               <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 20, margin: 0, display: 'flex', alignItems: 'center', gap: 12 }}>
+                 <UserIcon size={22} color="var(--g)" /> Edit Your Info
                </h3>
                
                <div style={{ position: 'relative', alignSelf: 'center', marginBottom: 10 }}>
-                 <Avatar src={avatar} name={name} size={100} />
+                 <Avatar src={avatar} name={name} size={110} />
                  <label style={{
                    position: 'absolute', bottom: 0, right: 0,
-                   background: 'var(--g)', color: '#fff', width: 32, height: 32,
+                   background: 'var(--g)', color: '#fff', width: 36, height: 36,
                    borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                   cursor: 'pointer', boxShadow: '0 4px 8px rgba(0,0,0,0.15)', border: '2px solid #fff'
+                   cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.2)', border: '3px solid #fff'
                  }}>
-                   <Camera size={16} />
+                   <Camera size={18} />
                    <input type="file" hidden accept="image/*" onChange={handleAvatarChange} />
                  </label>
                </div>
 
-               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                  <div className="input-group">
-                   <label className="section-label" style={{ fontSize: 9 }}>Name (Required)</label>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '4px 12px', borderRadius: 12 }}>
-                     <UserIcon size={16} color="var(--muted)" />
-                     <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Full Name" maxLength={40} style={{ flex: 1, background: 'transparent', border: 'none', padding: '10px 0', fontSize: 14, outline: 'none' }} />
+                   <label className="section-label">Full Name</label>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16 }}>
+                     <Type size={18} color="var(--muted)" />
+                     <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="e.g. John Doe" maxLength={40} style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none', fontWeight: 500 }} />
                    </div>
                  </div>
 
                  <div className="input-group">
-                   <label className="section-label" style={{ fontSize: 9 }}>Position (Required)</label>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '4px 12px', borderRadius: 12 }}>
-                     <Type size={16} color="var(--muted)" />
-                     <input type="text" value={role} onChange={e => setRole(e.target.value)} placeholder="Role / Position" maxLength={30} style={{ flex: 1, background: 'transparent', border: 'none', padding: '10px 0', fontSize: 14, outline: 'none' }} />
+                   <label className="section-label">Position / Role</label>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16 }}>
+                     <UserIcon size={18} color="var(--muted)" />
+                     <input type="text" value={role} onChange={e => setRole(e.target.value)} placeholder="e.g. Lead Developer" maxLength={30} style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none', fontWeight: 500 }} />
                    </div>
                  </div>
 
                  <div className="input-group">
-                   <label className="section-label" style={{ fontSize: 9 }}>Company (Required)</label>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '4px 12px', borderRadius: 12 }}>
-                     <Building size={16} color="var(--muted)" />
-                     <input type="text" value={company} onChange={e => setCompany(e.target.value)} placeholder="Company Name" maxLength={30} style={{ flex: 1, background: 'transparent', border: 'none', padding: '10px 0', fontSize: 14, outline: 'none' }} />
+                   <label className="section-label">Company</label>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16 }}>
+                     <Building size={18} color="var(--muted)" />
+                     <input type="text" value={company} onChange={e => setCompany(e.target.value)} placeholder="e.g. Tech Corp" maxLength={30} style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none', fontWeight: 500 }} />
                    </div>
                  </div>
 
                  <div className="input-group">
-                   <label className="section-label" style={{ fontSize: 9 }}>Contact</label>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '4px 12px', borderRadius: 12 }}>
-                     <Smartphone size={16} color="var(--muted)" />
-                     <input type="tel" value={phone} onChange={handlePhone} placeholder="(555) 000-0000" style={{ flex: 1, background: 'transparent', border: 'none', padding: '10px 0', fontSize: 14, outline: 'none' }} />
+                   <label className="section-label">Email Address</label>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16, opacity: 0.7 }}>
+                     <Mail size={18} color="var(--muted)" />
+                     <input type="email" value={profile.email} disabled style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none' }} />
                    </div>
                  </div>
 
-                 <textarea value={bio} onChange={e => setBio(e.target.value)} placeholder="Short Professional Bio" rows={3} maxLength={160} style={{ width: '100%', background: 'var(--s2)', border: 'none', borderRadius: 12, padding: 12, resize: 'none', fontSize: 14, outline: 'none' }} />
+                 <div className="input-group">
+                   <label className="section-label">Resume Link</label>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16 }}>
+                     <FileText size={18} color="var(--muted)" />
+                     <input type="url" value={resumeLink} onChange={e => setResumeLink(e.target.value)} placeholder="https://..." style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none', fontWeight: 500 }} />
+                   </div>
+                 </div>
+
+                 <div className="input-group">
+                   <label className="section-label">Phone</label>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16 }}>
+                     <Smartphone size={18} color="var(--muted)" />
+                     <input type="tel" value={phone} onChange={handlePhone} placeholder="(555) 000-0000" style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none', fontWeight: 500 }} />
+                   </div>
+                 </div>
+               </div>
+
+               <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
+                 <button 
+                  onClick={() => setIsEditing(false)}
+                  style={{ flex: 1, background: 'var(--s1)', color: 'var(--text)', border: 'none', borderRadius: 16, padding: '16px', fontFamily: 'var(--fb)', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}
+                 >
+                   Cancel
+                 </button>
+                 <button 
+                  onClick={saveProfile} 
+                  disabled={saving}
+                  style={{
+                    flex: 2, background: 'var(--g)', color: '#fff', border: 'none', borderRadius: 16, padding: '16px',
+                    fontFamily: 'var(--fb)', fontWeight: 800, fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                    opacity: saving ? 0.7 : 1, transition: 'all 0.2s', boxShadow: '0 8px 20px rgba(0,0,0,0.15)'
+                  }}
+                >
+                  {saving ? 'Saving...' : 'Save Profile'}
+                </button>
                </div>
             </div>
           </div>
@@ -488,7 +478,7 @@ function MyCardContent() {
         <Modal center open={qrExpanded} onClose={() => setQrExpanded(false)}>
           <div style={{ padding: 40, background: '#fff', borderRadius: 32, textAlign: 'center', outline: 'none' }} className="page-enter">
             <div style={{ padding: 16, background: '#fff', border: '2px solid var(--border)', borderRadius: 24, display: 'inline-block', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}>
-              <QRCodeSVG value={profile.id} size={300} level="H" fgColor={style.textColor} bgColor="#ffffff" />
+              <QRCodeSVG value={profile.id} size={300} level="H" fgColor="#413429" bgColor="#ffffff" />
             </div>
             <h2 style={{ marginTop: 24, fontSize: 24, fontWeight: 800 }}>{name}</h2>
             <p style={{ color: 'var(--muted)', fontSize: 14 }}>Tap anywhere to close</p>

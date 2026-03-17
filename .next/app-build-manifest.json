@@ -36,6 +36,11 @@
       "static/chunks/main-app.js",
       "static/chunks/app/app/my-card/page.js"
     ],
+    "/app/scan/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/app/scan/page.js"
+    ],
     "/_not-found/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
