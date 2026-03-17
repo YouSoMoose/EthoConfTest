@@ -322,7 +322,7 @@ function MyCardContent() {
             style={{ cursor: 'pointer', display: 'flex', justifyContent: 'center', width: '100%' }}
           >
             <div style={{
-              transform: 'scale(calc((100vw - 32px) / 280))',
+              transform: 'scale(calc((100vw - 32px) / 260))',
               transformOrigin: 'top center',
               display: 'flex', flexDirection: 'column', alignItems: 'center',
             }}>
@@ -411,7 +411,11 @@ function MyCardContent() {
                 ].map(({ label, icon, value, setter, placeholder, type, maxLength }) => (
                   <div key={label} className="input-group">
                     <label className="section-label">{label}</label>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'transparent', padding: '0 4px' }}>
+                    <div style={{ 
+                      display: 'flex', alignItems: 'center', gap: 12, 
+                      background: 'var(--as1)', padding: '0 16px', borderRadius: 16,
+                      border: 'none', transition: 'all 0.2s'
+                    }}>
                       {icon}
                       <input
                         type={type}
@@ -420,9 +424,9 @@ function MyCardContent() {
                         placeholder={placeholder}
                         maxLength={maxLength}
                         style={{ 
-                          flex: 1, background: 'var(--as1)', border: '1px solid var(--border)', 
-                          padding: '12px 16px', fontSize: 15, outline: 'none', fontWeight: 500,
-                          borderRadius: 14
+                          flex: 1, background: 'transparent', border: 'none', 
+                          padding: '14px 0', fontSize: 15, outline: 'none', 
+                          fontWeight: 500, color: 'var(--text)'
                         }}
                       />
                     </div>
@@ -436,9 +440,10 @@ function MyCardContent() {
                     onChange={e => setBio(e.target.value)}
                     placeholder="Tell us about yourself..."
                     style={{ 
-                      width: '100%', background: 'var(--as1)', border: '1px solid var(--border)', 
-                      padding: '12px 16px', fontSize: 15, outline: 'none', fontWeight: 500,
-                      borderRadius: 14, minHeight: 100, fontFamily: 'inherit', resize: 'none'
+                      width: '100%', background: 'var(--as1)', border: 'none', 
+                      padding: '16px', fontSize: 15, outline: 'none', fontWeight: 500,
+                      borderRadius: 16, minHeight: 120, fontFamily: 'inherit', resize: 'none',
+                      color: 'var(--text)'
                     }}
                   />
                 </div>
@@ -446,14 +451,18 @@ function MyCardContent() {
                 {/* Email — disabled */}
                 <div className="input-group">
                   <label className="section-label">Email Address</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'transparent', padding: '0 4px', opacity: 0.7 }}>
+                  <div style={{ 
+                    display: 'flex', alignItems: 'center', gap: 12, 
+                    background: 'var(--as1)', padding: '0 16px', borderRadius: 16, 
+                    opacity: 0.6 
+                  }}>
                     <Mail size={18} color="var(--muted)" />
                     <input
                       type="email" value={profile.email} disabled
                       style={{ 
-                        flex: 1, background: 'var(--s2)', border: '1px solid var(--border)', 
-                        padding: '12px 16px', fontSize: 15, outline: 'none',
-                        borderRadius: 14
+                        flex: 1, background: 'transparent', border: 'none', 
+                        padding: '14px 0', fontSize: 15, outline: 'none',
+                        color: 'var(--text)'
                       }}
                     />
                   </div>
