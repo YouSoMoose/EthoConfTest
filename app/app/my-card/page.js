@@ -239,8 +239,12 @@ function MyCardContent() {
     return () => { document.body.style.overflow = ''; };
   }, [qrExpanded]);
 
+  const initializedRef = useRef(false);
   useEffect(() => {
-    if (profile) {
+    // Only populate fields once on first load — prevents unsaved edits from
+    // being wiped if the session object re-renders mid-edit
+    if (profile && !initializedRef.current) {
+      initializedRef.current = true;
       setName(profile.name || '');
       setAvatar(profile.avatar || '');
       setPhone(profile.phone || '');
@@ -276,9 +280,8 @@ function MyCardContent() {
         body: JSON.stringify({ resume_link: resumeLink, phone, bio, role, name, avatar, company, linkedin }),
       });
       if (res.ok) {
-        await updateSession();
         toast.success('Profile saved', { id: t });
-        setIsEditing(false);
+        updateSession(); // fire and forget — don't block redirect
         router.push('/app');
       } else {
         toast.error('Failed to save', { id: t });
@@ -317,7 +320,7 @@ function MyCardContent() {
             style={{ cursor: 'pointer', display: 'flex', justifyContent: 'center', width: '100%' }}
           >
             <div style={{
-              transform: 'scale(min(1, calc(100vw / 400)))',
+              transform: 'scale(min(calc((100vw - 32px) / 300), calc((100dvh - 200px) / 430)))',
               transformOrigin: 'top center',
               display: 'flex', flexDirection: 'column', alignItems: 'center',
             }}>
