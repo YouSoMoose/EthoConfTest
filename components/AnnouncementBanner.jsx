@@ -142,12 +142,9 @@ export default function AnnouncementBanner() {
               {a.content && (
                 <p style={{
                   fontFamily: 'var(--fb)', fontSize: 13,
-                  color: 'rgba(255,255,255,0.65)',
-                  lineHeight: 1.35,
-                  overflow: 'hidden',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
+                  color: 'rgba(255,255,255,0.85)',
+                  lineHeight: 1.4,
+                  marginTop: 6,
                 }}>{a.content}</p>
               )}
             </div>

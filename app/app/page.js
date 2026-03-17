@@ -174,7 +174,7 @@ export default function AttendeeDashboard() {
             <Avatar src={profile?.avatar} name={profile?.name} size={52} />
             <div style={{ flex: 1, minWidth: 0 }}>
               <h1 style={{ fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 24, margin: 0, color: 'var(--g)', letterSpacing: '-0.02em' }}>
-                Hey, {firstName}! 👋
+                Hey, {firstName}!
               </h1>
               <p style={{ fontFamily: 'var(--fb)', fontSize: 13, opacity: 0.9, marginTop: 2, color: 'var(--sub)', fontWeight: 500 }}>
                 Welcome to Ethos 2026
@@ -311,7 +311,6 @@ export default function AttendeeDashboard() {
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
              <p className="section-label" style={{ margin: 0 }}>MY CARD</p>
-             <Link href="/app/my-card" style={{ fontSize: 13, fontFamily: 'var(--fb)', fontWeight: 600, color: 'var(--accent)', textDecoration: 'none' }}>Virtual ID &rarr;</Link>
           </div>
           
           <Link
