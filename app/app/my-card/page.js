@@ -295,14 +295,14 @@ function MyCardContent() {
 
   return (
     <div className="page-enter" style={{ paddingBottom: 100 }}>
-      {/* Back Button */}
       <div style={{ padding: '16px 16px 0', maxWidth: 500, margin: '0 auto', width: '100%' }}>
         <button 
           onClick={() => router.push('/app')}
           style={{ 
-            background: 'var(--as1)', border: '1px solid var(--border)', borderRadius: 12, 
-            padding: '8px 12px', fontSize: 13, fontWeight: 700, color: 'var(--text)',
-            display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer'
+            background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 12, 
+            padding: '8px 12px', fontSize: 13, fontWeight: 700, color: 'var(--g)',
+            display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
           }}
         >
           <ChevronLeft size={16} /> Back
