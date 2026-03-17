@@ -117,7 +117,8 @@ export default function AttendeeDashboard() {
               </Link>
             )}
             <button 
-              onClick={() => signOut({ callbackUrl: '/login' })} 
+              type="button"
+              onClick={() => signOut({ redirect: true, callbackUrl: '/login' })} 
               className="signout-btn"
               style={{
                 flex: profile?.access_level >= 3 ? 0.4 : 1, 

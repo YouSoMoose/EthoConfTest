@@ -51,10 +51,18 @@ export default function AdminLayout({ children }) {
             }}>
               👤 Attendee View
             </Link>
-            <button onClick={() => signOut({ callbackUrl: '/login' })} style={{
-              background: 'none', border: 'none', color: 'var(--asub)',
-              fontFamily: 'var(--fb)', fontSize: 12, cursor: 'pointer',
-            }}>Sign Out</button>
+            <button 
+              type="button"
+              onClick={() => signOut({ redirect: true, callbackUrl: '/login' })} 
+              className="signout-btn"
+              style={{
+                background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8,
+                padding: '6px 12px', fontFamily: 'var(--fb)', fontSize: 12,
+                fontWeight: 600, color: 'var(--accent)', cursor: 'pointer'
+              }}
+            >
+              Sign Out
+            </button>
           </div>
         </header>
         <main style={{ flex: 1, paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
@@ -111,11 +119,17 @@ export default function AdminLayout({ children }) {
           }}>
             <span style={{ fontSize: 16 }}>👤</span> Attendee View
           </Link>
-          <button onClick={() => signOut({ callbackUrl: '/login' })} style={{
-            background: 'none', border: 'none', color: 'var(--amuted)',
-            fontFamily: 'var(--fb)', fontSize: 13, cursor: 'pointer',
-            padding: '8px 12px', width: '100%', textAlign: 'left',
-          }}>
+          <button 
+            type="button"
+            onClick={() => signOut({ redirect: true, callbackUrl: '/login' })} 
+            className="signout-btn"
+            style={{
+              background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', 
+              color: 'var(--amuted)', borderRadius: 10,
+              fontFamily: 'var(--fb)', fontSize: 13, cursor: 'pointer',
+              padding: '8px 12px', width: '100%', textAlign: 'left',
+            }}
+          >
             Sign Out
           </button>
         </div>
@@ -148,10 +162,18 @@ export default function AdminLayout({ children }) {
           }}>
             👤 Attendee
           </Link>
-          <button onClick={() => signOut({ callbackUrl: '/login' })} style={{
-            background: 'none', border: 'none', color: 'var(--asub)',
-            fontFamily: 'var(--fb)', fontSize: 12, cursor: 'pointer',
-          }}>Sign Out</button>
+          <button 
+            type="button"
+            onClick={() => signOut({ redirect: true, callbackUrl: '/login' })} 
+            className="signout-btn"
+            style={{
+              background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8,
+              padding: '5px 10px', fontFamily: 'var(--fb)', fontSize: 11,
+              fontWeight: 600, color: 'var(--accent)', cursor: 'pointer'
+            }}
+          >
+            Sign Out
+          </button>
         </div>
       </header>
 
@@ -205,11 +227,17 @@ export default function AdminLayout({ children }) {
             </nav>
 
             <div style={{ padding: '16px', borderTop: '1px solid var(--aborder)' }}>
-              <button onClick={() => signOut({ callbackUrl: '/login' })} style={{
-                background: 'none', border: 'none', color: 'var(--amuted)',
-                fontFamily: 'var(--fb)', fontSize: 13, cursor: 'pointer',
-                padding: '8px 0', width: '100%', textAlign: 'left',
-              }}>
+              <button 
+                type="button"
+                onClick={() => signOut({ redirect: true, callbackUrl: '/login' })} 
+                className="signout-btn"
+                style={{
+                  background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', 
+                  color: 'var(--amuted)', borderRadius: 10,
+                  fontFamily: 'var(--fb)', fontSize: 13, cursor: 'pointer',
+                  padding: '10px 12px', width: '100%', textAlign: 'left',
+                }}
+              >
                 Sign Out
               </button>
             </div>
