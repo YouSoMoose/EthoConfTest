@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback, memo, Suspense } from 'react';
+import { useEffect, useState, useRef, useCallback, memo, Suspense, useMemo } from 'react';
 import Link from 'next/link';
 import Loader from '@/components/Loader';
 import { CardPreview, DEFAULT_STYLE } from '@/components/CardPreview';
 import { toPng } from 'html-to-image';
 import toast from 'react-hot-toast';
+import { Search, X, ChevronLeft, Layout, Settings, Printer, Download } from 'lucide-react';
 
 
 // Direct DOM mutations per attribute — bypasses React entirely during drag
@@ -324,7 +325,7 @@ function AdminIDCardsContent() {
   const [loading, setLoading] = useState(true);
   const [printingId, setPrintingId] = useState(null);
   const [customizations, setCustomizations] = useState({});
-  const [search, setSearch] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const saved = localStorage.getItem('ethos_card_customizations');
@@ -334,6 +335,11 @@ function AdminIDCardsContent() {
       .then(data => { setUsers(data || []); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
+
+  const filteredUsers = users.filter(u => 
+    u.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    u.email?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleGlobalUpdate = useCallback((userId, newStyle) => {
     setCustomizations(prev => {
@@ -424,61 +430,85 @@ function AdminIDCardsContent() {
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 32 }}>
           <Link href="/admin" style={{
-            textDecoration: 'none', color: 'var(--asub)', fontSize: 24,
+            textDecoration: 'none', color: 'var(--asub)', 
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            width: 48, height: 48, borderRadius: 24, background: 'var(--as1)',
-            border: '1px solid var(--aborder)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
-          }}>←</Link>
+            width: 42, height: 42, borderRadius: 12, background: 'var(--as1)',
+            border: '1px solid var(--aborder)', transition: 'all 0.2s'
+          }}>
+            <ChevronLeft size={20} />
+          </Link>
           <div>
             <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 800, fontSize: 28, color: 'var(--atext)', margin: 0, letterSpacing: '-0.02em' }}>
               ID Card Designer
             </h2>
             <p style={{ margin: 0, fontSize: 13, color: 'var(--asub)', fontWeight: 500 }}>Global Conference Asset Management</p>
           </div>
-          <div style={{ flex: 1, maxWidth: 400, marginLeft: 'auto' }}>
-            <div style={{ position: 'relative' }}>
+          
+          <div style={{ flex: 1, minWidth: 300, position: 'relative' }}>
+            <div style={{ position: 'relative', width: '100%' }}>
+              <div style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'var(--accent)', opacity: 0.8, pointerEvents: 'none' }}>
+                <Search size={18} />
+              </div>
               <input
                 type="text"
-                placeholder="Search attendees (name, email, company)..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
+                placeholder="Find attendees by name or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 style={{
-                  width: '100%', background: 'var(--as1)', border: '1px solid var(--aborder)',
-                  borderRadius: 12, padding: '12px 16px', fontSize: 14,
-                  fontFamily: 'var(--fb)', color: 'var(--atext)', outline: 'none',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.05)', transition: 'all 0.2s'
+                  width: '100%',
+                  background: 'var(--as1)',
+                  border: '1.5px solid var(--aborder)',
+                  borderRadius: 16,
+                  padding: '14px 20px 14px 48px',
+                  fontSize: 14,
+                  fontFamily: 'var(--fh)',
+                  color: 'var(--atext)',
+                  outline: 'none',
+                  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)',
+                  fontWeight: 500
                 }}
-                onFocus={e => e.target.style.borderColor = 'var(--accent)'}
-                onBlur={e => e.target.style.borderColor = 'var(--aborder)'}
+                onFocus={e => {
+                  e.target.style.borderColor = 'var(--accent)';
+                  e.target.style.boxShadow = '0 0 0 4px color-mix(in srgb, var(--accent) 15%, transparent), inset 0 2px 4px rgba(0,0,0,0.02)';
+                  e.target.style.background = 'var(--white)';
+                }}
+                onBlur={e => {
+                  e.target.style.borderColor = 'var(--aborder)';
+                  e.target.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.02)';
+                  e.target.style.background = 'var(--as1)';
+                }}
               />
-              <span style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', opacity: 0.4, pointerEvents: 'none' }}>🔍</span>
+              {searchTerm && (
+                <button 
+                  onClick={() => setSearchTerm('')}
+                  style={{
+                    position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
+                    background: 'var(--as2)', border: 'none', borderRadius: 8, padding: 6,
+                    cursor: 'pointer', color: 'var(--asub)', display: 'flex', alignItems: 'center', transition: 'all 0.2s'
+                  }}
+                >
+                  <X size={14} />
+                </button>
+              )}
             </div>
           </div>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 40, background: 'var(--as1)', padding: 32, borderRadius: 24, border: '1px solid var(--aborder)', boxShadow: '0 20px 60px rgba(0,0,0,0.05)' }}>
-          {users.filter(u => 
-            !search || 
-            u.name?.toLowerCase().includes(search.toLowerCase()) || 
-            u.email?.toLowerCase().includes(search.toLowerCase()) || 
-            u.company?.toLowerCase().includes(search.toLowerCase())
-          ).map(u => (
-            <CardRow
-              key={u.id} user={u}
-              initialStyle={customizations[u.id]}
-              globalUpdate={handleGlobalUpdate}
-              isPrinting={printingId === u.id}
-              setPrintingId={setPrintingId}
-            />
-          ))}
-          {users.length > 0 && users.filter(u => 
-            u.name?.toLowerCase().includes(search.toLowerCase()) || 
-            u.email?.toLowerCase().includes(search.toLowerCase()) || 
-            u.company?.toLowerCase().includes(search.toLowerCase())
-          ).length === 0 && (
+          {filteredUsers.length > 0 ? (
+            filteredUsers.map(u => (
+              <CardRow
+                key={u.id} user={u}
+                initialStyle={customizations[u.id]}
+                globalUpdate={handleGlobalUpdate}
+                isPrinting={printingId === u.id}
+                setPrintingId={setPrintingId}
+              />
+            ))
+          ) : (
             <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--asub)' }}>
-              <p style={{ fontSize: 16, fontWeight: 600 }}>No attendees found matching "{search}"</p>
-              <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontWeight: 700, fontSize: 14 }}>Clear search</button>
+              No users found matching "{searchTerm}"
             </div>
           )}
         </div>
