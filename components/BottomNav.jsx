@@ -28,7 +28,7 @@ export default function BottomNav({ items, admin }) {
     if (admin || !session?.profile?.id) return;
     (async () => {
       try {
-        const res = await fetch('/api/messages?unread=true');
+        const res = await fetch(`/api/messages?unread=true&_t=${Date.now()}`);
         if (res.ok) { const d = await res.json(); setUnread(d.unreadCount || 0); }
       } catch { }
     })();

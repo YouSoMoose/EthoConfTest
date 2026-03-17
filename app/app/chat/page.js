@@ -34,7 +34,7 @@ export default function ChatPage() {
     if (!myId || level >= 3) return;
     try {
       // Fetch direct messages with admin
-      const res = await fetch('/api/messages?as=attendee&direct=admin');
+      const res = await fetch(`/api/messages?as=attendee&direct=admin&_t=${Date.now()}`);
       if (res.ok) setMessages(await res.json());
     } catch { }
     setLoading(false);

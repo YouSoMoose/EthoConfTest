@@ -23,7 +23,7 @@ export default function MessageNotification() {
 
     (async () => {
       try {
-        const res = await fetch('/api/messages?unread=true&latest=true');
+        const res = await fetch(`/api/messages?unread=true&latest=true&_t=${Date.now()}`);
         if (res.ok) {
           const msg = await res.json();
           // Don't notify if the message is from ourselves, or if it's the exact same message

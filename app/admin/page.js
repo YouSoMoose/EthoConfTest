@@ -25,9 +25,9 @@ export default function AdminDashboard() {
     if (level === 2) { setLoading(false); return; }
     Promise.all([
       fetch('/api/users').then(r => r.json()),
-      fetch('/api/messages?unread=true').then(r => r.json()),
+      fetch(`/api/messages?unread=true&_t=${Date.now()}`).then(r => r.json()),
       fetch('/api/raffle').then(r => r.json()).catch(() => []),
-      fetch('/api/announcements?all=true').then(r => r.json()).catch(() => []),
+      fetch(`/api/announcements?all=true&_t=${Date.now()}`).then(r => r.json()).catch(() => []),
     ]).then(([users, unread, raffle, ann]) => {
       const u = Array.isArray(users) ? users : [];
       setAnnouncements(Array.isArray(ann) ? ann : []);

@@ -21,7 +21,7 @@ export default function AdminMessagesPage() {
   const fetchData = useCallback(async () => {
     try {
       const [mRes, uRes] = await Promise.all([
-        fetch('/api/messages'),
+        fetch(`/api/messages?_t=${Date.now()}`),
         fetch('/api/users')
       ]);
       if (mRes.ok) setMessages((await mRes.json()) || []);

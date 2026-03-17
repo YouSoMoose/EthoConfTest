@@ -100,7 +100,7 @@ export default function AttendeeDashboard() {
 
   useEffect(() => {
     const fetchSched = fetch('/api/schedule').then(r => r.json());
-    const fetchAnn = fetch('/api/announcements').then(r => r.json());
+    const fetchAnn = fetch(`/api/announcements?_t=${Date.now()}`).then(r => r.json());
     
     Promise.all([fetchSched, fetchAnn]).then(([sched, ann]) => {
       setSchedule(sched || []);
