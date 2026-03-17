@@ -2,11 +2,11 @@
 
 :root {
   /* Attendee / Light Theme */
-  --bg: #FFFFFF;
+  --bg: #F5F0E6; /* Warmer Tan */
   --white: #FFFFFF;
-  --s1: #FAF7F2;
-  --s2: #FFEBE3;
-  --border: #F0E9E0;
+  --s1: #EBE4D8; /* Darker tan for contrast */
+  --s2: #F0E9DC;
+  --border: #DCD4C8;
   --g: #413429; /* Darkest Coffee - used for Headers */
   --gl: #FFF8F4;
   --gb: #FAF3EF;
@@ -169,6 +169,12 @@ button:active {
   from { width: 0; }
 }
 
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 /* ── Stagger children ──────────────────────────────────── */
 .stagger > *       { opacity: 0; transform: translateY(8px); animation: fadeUp 0.3s ease both; }
 .stagger > *:nth-child(1)  { animation-delay: 0.04s; }
@@ -265,15 +271,27 @@ button:active {
   .admin-cards { display: none; }
 }
 
-/* ── Section label style ───────────────────────────────── */
+.input-group input, .input-group textarea {
+  border: 1.5px solid var(--border) !important;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+  transition: all 0.2s var(--liquid);
+}
+
+.input-group input:focus, .input-group textarea:focus {
+  border-color: var(--g) !important;
+  background: var(--white) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
 .section-label {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 11px;
   color: var(--muted);
-  font-weight: 600;
+  font-weight: 700;
   font-family: var(--fb);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
+  display: block;
 }
 
 .section-label-admin {

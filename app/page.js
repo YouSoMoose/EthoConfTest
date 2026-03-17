@@ -148,6 +148,8 @@ export default function LandingPage() {
             position: 'absolute',
             inset: 0,
             background: s.gradient,
+            backgroundSize: '200% 200%',
+            animation: 'gradientMove 12s ease infinite',
             opacity: current === i ? 1 : 0,
             transition: 'opacity 1s cubic-bezier(0.4, 0, 0.2, 1)',
           }} />
