@@ -9,8 +9,8 @@ export const DEFAULT_STYLE = {
   roleSize: 14, roleX: 0, roleY: 0, roleVisible: true,
   companySize: 13, companyX: 0, companyY: 0, companyVisible: true,
   emailSize: 11, emailX: 0, emailY: 0, emailVisible: true,
-  qrSize: 130, qrX: 0, qrY: 0, qrVisible: true,
-  logoSize: 44, logoX: 0, logoY: 0, logoVisible: true,
+  qrSize: 64, qrX: 0, qrY: 0, qrVisible: true,
+  logoSize: 28, logoX: 0, logoY: 0, logoVisible: true,
   accentColor: '#D49B7A',
   textColor: '#413429',
   subColor: '#7D6F63',
@@ -47,11 +47,6 @@ export const CardPreview = memo(function CardPreview({ user = {}, style = DEFAUL
         background: `linear-gradient(135deg, ${s.accentColor}20 0%, transparent 100%)`,
         borderRadius: '0 0 0 100%', pointerEvents: 'none', zIndex: 0
       }} />
-
-      {/* Avatar Section */}
-      <div style={{ position: 'relative', zIndex: 1, flexShrink: 0 }}>
-        <Avatar src={user?.avatar} name={user?.name} size={68} />
-      </div>
 
       {/* Text Info Section */}
       <div style={{ flex: 1, minWidth: 0, zIndex: 1, position: 'relative' }}>
@@ -120,7 +115,7 @@ export const CardPreview = memo(function CardPreview({ user = {}, style = DEFAUL
           boxShadow: '0 4px 12px rgba(0,0,0,0.04)',
           transform: `translate(${s.qrX || 0}px, ${s.qrY || 0}px)`, zIndex: 1
         }}>
-          <QRCodeSVG value={user?.id || user?.email || ''} size={s.qrSize || 72} level="H" fgColor={s.textColor} bgColor="#ffffff" />
+          <QRCodeSVG value={user?.id || user?.email || ''} size={s.qrSize || 64} level="H" fgColor={s.textColor} bgColor="#ffffff" />
         </div>
       )}
 

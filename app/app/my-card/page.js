@@ -357,7 +357,7 @@ function MyCardContent() {
                 boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
               }}
             >
-              <Smartphone size={18} /> Edit Profile Info
+              <UserIcon size={18} /> Edit Profile Info
             </button>
           )}
         </div>
