@@ -1,3 +1,8 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+import Topbar from '@/components/Topbar';
+import QRScanner from '@/components/QRScanner';
 import { Scan } from 'lucide-react';
 
 export default function ScanPage() {

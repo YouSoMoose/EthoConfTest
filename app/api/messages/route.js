@@ -44,22 +44,14 @@ export async function GET(request) {
     return NextResponse.json({ unreadCount: count || 0 });
   }
 
-  // Staff/admin: get all messages or messages for a specific user
-  if (level >= 2 && !asAttendee) {
-    // Restricted Chat logic: level 2 staff shouldn't see sensitive admin messages
-    if (level === 2) {
-       return NextResponse.json([{ 
-         id: 'humor', 
-         content: 'Why are you here? You dont need this.', 
-         sender: { name: 'System', avatar: null },
-         created_at: new Date().toISOString()
-       }]);
-    }
+  const directAdmin = searchParams.get('direct') === 'admin';
 
+  // Staff/admin: get all messages or messages for a specific user
+  if (level >= 3 && !asAttendee) {
     const targetUser = searchParams.get('user_id');
     let query = supabaseAdmin
       .from('messages')
-      .select('*, sender:profiles!sender_id(id, name, email, avatar), recipient:profiles!recipient_id(id, name, email, avatar)')
+      .select('*, sender:profiles!sender_id(id, name, email, avatar, access_level), recipient:profiles!recipient_id(id, name, email, avatar, access_level)')
       .eq('deleted', false)
       .order('created_at', { ascending: true });
 
@@ -72,14 +64,22 @@ export async function GET(request) {
     return NextResponse.json(data);
   }
 
-  // Attendees: get their own messages (to/from staff)
-  const { data, error } = await supabaseAdmin
+  // Attendees & Staff (in attendee view): get direct conversation with admin
+  let query = supabaseAdmin
     .from('messages')
-    .select('*, sender:profiles!sender_id(id, name, email, avatar), recipient:profiles!recipient_id(id, name, email, avatar)')
-    .or(`sender_id.eq.${userId},recipient_id.eq.${userId}`)
+    .select('*, sender:profiles!sender_id(id, name, email, avatar, access_level), recipient:profiles!recipient_id(id, name, email, avatar, access_level)')
     .eq('deleted', false)
     .order('created_at', { ascending: true });
 
+  if (directAdmin) {
+    // Show messages between ME and any Level 3 Admin
+    query = query.or(`and(sender_id.eq.${userId},recipient:profiles!recipient_id(access_level.gte.3)),and(recipient_id.eq.${userId},sender:profiles!sender_id(access_level.gte.3))`);
+  } else {
+    // Fallback or generic conversation
+    query = query.or(`sender_id.eq.${userId},recipient_id.eq.${userId}`);
+  }
+
+  const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data);
 }
@@ -92,34 +92,36 @@ export async function POST(request) {
 
   const { searchParams } = new URL(request.url);
   const asAttendee = searchParams.get('as') === 'attendee';
+  const directAdmin = searchParams.get('direct') === 'admin';
   const body = await request.json();
+  const userId = session.profile.id;
   const level = session.profile.access_level;
 
   let recipientId = body.recipient_id;
 
-  // Attendees auto-route to any staff member
-  if ((level < 2 || asAttendee) && !recipientId) {
-    const { data: staffMembers } = await supabaseAdmin
+  // Direct Admin Routing: Attendees/Staff auto-route to a Level 3 member
+  if ((level < 3 || asAttendee || directAdmin) && !recipientId) {
+    const { data: adminMembers } = await supabaseAdmin
       .from('profiles')
       .select('id')
-      .gte('access_level', 2)
+      .gte('access_level', 3)
       .limit(1);
 
-    if (staffMembers && staffMembers.length > 0) {
-      recipientId = staffMembers[0].id;
+    if (adminMembers && adminMembers.length > 0) {
+      recipientId = adminMembers[0].id;
     } else {
-      return NextResponse.json({ error: 'No staff available' }, { status: 404 });
+      return NextResponse.json({ error: 'Support is currently unavailable' }, { status: 404 });
     }
   }
 
   const { data, error } = await supabaseAdmin
     .from('messages')
     .insert({
-      sender_id: session.profile.id,
+      sender_id: userId,
       recipient_id: recipientId,
       content: body.content,
     })
-    .select('*, sender:profiles!sender_id(id, name, email, avatar), recipient:profiles!recipient_id(id, name, email, avatar)')
+    .select('*, sender:profiles!sender_id(id, name, email, avatar, access_level), recipient:profiles!recipient_id(id, name, email, avatar, access_level)')
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

@@ -37,13 +37,19 @@ export default function SchedulePage() {
                 boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
               }}>
                 <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-                    <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 16, color: 'var(--text)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
+                    <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 17, color: 'var(--g)' }}>
                       {item.title}
                     </h3>
                   </div>
                   
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, color: 'var(--g)' }}>
+                  {item.speaker && (
+                    <p style={{ fontFamily: 'var(--fb)', fontSize: 13, fontWeight: 700, color: 'var(--sub)', marginBottom: 8 }}>
+                      🎤 {item.speaker}
+                    </p>
+                  )}
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, color: 'var(--g)' }}>
                     <Clock size={14} />
                     <span style={{ fontFamily: 'var(--fb)', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                       {item.start_time} {item.end_time ? `— ${item.end_time}` : ''}
@@ -51,18 +57,22 @@ export default function SchedulePage() {
                   </div>
 
                   {item.description && (
-                    <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--sub)', lineHeight: 1.5, marginBottom: 12 }}>
+                    <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--sub)', lineHeight: 1.5, marginBottom: 14 }}>
                       {item.description}
                     </p>
                   )}
                   
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                     {item.location && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--muted)', background: 'var(--s2)', padding: '4px 10px', borderRadius: 20 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--muted)', background: 'var(--s1)', padding: '5px 12px', borderRadius: 20, border: '1px solid var(--border)' }}>
                         <MapPin size={12} />
-                        <span style={{ fontFamily: 'var(--fb)', fontSize: 11, fontWeight: 600 }}>{item.location}</span>
+                        <span style={{ fontFamily: 'var(--fb)', fontSize: 11, fontWeight: 700 }}>{item.location}</span>
                       </div>
                     )}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--g)', background: 'var(--s2)', padding: '5px 12px', borderRadius: 20, border: '1px solid var(--warm-border)' }}>
+                      <Info size={12} />
+                      <span style={{ fontFamily: 'var(--fb)', fontSize: 11, fontWeight: 800 }}>EVENT INFO</span>
+                    </div>
                   </div>
                 </div>
               </div>
