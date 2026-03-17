@@ -5,7 +5,7 @@ import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import Avatar from '@/components/Avatar';
 import Loader from '@/components/Loader';
-import { Home, Calendar, Wallet, Scan, MessageCircle, FileText, CreditCard, ChevronRight, LogOut, Settings } from 'lucide-react';
+import { Home, Calendar, Wallet, Scan, MessageCircle, FileText, CreditCard, ChevronRight, LogOut, Settings, Bell } from 'lucide-react';
 import { CardPreview } from '@/components/CardPreview';
 import { useScrollHero } from '@/lib/animations';
 
@@ -204,6 +204,41 @@ export default function AttendeeDashboard() {
 
       <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 24 }}>
         
+        {/* Notification Permission Request */}
+        {typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default' && (
+          <div style={{
+            background: 'var(--accent)',
+            color: 'var(--text)',
+            borderRadius: 16,
+            padding: '16px 20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+            boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+            animation: 'fadeUp 0.5s ease both'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <Bell size={20} />
+              <div style={{ flex: 1 }}>
+                <p style={{ margin: 0, fontWeight: 700, fontSize: 13 }}>Enable Notifications</p>
+                <p style={{ margin: '2px 0 0', fontSize: 11, opacity: 0.9 }}>Get alerted about announcements & updates.</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => {
+                Notification.requestPermission().then(() => window.location.reload());
+              }}
+              style={{
+                background: 'var(--text)', color: 'var(--white)', border: 'none', borderRadius: 8,
+                padding: '6px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer'
+              }}
+            >
+              Turn On
+            </button>
+          </div>
+        )}
+        
         {/* 1. Schedule (Up Next) */}
         {upNext && (
           <div>
@@ -256,7 +291,7 @@ export default function AttendeeDashboard() {
           </div>
         )}
 
-        {/* 3. RESPONSIVE ID CARD PREVIEW — with spring press */}
+        {/* 3. RESPONSIVE ID CARD PREVIEW — Landscape */}
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
              <p className="section-label" style={{ margin: 0 }}>MY CARD</p>
@@ -274,8 +309,8 @@ export default function AttendeeDashboard() {
               ref={cardPreviewRef}
               style={{ 
                 transformOrigin: 'top center', 
-                transform: 'scale(min(1, calc((100vw - 64px) / 300)))',
-                width: 300, height: 430,
+                transform: 'scale(calc((100vw - 32px) / 320))',
+                width: 320, height: 152,
                 transition: `transform 0.4s ${SPRING}`,
               }}
             >

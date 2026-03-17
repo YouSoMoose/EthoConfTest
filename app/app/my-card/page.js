@@ -9,8 +9,8 @@ import { CardPreview } from '@/components/CardPreview';
 import { QRCodeSVG } from 'qrcode.react';
 import toast from 'react-hot-toast';
 import {
-  Camera, Smartphone, Building, User as UserIcon,
-  Type, Mail, FileText,
+  Camera, Building, User as UserIcon,
+  Type, Mail, FileText, Linkedin, ChevronLeft
 } from 'lucide-react';
 
 const DEFAULT_STYLE = {
@@ -217,7 +217,6 @@ function MyCardContent() {
   const [isEditing, setIsEditing] = useState(isOnboarding);
   const [name, setName] = useState('');
   const [avatar, setAvatar] = useState('');
-  const [phone, setPhone] = useState('');
   const [role, setRole] = useState('');
   const [bio, setBio] = useState('');
   const [company, setCompany] = useState('');
@@ -243,11 +242,9 @@ function MyCardContent() {
   useEffect(() => {
     // Only populate fields once on first load — prevents unsaved edits from
     // being wiped if the session object re-renders mid-edit
-    if (profile && !initializedRef.current) {
-      initializedRef.current = true;
+    if (profile) {
       setName(profile.name || '');
       setAvatar(profile.avatar || '');
-      setPhone(profile.phone || '');
       setRole(profile.role || '');
       setBio(profile.bio || '');
       setCompany(profile.company || '');
@@ -256,15 +253,6 @@ function MyCardContent() {
     }
   }, [profile]);
 
-  const handlePhone = (e) => {
-    let val = e.target.value.replace(/\D/g, '');
-    if (val.length > 10) val = val.slice(0, 10);
-    let formatted = val;
-    if (val.length > 6) formatted = `(${val.slice(0, 3)}) ${val.slice(3, 6)}-${val.slice(6)}`;
-    else if (val.length > 3) formatted = `(${val.slice(0, 3)}) ${val.slice(3)}`;
-    else if (val.length > 0) formatted = `(${val}`;
-    setPhone(formatted);
-  };
 
   const saveProfile = async () => {
     if (!name || name.length < 2) return toast.error('Valid Name is required');
@@ -277,7 +265,7 @@ function MyCardContent() {
       const res = await fetch('/api/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resume_link: resumeLink, phone, bio, role, name, avatar, company, linkedin }),
+        body: JSON.stringify({ resume_link: resumeLink, bio, role, name, avatar, company, linkedin }),
       });
       if (res.ok) {
         toast.success('Profile saved', { id: t });
@@ -307,20 +295,34 @@ function MyCardContent() {
 
   return (
     <div className="page-enter" style={{ paddingBottom: 100 }}>
+      {/* Back Button */}
+      <div style={{ padding: '16px 16px 0', maxWidth: 500, margin: '0 auto', width: '100%' }}>
+        <button 
+          onClick={() => router.push('/app')}
+          style={{ 
+            background: 'var(--as1)', border: '1px solid var(--border)', borderRadius: 12, 
+            padding: '8px 12px', fontSize: 13, fontWeight: 700, color: 'var(--text)',
+            display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer'
+          }}
+        >
+          <ChevronLeft size={16} /> Back
+        </button>
+      </div>
+
       <div style={{
-        maxWidth: 500, margin: '0 auto', padding: '20px 16px',
-        display: 'flex', flexDirection: 'column', gap: 32,
-        alignItems: 'center', justifyContent: 'center', minHeight: '80dvh',
+        maxWidth: 500, margin: '0 auto', padding: '10px 16px',
+        display: 'flex', flexDirection: 'column', gap: 24,
+        alignItems: 'center', minHeight: '80dvh',
       }}>
 
         {/* ── Card display ── */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'center', width: '100%', overflowX: 'hidden' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center', width: '100%', overflowX: 'hidden' }}>
           <div
             onClick={() => setQrExpanded(true)}
             style={{ cursor: 'pointer', display: 'flex', justifyContent: 'center', width: '100%' }}
           >
             <div style={{
-              transform: 'scale(min(1.4, calc((100vw - 32px) / 300)))',
+              transform: 'scale(calc((100vw - 32px) / 320))',
               transformOrigin: 'top center',
               display: 'flex', flexDirection: 'column', alignItems: 'center',
             }}>
@@ -404,17 +406,17 @@ function MyCardContent() {
                   { label: 'Full Name', icon: <Type size={18} color="var(--muted)" />, value: name, setter: setName, placeholder: 'e.g. John Doe', type: 'text', maxLength: 40 },
                   { label: 'Position / Role', icon: <UserIcon size={18} color="var(--muted)" />, value: role, setter: setRole, placeholder: 'e.g. Lead Developer', type: 'text', maxLength: 30 },
                   { label: 'Company', icon: <Building size={18} color="var(--muted)" />, value: company, setter: setCompany, placeholder: 'e.g. Tech Corp', type: 'text', maxLength: 30 },
+                  { label: 'LinkedIn URL', icon: <Linkedin size={18} color="var(--muted)" />, value: linkedin, setter: setLinkedin, placeholder: 'linkedin.com/in/...', type: 'url', maxLength: undefined },
                   { label: 'Resume Link', icon: <FileText size={18} color="var(--muted)" />, value: resumeLink, setter: setResumeLink, placeholder: 'https://...', type: 'url', maxLength: undefined },
-                  { label: 'Phone', icon: <Smartphone size={18} color="var(--muted)" />, value: phone, setter: null, placeholder: '(555) 000-0000', type: 'tel', maxLength: undefined },
                 ].map(({ label, icon, value, setter, placeholder, type, maxLength }) => (
                   <div key={label} className="input-group">
                     <label className="section-label">{label}</label>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--s2)', padding: '6px 16px', borderRadius: 16 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--as1)', padding: '6px 16px', borderRadius: 16, border: '1px solid var(--border)' }}>
                       {icon}
                       <input
                         type={type}
                         value={value}
-                        onChange={label === 'Phone' ? handlePhone : e => setter(e.target.value)}
+                        onChange={e => setter(e.target.value)}
                         placeholder={placeholder}
                         maxLength={maxLength}
                         style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 0', fontSize: 15, outline: 'none', fontWeight: 500 }}

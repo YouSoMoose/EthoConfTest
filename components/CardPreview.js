@@ -19,132 +19,121 @@ export const DEFAULT_STYLE = {
 export const CardPreview = memo(function CardPreview({ user, style = DEFAULT_STYLE, cardRef, domRefs = { current: {} }, fullSize = true }) {
   const s = Object.assign({}, DEFAULT_STYLE, style);
 
-  // Conditionally handle the size logic (Admin printing vs App page viewer)
-  const containerStyle = fullSize
-    ? {
-      background: '#ffffff', borderRadius: 24, border: '1px solid var(--border)',
-      width: 300, minHeight: 430, padding: '28px 28px 36px', textAlign: 'center',
-      boxShadow: '0 20px 60px rgba(0,0,0,0.08)',
-      position: 'relative', flexShrink: 0,
-      animation: 'scaleIn 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67) both'
-    }
-    : {
-      background: '#ffffff', borderRadius: 14, border: '1px solid #ddd',
-      width: '87mm', height: '57mm', padding: 20, boxSizing: 'border-box',
-      display: 'flex', alignItems: 'center', gap: 20,
-      boxShadow: '0 15px 45px rgba(0,0,0,0.06)',
-      position: 'relative', overflow: 'hidden', flexShrink: 0,
-    };
+  // Unified Landscape Layout (9.5 x 4.5 implementation)
+  const containerStyle = {
+    background: '#ffffff',
+    borderRadius: 16,
+    border: '1px solid var(--border)',
+    width: 320, // 9.5 equivalent in relative units
+    height: 152, // 4.5 equivalent in relative units
+    padding: '16px 20px',
+    textAlign: 'left',
+    boxShadow: '0 12px 32px rgba(0,0,0,0.06)',
+    position: 'relative',
+    overflow: 'hidden',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 16,
+    boxSizing: 'border-box',
+    flexShrink: 0,
+  };
 
   return (
     <div ref={cardRef} style={containerStyle}>
+      {/* Decorative corner gradient */}
       <div style={{
         position: 'absolute', top: 0, right: 0,
-        width: fullSize ? 220 : 160, height: fullSize ? 220 : 160,
-        background: `linear-gradient(135deg, ${s.accentColor}25 0%, ${fullSize ? 'transparent' : 'rgba(168,158,148,0.05)'} 100%)`,
-        borderRadius: '0 0 0 100%', pointerEvents: 'none'
+        width: 140, height: 140,
+        background: `linear-gradient(135deg, ${s.accentColor}20 0%, transparent 100%)`,
+        borderRadius: '0 0 0 100%', pointerEvents: 'none', zIndex: 0
       }} />
 
-      <div style={fullSize ? { zIndex: 1, position: 'relative' } : { flex: 1, minWidth: 0, zIndex: 1, position: 'relative' }}>
+      {/* Avatar Section */}
+      <div style={{ position: 'relative', zIndex: 1, flexShrink: 0 }}>
+        <Avatar src={user.avatar} name={user.name} size={64} />
+      </div>
+
+      {/* Text Info Section */}
+      <div style={{ flex: 1, minWidth: 0, zIndex: 1, position: 'relative' }}>
         {s.logoVisible && (
           <div ref={el => domRefs.current.logoWrap = el} style={{
-            display: 'flex', alignItems: 'center', justifyContent: fullSize ? 'center' : 'flex-start',
-            gap: 10, marginBottom: fullSize ? 20 : 12,
+            display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8,
             transform: `translate(${s.logoX || 0}px, ${s.logoY || 0}px)`,
           }}>
             <div ref={el => domRefs.current.logoBox = el} style={{
-              width: s.logoSize, height: s.logoSize,
-              margin: fullSize ? '0 auto' : '0',
-              borderRadius: 8, overflow: 'hidden', flexShrink: 0
+              width: s.logoSize || 24, height: s.logoSize || 24,
+              borderRadius: 4, overflow: 'hidden', flexShrink: 0
             }}>
-              <img src={fullSize ? "/assets/ethos-logo.png" : "/assets/ethos-logo-insignia.png"} alt="E" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              <img src="/assets/ethos-logo-insignia.png" alt="E" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
           </div>
         )}
 
-        {fullSize && <Avatar src={user.avatar} name={user.name} size={90} />}
+        {s.nameVisible && (
+          <h2 ref={el => domRefs.current.name = el} style={{
+            fontFamily: 'var(--fh)', fontWeight: 800, fontSize: s.nameSize || 18,
+            color: s.textColor, margin: 0, lineHeight: 1.1,
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+            transform: `translate(${s.nameX || 0}px, ${s.nameY || 0}px)`,
+          }}>
+            {user.name || 'Your Name'}
+          </h2>
+        )}
 
-        <div style={fullSize ? { marginTop: 16 } : {}}>
-          {s.nameVisible && (
-            fullSize ? (
-              <h2 ref={el => domRefs.current.name = el} style={{
-                fontFamily: 'var(--fh)', fontWeight: 800, fontSize: s.nameSize,
-                color: s.textColor, margin: 0, lineHeight: 1.1,
-                transform: `translate(${s.nameX}px, ${s.nameY}px)`,
-              }}>
-                {user.name || 'Your Name'}
-              </h2>
-            ) : (
-              <h3 ref={el => domRefs.current.name = el} style={{
-                fontFamily: 'var(--fh)', fontWeight: 800, fontSize: s.nameSize,
-                color: s.textColor, margin: 0, lineHeight: 1.05,
-                overflowWrap: 'break-word', wordBreak: 'break-word',
-                transform: `translate(${s.nameX}px, ${s.nameY}px)`,
-              }}>
-                {user.name || 'Anonymous User'}
-              </h3>
-            )
-          )}
+        {s.roleVisible && (
+          <p ref={el => domRefs.current.role = el} style={{
+            fontFamily: 'var(--fb)', fontWeight: 700, fontSize: s.roleSize || 11,
+            color: s.accentColor, margin: '2px 0',
+            textTransform: 'uppercase', letterSpacing: '0.5px',
+            transform: `translate(${s.roleX || 0}px, ${s.roleY || 0}px)`,
+          }}>
+            {user.role || (user.access_level === 3 ? 'Super Admin' : user.access_level === 2 ? 'Event Staff' : 'Attendee')}
+          </p>
+        )}
 
-          {s.roleVisible && (
-            <p ref={el => domRefs.current.role = el} style={{
-              fontFamily: 'var(--fb)', fontWeight: 700, fontSize: s.roleSize,
-              color: s.accentColor, margin: fullSize ? '8px 0' : '6px 0',
-              textTransform: 'uppercase', letterSpacing: '1px',
-              transform: `translate(${s.roleX}px, ${s.roleY}px)`,
-            }}>
-              {user.role || (fullSize ? 'Attendee' : (user.access_level === 3 ? 'Super Admin' : user.access_level === 2 ? 'Event Staff' : 'Attendee'))}
-            </p>
-          )}
+        {s.companyVisible && (
+          <p ref={el => domRefs.current.company = el} style={{
+            fontFamily: 'var(--fb)', fontWeight: 600, fontSize: s.companySize || 10,
+            color: s.subColor, margin: 0,
+            transform: `translate(${s.companyX || 0}px, ${s.companyY || 0}px)`,
+          }}>
+            {user.company || 'Ethos Attendee'}
+          </p>
+        )}
 
-          {s.companyVisible && (
-            <p ref={el => domRefs.current.company = el} style={{
-              fontFamily: 'var(--fb)', fontWeight: 600, fontSize: s.companySize,
-              color: s.subColor, margin: fullSize ? '4px 0' : '0 0 6px',
-              transform: `translate(${s.companyX || 0}px, ${s.companyY || 0}px)`,
-            }}>
-              {user.company || 'Ethos Attendee'}
-            </p>
-          )}
-
-          {s.emailVisible && (
-            <p ref={el => domRefs.current.email = el} style={{
-              fontFamily: 'var(--fb)', fontSize: s.emailSize, color: fullSize ? 'var(--muted)' : '#948B80',
-              margin: 0, opacity: fullSize ? 1 : 0.8,
-              transform: `translate(${s.emailX || 0}px, ${s.emailY || 0}px)`,
-            }}>
-              {user.email}
-            </p>
-          )}
-        </div>
-
-        {fullSize && s.qrVisible && (
-          <div style={{
-            background: '#fff', padding: 12, borderRadius: 16, border: `1.5px solid ${s.accentColor}33`,
-            display: 'inline-block', marginTop: 20,
-            transform: `translate(${s.qrX}px, ${s.qrY}px)`,
-          }} ref={el => domRefs.current.qrWrap = el}>
-            <QRCodeSVG value={user.id || ''} size={s.qrSize} level="M" fgColor={s.textColor} bgColor="#ffffff" />
-          </div>
+        {s.emailVisible && (
+          <p ref={el => domRefs.current.email = el} style={{
+            fontFamily: 'var(--fb)', fontSize: s.emailSize || 9, color: 'var(--muted)',
+            marginTop: 4, margin: 0, opacity: 0.8,
+            transform: `translate(${s.emailX || 0}px, ${s.emailY || 0}px)`,
+          }}>
+            {user.email}
+          </p>
         )}
       </div>
 
-      {!fullSize && s.qrVisible && (
+      {/* QR Section */}
+      {s.qrVisible && (
         <div ref={el => domRefs.current.qrWrap = el} style={{
-          background: '#fff', padding: 8, borderRadius: 12, border: '1px solid #efefef',
+          background: '#fff', padding: 6, borderRadius: 10, border: '1px solid #efefef',
           display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-          boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
-          transform: `translate(${s.qrX}px, ${s.qrY}px)`, zIndex: 2
+          boxShadow: '0 4px 12px rgba(0,0,0,0.04)',
+          transform: `translate(${s.qrX || 0}px, ${s.qrY || 0}px)`, zIndex: 1
         }}>
-          <QRCodeSVG value={user.id || ''} size={s.qrSize || 80} level="H" fgColor={s.textColor} bgColor="#ffffff" />
+          <QRCodeSVG value={user.id || user.email || ''} size={s.qrSize || 64} level="H" fgColor={s.textColor} bgColor="#ffffff" />
         </div>
       )}
 
-      {fullSize && (
-        <p style={{ fontFamily: 'var(--fb)', fontSize: 10, color: 'var(--muted)', marginTop: 16, marginBottom: 8, opacity: 0.6, letterSpacing: '0.1em' }}>
-          ETHOS 2026 OFFICIAL BADGE
-        </p>
-      )}
+      {/* Footer watermark */}
+      <p style={{
+        position: 'absolute', bottom: 8, right: 12,
+        fontFamily: 'var(--fb)', fontSize: 7, color: 'var(--muted)',
+        margin: 0, opacity: 0.4, letterSpacing: '0.1em'
+      }}>
+        ETHOS 2026 OFFICIAL BADGE
+      </p>
     </div>
   );
 });
+
+export default CardPreview;
