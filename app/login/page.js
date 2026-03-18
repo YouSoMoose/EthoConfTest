@@ -171,12 +171,8 @@ export default function LoginPage() {
           Enable Browser Notifications <Bell size={14} />
         </button>
 
-        <p style={{
-          fontSize: 12, color: '#8E8E93', textAlign: 'center',
-          lineHeight: 1.6, fontFamily: 'var(--fb)',
-        }}>
-          Sign in with your organizational Google account — staff/admin access is assigned automatically based on your email.
-        </p>
+
+
 
         <Modal open={termsOpen} onClose={() => setTermsOpen(false)} title="Legal Information" center>
           <div style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: 8, textAlign: 'left', fontFamily: 'var(--fb)' }}>

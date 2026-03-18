@@ -240,14 +240,14 @@ export default function LandingPage() {
           <img src="/assets/ethos-logo-insignia.png" alt="The Circular Economy Conference" style={{ width: '85%', height: '85%', objectFit: 'contain' }} />
         </div>
         <p style={{
-          fontSize: 'clamp(10px, 2vh, 11px)', fontWeight: 800, letterSpacing: '.3em',
+          fontSize: 'clamp(9px, 1.8vh, 10px)', fontWeight: 800, letterSpacing: '.3em',
           color: slide.textMode === 'light' ? 'rgba(255,255,255,.7)' : 'var(--muted)',
           textTransform: 'uppercase', marginBottom: 8, transition: 'color 0.4s ease'
         }}>
           Annual Conference · 2026
         </p>
         <h1 style={{
-          fontFamily: 'var(--fh)', fontSize: 'clamp(36px, 9vh, 48px)', fontWeight: 800,
+          fontFamily: 'var(--fh)', fontSize: 'clamp(32px, 8vh, 40px)', fontWeight: 800,
           color: slide.textMode === 'light' ? '#fff' : 'var(--g)',
           lineHeight: 1, marginBottom: 6, transition: 'color 0.4s ease',
           textShadow: slide.textMode === 'light' ? '0 2px 10px rgba(0,0,0,0.1)' : 'none'
@@ -278,8 +278,8 @@ export default function LandingPage() {
                 backdropFilter: 'blur(25px)', WebkitBackdropFilter: 'blur(25px)',
                 borderRadius: 40,
                 border: '1px solid rgba(255,255,255,0.25)',
-                padding: 'clamp(40px, 8vh, 56px) 32px',
-                maxWidth: 400, width: '100%', textAlign: 'center',
+                padding: 'clamp(32px, 6vh, 44px) 24px',
+                maxWidth: 360, width: '100%', textAlign: 'center',
                 boxShadow: '0 25px 60px rgba(0,0,0,0.12)',
                 position: 'relative', overflow: 'hidden',
               }}>
@@ -290,17 +290,17 @@ export default function LandingPage() {
                   pointerEvents: 'none'
                 }} />
 
-                <s.icon size={containerW.current < 600 ? 56 : 72} color={s.textMode === 'light' ? '#fff' : 'var(--g)'} style={{
+                <s.icon size={containerW.current < 600 ? 44 : 64} color={s.textMode === 'light' ? '#fff' : 'var(--g)'} style={{
                   display: 'block',
                   margin: '0 auto clamp(20px, 4vh, 32px)',
                   filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
                 }} />
                 <h2 style={{
-                  fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 'clamp(28px, 5vh, 32px)',
+                  fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 'clamp(24px, 4.5vh, 28px)',
                   color: s.textMode === 'light' ? '#fff' : 'var(--g)', marginBottom: 14,
                 }}>{s.title}</h2>
                 <p style={{
-                  fontFamily: 'var(--fb)', fontSize: 'clamp(14px, 2.8vh, 16px)',
+                  fontFamily: 'var(--fb)', fontSize: 'clamp(13px, 2.5vh, 15px)',
                   color: s.textMode === 'light' ? 'rgba(255,255,255,.85)' : 'var(--sub)',
                   lineHeight: 1.6, fontWeight: 500
                 }}>{s.desc}</p>
@@ -312,10 +312,10 @@ export default function LandingPage() {
 
       {/* Dots + CTA */}
       <div style={{
-        padding: '0 24px max(32px, env(safe-area-inset-bottom))',
+        padding: '0 24px calc(max(12px, env(safe-area-inset-bottom)) + 24px)',
         maxWidth: 420, width: '100%', margin: '0 auto', zIndex: 10, position: 'relative',
       }}>
-        <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginBottom: 36 }}>
+        <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginBottom: 24 }}>
           {slides.map((_, i) => (
             <button key={i} onClick={() => goTo(i)} style={{
               width: current === i ? 36 : 10, height: 10, borderRadius: 5,
@@ -331,7 +331,7 @@ export default function LandingPage() {
         {isLast ? (
           <button onClick={finishCarousel} style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
-            width: '100%', padding: '20px 24px',
+            width: '100%', padding: '16px 24px',
             background: slide.textMode === 'light' ? '#fff' : 'var(--g)',
             color: slide.textMode === 'light' ? '#1a1814' : '#fff',
             borderRadius: 20, fontFamily: 'var(--fb)',
@@ -343,7 +343,7 @@ export default function LandingPage() {
         ) : (
           <div style={{ display: 'flex', gap: 14 }}>
             <button onClick={finishCarousel} style={{
-              flex: 1, padding: '18px 20px', textAlign: 'center',
+              flex: 1, padding: '15px 20px', textAlign: 'center',
               background: slide.textMode === 'light' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.03)',
               color: slide.textMode === 'light' ? 'rgba(255,255,255,.8)' : 'var(--muted)',
               borderRadius: 20, fontFamily: 'var(--fb)',
@@ -354,7 +354,7 @@ export default function LandingPage() {
               Skip
             </button>
             <button onClick={() => goTo(Math.min(current + 1, slides.length - 1))} style={{
-              flex: 2, padding: '18px 20px',
+              flex: 2, padding: '15px 20px',
               background: slide.textMode === 'light' ? 'rgba(255,255,255,0.25)' : 'var(--g)',
               color: '#fff',
               borderRadius: 20, fontFamily: 'var(--fb)',
