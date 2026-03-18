@@ -151,7 +151,7 @@ function CardEditor({ style, onUpdate, onReset, onClose, cardDOMRefs }) {
             flex: 1, padding: '8px', border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 700,
             background: activeTab === t ? 'var(--as3)' : 'transparent',
             color: activeTab === t ? 'var(--accent)' : 'var(--amuted)',
-            cursor: 'pointer', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            cursor: t === activeTab ? 'default' : 'pointer', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             textTransform: 'uppercase', letterSpacing: '0.05em'
           }}>
             {t === 'size' ? 'Scale' : t === 'pos' ? 'Layout' : 'Toggle'}
@@ -260,7 +260,10 @@ function CardRow({ user, initialStyle, globalUpdate, isPrinting, setPrintingId }
     if (!cardRef.current) return;
     const t = toast.loading('Generating image...');
     try {
-      const dataUrl = await toPng(cardRef.current, { pixelRatio: 3, backgroundColor: '#fff' });
+      // iOS Safari Warmup fix: call once to ensure assets are loaded in html-to-image cache
+      await toPng(cardRef.current, { pixelRatio: 3, backgroundColor: '#fff', cacheBust: true });
+      
+      const dataUrl = await toPng(cardRef.current, { pixelRatio: 3, backgroundColor: '#fff', cacheBust: true });
       const img = new Image();
       img.src = dataUrl;
       img.onload = () => {

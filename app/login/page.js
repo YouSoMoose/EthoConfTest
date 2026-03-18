@@ -1,13 +1,25 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
-import { useState } from 'react';
+import { signIn, useSession } from 'next-auth/react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Info } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function LoginPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (status === 'authenticated' && session?.profile) {
+      const level = session.profile.access_level ?? 0;
+      if (level >= 2) router.replace('/admin');
+      else if (level === 1) router.replace('/company');
+      else router.replace('/app');
+    }
+  }, [session, status, router]);
 
   async function handleGoogle() {
     setLoading(true);
@@ -23,6 +35,22 @@ export default function LoginPage() {
       }
     }
   };
+
+  if (status === 'loading' || (status === 'authenticated' && session?.profile)) {
+    return (
+      <div style={{
+        minHeight: '100dvh', background: 'var(--hero)',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      }}>
+        <div style={{
+          width: 24, height: 24, border: '3px solid rgba(255,255,255,.2)',
+          borderTopColor: '#fff', borderRadius: '50%',
+          animation: 'spin 0.8s linear infinite', margin: '0 auto 16px',
+        }} />
+        <p style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'rgba(255,255,255,.5)' }}>Checking session…</p>
+      </div>
+    );
+  }
 
   return (
     <div style={{

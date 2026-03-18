@@ -4,7 +4,7 @@ import { memo, useState, useEffect } from 'react';
 import Avatar from '@/components/Avatar';
 import { QRCodeSVG } from 'qrcode.react';
 
-const DEFAULT_STYLE = {
+export const DEFAULT_STYLE = {
   nameSize: 20,    nameX: 0,    nameY: 0,    nameVisible: true,
   roleSize: 13,    roleX: 0,    roleY: 0,    roleVisible: true,
   companySize: 12, companyX: 0, companyY: 0, companyVisible: true,
@@ -101,7 +101,6 @@ export const CardPreview = memo(function CardPreview({
               <img
                 src={logoSrc}
                 alt="Ethos"
-                crossOrigin="anonymous"
                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
               />
             </div>
