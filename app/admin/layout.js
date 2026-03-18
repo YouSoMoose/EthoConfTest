@@ -5,11 +5,12 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import PageTransition from '@/components/PageTransition';
+import AdminSwitch from '@/components/AdminSwitch';
 
 import { LayoutDashboard, CheckCircle, MessageSquare, Calendar, Users, User, Leaf, Menu, X, CreditCard } from 'lucide-react';
 
 const tabs = [
-  { label: 'Dashboard', href: '/admin', icon: LayoutDashboard, show: (level) => level >= 2 },
+  { label: 'Dashboard', href: '/admin', icon: LayoutDashboard, show: (level) => level >= 3 },
   { label: 'Check-in', href: '/admin/checkin', icon: CheckCircle, show: (level) => level >= 2 },
   { label: 'Messages', href: '/admin/messages', icon: MessageSquare, show: (level) => level >= 3 },
   { label: 'Schedule', href: '/admin/schedule', icon: Calendar, show: (level) => level >= 3 },
@@ -32,8 +33,8 @@ export default function AdminLayout({ children }) {
   }, [status, router]);
 
   useEffect(() => {
-    if (level === 2 && pathname !== '/admin' && status === 'authenticated') {
-      router.replace('/admin');
+    if (level === 2 && pathname !== '/admin/checkin' && status === 'authenticated') {
+      router.replace('/admin/checkin');
     }
   }, [level, pathname, router, status]);
 
@@ -54,14 +55,7 @@ export default function AdminLayout({ children }) {
         }}>
           <h1 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 16, color: 'var(--atext)' }}>Staff Scanner</h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Link href="/app" style={{
-              background: 'var(--ad)', border: '1px solid var(--ab)', borderRadius: 8,
-              padding: '6px 12px', fontFamily: 'var(--fb)', fontSize: 12,
-              fontWeight: 600, color: 'var(--accent)', textDecoration: 'none',
-              display: 'flex', alignItems: 'center', gap: 6
-            }}>
-              <User size={14} /> Attendee View
-            </Link>
+            <AdminSwitch initialMode="admin" admin />
             <button
               type="button"
               onClick={() => signOut({ redirect: true, callbackUrl: '/login' })}
@@ -127,14 +121,9 @@ export default function AdminLayout({ children }) {
         </nav>
 
         <div style={{ marginTop: 'auto', padding: '12px 16px' }}>
-          <Link href="/app" style={{
-            display: 'flex', alignItems: 'center', gap: 8,
-            padding: '10px 12px', borderRadius: 10, marginBottom: 4,
-            background: 'var(--ad)', color: 'var(--accent)',
-            fontFamily: 'var(--fb)', fontSize: 13, fontWeight: 500,
-          }}>
-            <User size={16} /> Attendee View
-          </Link>
+          <div style={{ padding: '0 8px' }}>
+            <AdminSwitch initialMode="admin" admin />
+          </div>
           <button
             type="button"
             onClick={() => signOut({ redirect: true, callbackUrl: '/login' })}
@@ -175,14 +164,7 @@ export default function AdminLayout({ children }) {
           <Link href="/admin" style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 15, color: 'var(--atext)' }}>Admin</Link>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Link href="/app" style={{
-            background: 'var(--ad)', border: '1px solid var(--ab)', borderRadius: 8,
-            padding: '5px 10px', fontFamily: 'var(--fb)', fontSize: 11,
-            fontWeight: 600, color: 'var(--accent)', whiteSpace: 'nowrap',
-            display: 'flex', alignItems: 'center', gap: 4
-          }}>
-            <User size={12} /> Attendee
-          </Link>
+            <AdminSwitch initialMode="admin" admin />
           <button
             type="button"
             onClick={() => signOut({ redirect: true, callbackUrl: '/login' })}

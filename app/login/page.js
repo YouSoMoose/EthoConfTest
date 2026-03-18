@@ -49,7 +49,7 @@ export default function LoginPage() {
         if (inAdmin) router.replace('/admin');
         else router.replace('/app');
       } else if (level === 2) {
-        router.replace('/admin');
+        router.replace('/admin/checkin');
       } else if (level === 1) {
         router.replace('/company');
       } else {

@@ -9,6 +9,7 @@ import Loader from '@/components/Loader';
 import { Home, Calendar, Wallet, Scan, MessageCircle, FileText, CreditCard, ChevronRight, LogOut, Settings, Bell } from 'lucide-react';
 import { CardPreview } from '@/components/CardPreview';
 import { useScrollHero } from '@/lib/animations';
+import AdminSwitch from '@/components/AdminSwitch';
 
 const LIQUID = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
 const LIQUID_SLOW = 'cubic-bezier(0.32, 0.72, 0, 1)';
@@ -186,18 +187,8 @@ export default function AttendeeDashboard() {
             <img src="/assets/ethos-logo-insignia.png" alt="" style={{ width: 44, height: 44, objectFit: 'contain' }} />
           </div>
 
-          <div style={{ marginTop: 28, display: 'flex', gap: 12 }}>
-            {profile?.access_level >= 3 && (
-              <Link href="/admin" style={{
-                flex: 1, background: 'rgba(0,0,0,0.06)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', border: '1px solid rgba(0,0,0,0.1)',
-                borderRadius: 14, padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                color: 'var(--g)', fontSize: 13, fontWeight: 700, textDecoration: 'none',
-                transition: `transform 0.4s ${LIQUID}`,
-                WebkitTapHighlightColor: 'transparent',
-              }}>
-                <Settings size={16} /> Admin Panel
-              </Link>
-            )}
+          <div style={{ marginTop: 28, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <AdminSwitch initialMode="app" />
             <button
               type="button"
               onClick={(e) => {
@@ -206,7 +197,7 @@ export default function AttendeeDashboard() {
               }}
               className="signout-btn bubble-click"
               style={{
-                flex: profile?.access_level >= 3 ? 0.4 : 1,
+                width: '100%',
                 background: 'rgba(0,0,0,0.04)',
                 border: '1px solid rgba(0,0,0,0.08)',
                 borderRadius: 14, padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
