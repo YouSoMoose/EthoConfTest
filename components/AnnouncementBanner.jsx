@@ -1,10 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { supabase } from '@/lib/supabase';
-
-const DISMISSED_KEY = 'ethos_dismissed_announcements';
 
 function getDismissed(uid) {
   if (!uid) return [];
@@ -25,87 +23,74 @@ export default function AnnouncementBanner() {
   const [announcements, setAnnouncements] = useState([]);
   const [visible, setVisible] = useState([]);
   const [exiting, setExiting] = useState([]);
-  // Fetch announcements periodically since Realtime might not be enabled for announcements
+  // Track IDs we've already processed to prevent double-adding from both sources
+  const seenIds = useRef(new Set());
+
+  const addAnnouncement = (ann, uid) => {
+    // If we've already processed this ID from either source, skip it
+    if (seenIds.current.has(ann.id)) return;
+    const dismissed = getDismissed(uid);
+    if (dismissed.includes(ann.id)) return;
+    seenIds.current.add(ann.id);
+    setAnnouncements(prev => [ann, ...prev]);
+    setVisible(prev => [...prev, ann.id]);
+  };
+
+  // Polling — only runs on mount and checks for new announcements
   useEffect(() => {
-    if (!session?.profile?.id) return;
+    const uid = session?.user?.id || session?.profile?.id;
+    if (!uid) return;
 
     const fetchAnnouncements = async () => {
       try {
         const res = await fetch(`/api/announcements?_t=${Date.now()}`);
-        if (res.ok) {
-          const data = await res.json();
-          const dismissed = getDismissed(session.profile.id);
-          
-          // Data is sorted descending (latest first). We only care about the latest ONE. 
-          const fresh = (data || []).filter(a => !dismissed.includes(a.id));
-          
-          if (fresh.length > 0) {
-            const latest = fresh[0];
-            const olderIds = fresh.slice(1).map(a => a.id);
-            
-            // Auto-dismiss older announcements so they don't pop up sequentially
-            if (olderIds.length > 0) {
-              const newDismissed = [...dismissed, ...olderIds];
-              localStorage.setItem(`ethos_dismissed_${session.profile.id}`, JSON.stringify(newDismissed));
-            }
+        if (!res.ok) return;
+        const data = await res.json();
+        const dismissed = getDismissed(uid);
+        const fresh = (data || []).filter(a => !dismissed.includes(a.id));
+        if (fresh.length === 0) return;
 
-            setAnnouncements(prev => {
-              if (prev.some(p => p.id === latest.id)) return prev;
-              return [latest, ...prev];
-            });
-            
-            setVisible(prev => {
-              // Only add if not already visible
-              if (prev.includes(latest.id)) return prev;
-              return [...prev, latest.id];
-            });
-          }
-        }
-      } catch {}
+        const latest = fresh[0];
+        // Auto-dismiss older ones silently
+        fresh.slice(1).forEach(a => addDismissed(uid, a.id));
+        addAnnouncement(latest, uid);
+      } catch { }
     };
 
     fetchAnnouncements();
-    const interval = setInterval(fetchAnnouncements, 10000); // Check every 10s
+    const interval = setInterval(fetchAnnouncements, 10000);
     return () => clearInterval(interval);
-  }, [session?.profile?.id]);
+  }, [session?.user?.id, session?.profile?.id]);
 
-  // Keep Supabase Realtime just in case it is enabled, but also limit it to 1 popup
+  // Realtime — listens for new inserts only
   useEffect(() => {
-    if (!session?.profile?.id) return;
+    const uid = session?.user?.id || session?.profile?.id;
+    if (!uid) return;
+
     const channel = supabase
       .channel('announcements-realtime')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'announcements' }, (payload) => {
-        const newAnn = payload.new;
-        const dismissed = getDismissed(session.profile.id);
-        if (dismissed.includes(newAnn.id)) return;
-
-        setAnnouncements(prev => {
-          if (prev.some(p => p.id === newAnn.id)) return prev;
-          return [newAnn, ...prev];
-        });
-        setVisible(prev => {
-          if (prev.includes(newAnn.id)) return prev;
-          return [...prev, newAnn.id];
-        });
+        addAnnouncement(payload.new, uid);
       })
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [session?.profile?.id]);
+  }, [session?.user?.id, session?.profile?.id]);
 
   const dismiss = (id) => {
+    const uid = session?.user?.id || session?.profile?.id;
     setExiting(e => [...e, id]);
     setTimeout(() => {
-      addDismissed(session?.profile?.id, id);
+      addDismissed(uid, id);
       setVisible(v => v.filter(x => x !== id));
       setExiting(e => e.filter(x => x !== id));
     }, 300);
   };
 
-  // Only show 1 at a time to completely eliminate screen spam on fresh login
+  const uid = session?.user?.id || session?.profile?.id;
   const activeAnnouncements = announcements.filter(a => visible.includes(a.id)).slice(0, 1);
 
-  if (!session?.profile || activeAnnouncements.length === 0) return null;
+  if (!uid || activeAnnouncements.length === 0) return null;
 
   return (
     <div style={{
@@ -145,7 +130,6 @@ export default function AnnouncementBanner() {
               animationDelay: isExiting ? '0s' : `${i * 0.08}s`,
             }}
           >
-            {/* App icon */}
             <div style={{
               width: 38, height: 38, borderRadius: 10,
               background: 'linear-gradient(135deg, #2d5016 0%, #1a4a3c 100%)',

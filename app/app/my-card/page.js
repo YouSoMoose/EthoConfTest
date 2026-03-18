@@ -10,8 +10,9 @@ import { QRCodeSVG } from 'qrcode.react';
 import toast from 'react-hot-toast';
 import {
   Camera, Building, User as UserIcon,
-  Type, Mail, FileText, Linkedin, ChevronLeft
+  Type, Mail, FileText, Linkedin, ChevronLeft, CheckCircle2
 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 const DEFAULT_STYLE = {
   nameSize: 20, nameX: 0, nameY: 0, nameVisible: true,
@@ -45,9 +46,6 @@ const LIVE_MAP = {
   qrY: (v, r, s) => r.qrWrap && (r.qrWrap.style.transform = `translate(${s.qrX ?? 0}px, ${v}px)`),
 };
 
-// ─────────────────────────────────────────────
-// CardEditor
-// ─────────────────────────────────────────────
 function CardEditor({ style, onUpdate, onReset, cardDOMRefs }) {
   const [activeTab, setActiveTab] = useState('size');
   const [localStyle, setLocalStyle] = useState(style);
@@ -129,7 +127,6 @@ function CardEditor({ style, onUpdate, onReset, cardDOMRefs }) {
 
   return (
     <div style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 24, padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
-      {/* Tabs */}
       <div style={{ display: 'flex', background: 'var(--as1)', borderRadius: 12, padding: 4 }}>
         {['size', 'pos', 'vis'].map(t => (
           <button
@@ -204,9 +201,6 @@ function CardEditor({ style, onUpdate, onReset, cardDOMRefs }) {
   );
 }
 
-// ─────────────────────────────────────────────
-// Main page content
-// ─────────────────────────────────────────────
 function MyCardContent() {
   const { data: session, update: updateSession } = useSession();
   const profile = session?.profile;
@@ -224,11 +218,33 @@ function MyCardContent() {
   const [resumeLink, setResumeLink] = useState('');
   const [saving, setSaving] = useState(false);
   const [qrExpanded, setQrExpanded] = useState(false);
+  const [showSuccessQR, setShowSuccessQR] = useState(false);
 
   const cardRef = useRef(null);
   const domRefs = useRef({});
 
-  // Lock body scroll when QR modal is open
+  useEffect(() => {
+    if (!profile?.id || profile.checked_in) return;
+
+    const channel = supabase
+      .channel(`checkin-${profile.id}`)
+      .on('postgres_changes', { 
+        event: 'UPDATE', 
+        schema: 'public', 
+        table: 'profiles', 
+        filter: `id=eq.${profile.id}` 
+      }, (payload) => {
+        if (payload.new.checked_in) {
+          toast.success('Check-in Successful!', { duration: 3000 });
+          updateSession();
+          setTimeout(() => router.push('/app'), 1000);
+        }
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [profile?.id, profile?.checked_in, router, updateSession]);
+
   useEffect(() => {
     if (qrExpanded) {
       document.body.style.overflow = 'hidden';
@@ -238,10 +254,7 @@ function MyCardContent() {
     return () => { document.body.style.overflow = ''; };
   }, [qrExpanded]);
 
-  const initializedRef = useRef(false);
   useEffect(() => {
-    // Only populate fields once on first load — prevents unsaved edits from
-    // being wiped if the session object re-renders mid-edit
     if (profile) {
       setName(profile.name || '');
       setAvatar(profile.avatar || '');
@@ -252,7 +265,6 @@ function MyCardContent() {
       setResumeLink(profile.resume_link || '');
     }
   }, [profile]);
-
 
   const saveProfile = async () => {
     if (!name || name.length < 2) return toast.error('Valid Name is required');
@@ -269,8 +281,12 @@ function MyCardContent() {
       });
       if (res.ok) {
         toast.success('Profile saved', { id: t });
-        updateSession(); // fire and forget — don't block redirect
-        router.push('/app');
+        updateSession(); 
+        if (profile.checked_in === false) {
+          setShowSuccessQR(true);
+        } else {
+          router.push('/app');
+        }
       } else {
         toast.error('Failed to save', { id: t });
       }
@@ -290,8 +306,79 @@ function MyCardContent() {
   };
 
   if (!profile) return <Loader />;
-
+  
   const qrValue = profile.id || profile.email || 'conference-placeholder';
+
+  if (showSuccessQR) {
+    return (
+      <div className="page-enter" style={{ 
+        minHeight: '100dvh', display: 'flex', flexDirection: 'column', 
+        alignItems: 'center', justifyContent: 'center', padding: 20, textAlign: 'center',
+        background: 'var(--bg)'
+      }}>
+        <div style={{
+          background: 'var(--white)', padding: 32, borderRadius: 32,
+          boxShadow: '0 20px 60px rgba(0,0,0,0.08)', border: '1px solid var(--border)',
+          maxWidth: 400, width: '100%', animation: 'fadeUp 0.5s ease both'
+        }}>
+          <div style={{ marginBottom: 28 }}>
+            <div style={{ 
+              width: 56, height: 56, borderRadius: '50%', background: 'var(--as1)', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px',
+              color: 'var(--g)'
+            }}>
+              <CheckCircle2 size={32} />
+            </div>
+            <h2 style={{ fontFamily: 'var(--fh)', fontSize: 24, fontWeight: 800, margin: '0 0 8px', color: 'var(--text)' }}>
+              Profile Ready
+            </h2>
+            <p style={{ color: 'var(--sub)', fontSize: 15, lineHeight: 1.5, fontWeight: 500 }}>
+              Show this QR code to any conference staff member to complete your check-in.
+            </p>
+          </div>
+
+          <div style={{
+            padding: 20, background: '#fff', borderRadius: 24,
+            border: '2px solid var(--g)', display: 'inline-block',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.06)', marginBottom: 28
+          }}>
+            <QRCodeSVG value={qrValue} size={240} level="H" fgColor="#000" />
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+            <div className="loading-pulse" style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--g)' }} />
+            <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--g)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Waiting for Staff Scan
+            </span>
+          </div>
+        </div>
+        
+        <button 
+          onClick={() => setShowSuccessQR(false)}
+          style={{ 
+            marginTop: 32, background: 'none', border: 'none', 
+            color: 'var(--sub)', fontSize: 13, fontWeight: 700, 
+            cursor: 'pointer', opacity: 0.8, textDecoration: 'underline'
+          }}
+        >
+          Go Back to Edit Profile
+        </button>
+
+        <style>{`
+          @keyframes pulse {
+            0% { opacity: 0.4; transform: scale(0.85); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 0.4; transform: scale(0.85); }
+          }
+          .loading-pulse { animation: pulse 2.5s infinite ease-in-out; }
+          @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   return (
     <div className="page-enter" style={{ paddingBottom: 100 }}>
@@ -328,14 +415,6 @@ function MyCardContent() {
               transformOrigin: 'top center',
               display: 'flex', flexDirection: 'column', alignItems: 'center',
             }}>
-              {/*
-                FIX 1: Avatar centering
-                Make sure CardPreview renders its avatar inside a centered flex wrapper.
-                If you control CardPreview, wrap the Avatar component like this:
-                  <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-                    <Avatar src={avatar} name={name} size={64} />
-                  </div>
-              */}
               <CardPreview
                 user={{ ...profile, name, avatar, role, company }}
                 style={DEFAULT_STYLE}
@@ -376,18 +455,8 @@ function MyCardContent() {
                 <UserIcon size={22} color="var(--g)" /> Edit Your Info
               </h3>
 
-              {/* Avatar upload — FIX 1: centered with flexbox */}
-              <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                width: '100%',
-                marginBottom: 10,
-              }}>
-                <div style={{
-                  position: 'relative',
-                  width: 'clamp(80px,25vw,110px)',
-                  height: 'clamp(80px,25vw,110px)',
-                }}>
+              <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginBottom: 10 }}>
+                <div style={{ position: 'relative', width: 'clamp(80px,25vw,110px)', height: 'clamp(80px,25vw,110px)' }}>
                   <Avatar src={avatar} name={name} size="100%" />
                   <label style={{
                     position: 'absolute', bottom: 0, right: 0,
@@ -402,7 +471,6 @@ function MyCardContent() {
                 </div>
               </div>
 
-              {/* Fields */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {[
                   { label: 'Full Name', icon: <Type size={18} color="var(--muted)" />, value: name, setter: setName, placeholder: 'e.g. John Doe', type: 'text', maxLength: 40 },
@@ -413,33 +481,20 @@ function MyCardContent() {
                 ].map(({ label, icon, value, setter, placeholder, type, maxLength }) => (
                   <div key={label} className="input-group">
                     <label className="section-label">{label}</label>
-                    <div style={{ 
-                      display: 'flex', alignItems: 'center', gap: 12, 
-                      padding: '0 16px', borderRadius: 16,
-                      border: 'none', transition: 'all 0.2s'
-                    }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px', borderRadius: 16, border: 'none', transition: 'all 0.2s' }}>
                       {icon}
                       <input
-                        type={type}
-                        value={value}
-                        onChange={e => setter(e.target.value)}
-                        placeholder={placeholder}
-                        maxLength={maxLength}
-                        style={{ 
-                          flex: 1, background: 'transparent', border: 'none', 
-                          padding: '14px 0', fontSize: 15, outline: 'none', 
-                          fontWeight: 500, color: 'var(--text)'
-                        }}
+                        type={type} value={value} onChange={e => setter(e.target.value)}
+                        placeholder={placeholder} maxLength={maxLength}
+                        style={{ flex: 1, background: 'transparent', border: 'none', padding: '14px 0', fontSize: 15, outline: 'none', fontWeight: 500, color: 'var(--text)' }}
                       />
                     </div>
                   </div>
                 ))}
-                {/* Bio */}
                 <div className="input-group">
                   <label className="section-label">Bio</label>
                   <textarea
-                    value={bio}
-                    onChange={e => setBio(e.target.value)}
+                    value={bio} onChange={e => setBio(e.target.value)}
                     placeholder="Tell us about yourself..."
                     style={{ 
                       width: '100%', background: 'transparent', border: 'none', 
@@ -449,39 +504,19 @@ function MyCardContent() {
                     }}
                   />
                 </div>
-
-                {/* Email — disabled */}
                 <div className="input-group">
                   <label className="section-label">Email Address</label>
-                  <div style={{ 
-                    display: 'flex', alignItems: 'center', gap: 12, 
-                    padding: '0 16px', borderRadius: 16, 
-                    border: 'none', opacity: 0.6 
-                  }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px', borderRadius: 16, border: 'none', opacity: 0.6 }}>
                     <Mail size={18} color="var(--muted)" />
-                    <input
-                      type="email" value={profile.email} disabled
-                      style={{ 
-                        flex: 1, background: 'transparent', border: 'none', 
-                        padding: '14px 0', fontSize: 15, outline: 'none',
-                        color: 'var(--text)'
-                      }}
-                    />
+                    <input type="email" value={profile.email} disabled style={{ flex: 1, background: 'transparent', border: 'none', padding: '14px 0', fontSize: 15, outline: 'none', color: 'var(--text)' }} />
                   </div>
                 </div>
               </div>
 
-              {/* Action buttons */}
               <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
+                <button onClick={() => setIsEditing(false)} style={{ flex: 1, background: 'rgba(0,0,0,0.05)', color: 'var(--text)', border: 'none', borderRadius: 16, padding: '16px', fontFamily: 'var(--fb)', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>Cancel</button>
                 <button
-                  onClick={() => setIsEditing(false)}
-                  style={{ flex: 1, background: 'rgba(0,0,0,0.05)', color: 'var(--text)', border: 'none', borderRadius: 16, padding: '16px', fontFamily: 'var(--fb)', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={saveProfile}
-                  disabled={saving}
+                  onClick={saveProfile} disabled={saving}
                   style={{
                     flex: 2, background: 'var(--g)', color: '#fff', border: 'none', borderRadius: 16, padding: '16px',
                     fontFamily: 'var(--fb)', fontWeight: 800, fontSize: 15, cursor: 'pointer',
@@ -497,76 +532,27 @@ function MyCardContent() {
         )}
       </div>
 
-      {/*
-        FIX 2: QR modal — replaced <Modal> with a direct portal-style overlay.
-        The old <Modal center> wrapper was causing the QR to collapse/misalign.
-        This renders a fixed backdrop div with the modal content centered inside it.
-        stopPropagation on the inner card prevents clicks on the QR from closing the modal.
-      */}
       {qrExpanded && (
         <div
           onClick={() => setQrExpanded(false)}
           style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0, 0, 0, 0.6)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 9999,
-            cursor: 'pointer',
-            padding: '20px',
+            position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.6)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 9999, cursor: 'pointer', padding: '20px',
           }}
         >
           <div
-            onClick={e => e.stopPropagation()}
-            className="page-enter"
+            onClick={e => e.stopPropagation()} className="page-enter"
             style={{
-              background: '#fff',
-              borderRadius: 32,
-              padding: 'clamp(20px, 5vw, 40px)',
-              textAlign: 'center',
-              maxWidth: '90vw',
-              width: '100%',
-              maxWidth: 380,
-              cursor: 'default',
+              background: '#fff', borderRadius: 32, padding: 'clamp(20px, 5vw, 40px)',
+              textAlign: 'center', maxWidth: 380, width: '100%', cursor: 'default',
             }}
           >
-            {/* QR container */}
-            <div style={{
-              padding: 16,
-              background: '#fff',
-              border: '2px solid var(--border)',
-              borderRadius: 24,
-              display: 'inline-block',
-              boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
-            }}>
-              <QRCodeSVG
-                value={qrValue}
-                size={240}
-                level="H"
-                fgColor="#413429"
-                bgColor="#ffffff"
-                style={{ display: 'block' }}
-              />
+            <div style={{ padding: 16, background: '#fff', border: '2px solid var(--border)', borderRadius: 24, display: 'inline-block', boxShadow: '0 10px 40px rgba(0,0,0,0.08)' }}>
+              <QRCodeSVG value={qrValue} size={240} level="H" fgColor="#413429" bgColor="#ffffff" style={{ display: 'block' }} />
             </div>
-
-            <h2 style={{
-              marginTop: 24,
-              marginBottom: 6,
-              fontSize: 'clamp(20px, 5vw, 26px)',
-              fontWeight: 800,
-              color: '#413429',
-              fontFamily: 'var(--fh)',
-            }}>
-              {name}
-            </h2>
-            <p
-              onClick={() => setQrExpanded(false)}
-              style={{ color: 'var(--muted)', fontSize: 13, cursor: 'pointer', margin: 0 }}
-            >
-              Tap anywhere to close
-            </p>
+            <h2 style={{ marginTop: 24, marginBottom: 6, fontSize: 'clamp(20px, 5vw, 26px)', fontWeight: 800, color: '#413429', fontFamily: 'var(--fh)' }}>{name}</h2>
+            <p onClick={() => setQrExpanded(false)} style={{ color: 'var(--muted)', fontSize: 13, cursor: 'pointer', margin: 0 }}>Tap anywhere to close</p>
           </div>
         </div>
       )}
@@ -574,9 +560,6 @@ function MyCardContent() {
   );
 }
 
-// ─────────────────────────────────────────────
-// Export
-// ─────────────────────────────────────────────
 export default function MyCardPage() {
   return (
     <Suspense fallback={<Loader />}>
