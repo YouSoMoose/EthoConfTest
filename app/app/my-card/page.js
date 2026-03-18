@@ -75,6 +75,7 @@ function MyCardContent() {
   const [qrExpanded, setQrExpanded] = useState(false);
   const [showSuccessQR, setShowSuccessQR] = useState(false);
   const [isCheckinSuccess, setIsCheckinSuccess] = useState(false);
+  const [isBeingScanned, setIsBeingScanned] = useState(false);
 
   const cardRef = useRef(null);
   const domRefs = useRef({});
@@ -136,6 +137,29 @@ function MyCardContent() {
       if (pollInterval) clearInterval(pollInterval);
     };
   }, [profile?.id, profile?.checked_in, router, updateSession, showSuccessQR, isCheckinSuccess]);
+
+  // 3. New Connection Realtime Listener (for "You got scanned")
+  useEffect(() => {
+    if (!profile?.id) return;
+
+    const channel = supabase
+      .channel(`scanned-${profile.id}`)
+      .on('postgres_changes', { 
+        event: 'INSERT', 
+        schema: 'public', 
+        table: 'connections',
+        filter: `scanned_id=eq.${profile.id}`
+      }, (payload) => {
+        console.log('[DEBUG] Connection Insert (Scanned!):', payload);
+        setIsBeingScanned(true);
+        setTimeout(() => setIsBeingScanned(false), 4000);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [profile?.id]);
 
   useEffect(() => {
     if (qrExpanded) {
@@ -475,6 +499,46 @@ function MyCardContent() {
             >
               <X size={28} />
             </button>
+          </div>
+        </div>
+      )}
+      {/* "You got scanned" Celebration Overlay */}
+      {isBeingScanned && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 100000,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          pointerEvents: 'none',
+        }}>
+          <div style={{
+            textAlign: 'center', animation: 'successPop 0.8s var(--liquid) both',
+            padding: 24, maxWidth: 400, width: '100%'
+          }}>
+            <div style={{
+              width: 100, height: 100, borderRadius: 50, background: 'var(--g)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              margin: '0 auto 24px', color: '#fff', boxShadow: '0 12px 40px rgba(62, 92, 38, 0.4)',
+              position: 'relative'
+            }}>
+              <QrCode size={50} />
+              {[...Array(12)].map((_, i) => (
+                <div key={i} style={{
+                  position: 'absolute', top: '50%', left: '50%',
+                  width: 8, height: 8, borderRadius: '50%',
+                  background: i % 2 === 0 ? 'var(--accent)' : 'var(--g)',
+                  '--tx': `${(Math.cos(i * 30 * Math.PI / 180) * 120)}px`,
+                  '--ty': `${(Math.sin(i * 30 * Math.PI / 180) * 120)}px`,
+                  animation: 'particleBurst 1s ease-out both',
+                }} />
+              ))}
+            </div>
+            <h2 style={{ fontFamily: 'var(--fh)', fontSize: 28, fontWeight: 800, color: 'var(--g)', margin: '0 0 8px' }}>
+              You Just Got Scanned!
+            </h2>
+            <p style={{ fontFamily: 'var(--fb)', fontSize: 17, color: 'var(--sub)', margin: 0, fontWeight: 700 }}>
+              Someone just added you to their wallet. 🥳
+            </p>
           </div>
         </div>
       )}

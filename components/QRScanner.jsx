@@ -12,6 +12,7 @@ export default function QRScanner() {
   const canvasRef = useRef(null);
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState(null);
+  const [showCelebration, setShowCelebration] = useState(false);
   const streamRef = useRef(null);
   const animRef = useRef(null);
 
@@ -70,6 +71,7 @@ export default function QRScanner() {
       const data = await res.json();
       if (res.ok) {
         setResult({ success: true, message: data.message || 'Added to Wallet!', profile: data.profile });
+        setShowCelebration(true);
         toast.success(data.message || 'Added to Wallet!');
       } else {
         setResult({ success: false, error: data.error, raw: cleanId });
@@ -165,6 +167,58 @@ export default function QRScanner() {
               padding: '8px'
             }}>
               Go to Wallet <Wallet size={14} />
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {showCelebration && result?.success && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 100000,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+        }}>
+          <div style={{
+            textAlign: 'center', animation: 'successPop 0.8s var(--liquid) both',
+            padding: 24, maxWidth: 400, width: '100%'
+          }}>
+            <div style={{
+              width: 100, height: 100, borderRadius: 50, background: 'var(--g)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              margin: '0 auto 24px', color: '#fff', boxShadow: '0 12px 40px rgba(62, 92, 38, 0.4)',
+              position: 'relative'
+            }}>
+              <CheckCircle size={50} />
+              {/* Simple CSS Particles */}
+              {[...Array(12)].map((_, i) => (
+                <div key={i} style={{
+                  position: 'absolute', top: '50%', left: '50%',
+                  width: 8, height: 8, borderRadius: '50%',
+                  background: i % 2 === 0 ? 'var(--accent)' : 'var(--g)',
+                  '--tx': `${(Math.cos(i * 30 * Math.PI / 180) * 120)}px`,
+                  '--ty': `${(Math.sin(i * 30 * Math.PI / 180) * 120)}px`,
+                  animation: 'particleBurst 1s ease-out both',
+                }} />
+              ))}
+            </div>
+            <h2 style={{ fontFamily: 'var(--fh)', fontSize: 28, fontWeight: 800, color: 'var(--g)', margin: '0 0 8px' }}>
+              Scan Successful!
+            </h2>
+            <p style={{ fontFamily: 'var(--fb)', fontSize: 17, color: 'var(--text)', margin: '0 0 4px', fontWeight: 700 }}>
+              {result.profile?.name}
+            </p>
+            <p style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'var(--sub)', margin: '0 0 32px', fontWeight: 600 }}>
+              Has been added to your wallet.
+            </p>
+            
+            <Btn onClick={() => setShowCelebration(false)} style={{ width: '100%', padding: '16px' }}>Great!</Btn>
+            
+            <Link href="/app/wallet" style={{ 
+              display: 'block', marginTop: 16, fontFamily: 'var(--fb)', fontSize: 14, 
+              color: 'var(--sub)', fontWeight: 700, textDecoration: 'underline' 
+            }}>
+              View in Wallet
             </Link>
           </div>
         </div>
