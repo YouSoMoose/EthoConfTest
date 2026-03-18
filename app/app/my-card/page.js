@@ -112,7 +112,23 @@ function MyCardContent() {
 
     // 2. High-frequency polling ONLY when the QR screen is active
     let pollInterval;
-
+    if (showSuccessQR && !isCheckinSuccess) {
+      console.log('[DEBUG] Starting 1s internal API poll...');
+      pollInterval = setInterval(async () => {
+        try {
+          const res = await fetch('/api/profile');
+          if (res.ok) {
+            const data = await res.json();
+            if (isCheckedIn(data.checked_in)) {
+              console.log('[DEBUG] 1s API Poll: SUCCESS!');
+              handleSuccess();
+            }
+          }
+        } catch (e) {
+          console.error('[DEBUG] Poll error:', e);
+        }
+      }, 1000);
+    }
 
     return () => {
       supabase.removeChannel(channel);

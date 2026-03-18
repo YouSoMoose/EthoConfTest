@@ -156,9 +156,7 @@ export default function AttendeeDashboard() {
   const upNext = schedule[0];
 
   return (
-    <div className="page-enter">
-      {/* Gradient header hero — scales down on scroll */}
-      <div
+
         ref={heroRef}
         style={{
           background: 'var(--hero)',

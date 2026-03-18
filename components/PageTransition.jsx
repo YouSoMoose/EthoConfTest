@@ -3,14 +3,23 @@
 import { usePathname } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
 
-const TAB_ORDER = ['/app', '/app/schedule', '/app/pitches', '/app/passport', '/app/chat'];
+const ATTENDEE_TABS = ['/app/my-card', '/app', '/app/schedule', '/app/wallet', '/app/scan', '/app/chat'];
+const ADMIN_TABS = ['/admin', '/admin/checkin', '/admin/messages', '/admin/schedule', '/admin/users'];
 
 function getTabIndex(path) {
-  if (TAB_ORDER.includes(path)) return TAB_ORDER.indexOf(path);
-  for (let i = TAB_ORDER.length - 1; i >= 1; i--) {
-    if (path.startsWith(TAB_ORDER[i])) return i;
+  // Separate handling for Admin vs App
+  if (path.startsWith('/admin')) {
+    if (path === '/admin') return 0;
+    const idx = ADMIN_TABS.findIndex(t => path.startsWith(t) && t !== '/admin');
+    return idx === -1 ? 0 : idx;
   }
-  return 0;
+  
+  // App/Attendee paths
+  if (path === '/app') return 1; // '/app' is Home, index 1 (after my-card)
+  if (path.startsWith('/app/my-card')) return 0;
+  
+  const idx = ATTENDEE_TABS.findIndex(t => path.startsWith(t) && t !== '/app' && t !== '/app/my-card');
+  return idx === -1 ? 1 : idx;
 }
 
 export default function PageTransition({ children }) {
@@ -25,13 +34,22 @@ export default function PageTransition({ children }) {
     if (pathname !== prevPathRef.current) {
       const oldIndex = getTabIndex(prevPathRef.current);
       const newIndex = getTabIndex(pathname);
+      
+      // Direction calculation
       // Direction 1 means new page comes from Right, old page exits Left
       let direction = newIndex >= oldIndex ? 1 : -1;
       
-      // If changing between non-tab pages, default to slide-up behavior
-      let doSwipe = oldIndex !== -1 && newIndex !== -1;
+      // Special logic: If crossing from Admin to App or vice versa, default to 1 (or -1 depending on preference)
+      // But usually they don't cross without a full layout change.
       
-      // Override if the URL explicitely requested a scale drill-down animation
+      // Swipe animation only for sibling-level transitions or tab changes
+      // If we are on very different areas, maybe do a different animation
+      const isCrossTab = (pathname.startsWith('/admin') && prevPathRef.current.startsWith('/admin')) ||
+                        (pathname.startsWith('/app') && prevPathRef.current.startsWith('/app'));
+                        
+      let doSwipe = isCrossTab;
+      
+      // Override if the URL explicitly requested a scale drill-down animation
       if (typeof window !== 'undefined' && window.location.search.includes('anim=scale')) {
         doSwipe = false;
       }
@@ -39,8 +57,8 @@ export default function PageTransition({ children }) {
       setDir(direction);
       setSwipeAnim(doSwipe);
       setPhase('out');
-      prevPathRef.current = pathname; // Update immediately for next click
-      
+      prevPathRef.current = pathname; 
+
       const timer1 = setTimeout(() => {
         setDisplayChildren(children);
         setPhase('prep');
@@ -54,7 +72,6 @@ export default function PageTransition({ children }) {
         }, 30); 
       }, 150); 
 
-
       return () => {
         clearTimeout(timer1);
       };
@@ -65,7 +82,6 @@ export default function PageTransition({ children }) {
     }
   }, [pathname, children]);
 
-  // Premium Apple-like easing curves
   const easeOutBack = 'cubic-bezier(0.22, 1, 0.36, 1)';
   const easeIn = 'ease-in';
   
@@ -77,7 +93,6 @@ export default function PageTransition({ children }) {
     if (swipeAnim) {
       transform = `translateX(${dir * -12}vw) scale(0.97)`;
     } else {
-      // Scale out for drill-down
       transform = `scale(0.92) translateY(10px)`;
     }
     opacity = 0;
@@ -86,11 +101,10 @@ export default function PageTransition({ children }) {
     if (swipeAnim) {
       transform = `translateX(${dir * 25}vw) scale(0.97)`;
     } else {
-      // Prep for scale in
       transform = `scale(1.05) translateY(-5px)`;
     }
     opacity = 0;
-    transition = 'none'; // instant, invisible move
+    transition = 'none'; 
   } else if (phase === 'in') {
     transform = 'translateX(0) scale(1) translateY(0)';
     opacity = 1;
@@ -108,7 +122,7 @@ export default function PageTransition({ children }) {
         willChange: 'opacity, transform',
         height: '100%',
         width: '100%',
-        overflowX: 'hidden' // hide horizontal scrollbars during swipe
+        overflowX: 'hidden'
       }}
     >
       {displayChildren}

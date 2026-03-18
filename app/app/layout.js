@@ -10,8 +10,17 @@ function AttendeeLayoutContent({ children }) {
   const isOnboarding = searchParams.get('onboarding') === '1';
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', paddingBottom: isOnboarding ? 0 : 100 }}>
-      <PageTransition>{children}</PageTransition>
+    <div style={{ 
+      height: '100dvh', 
+      background: 'var(--bg)', 
+      display: 'flex', 
+      flexDirection: 'column', 
+      overflow: 'hidden',
+      position: 'relative'
+    }}>
+      <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+        <PageTransition>{children}</PageTransition>
+      </div>
       {!isOnboarding && <BottomNav />}
     </div>
   );
