@@ -3,24 +3,39 @@
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { Calendar, ShieldCheck, MessageCircle, FileText, ArrowRight, Zap } from 'lucide-react';
+import { Calendar, MessageCircle, FileText, ArrowRight } from 'lucide-react';
 
 // ── Color helpers ──────────────────────────────────────────
 function hexToRgb(hex) {
   hex = hex.replace('#', '');
-  if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
-  return [parseInt(hex.slice(0,2),16), parseInt(hex.slice(2,4),16), parseInt(hex.slice(4,6),16)];
+  if (hex.length === 3) hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+  return [parseInt(hex.slice(0, 2), 16), parseInt(hex.slice(2, 4), 16), parseInt(hex.slice(4, 6), 16)];
 }
-function rgbToHex(r,g,b) {
-  return '#' + [r,g,b].map(c => Math.round(Math.min(255, Math.max(0, c))).toString(16).padStart(2,'0')).join('');
+function rgbToHex(r, g, b) {
+  return '#' + [r, g, b].map(c => Math.round(Math.min(255, Math.max(0, c))).toString(16).padStart(2, '0')).join('');
 }
 function lerpColor(a, b, t) {
-  const [r1,g1,b1] = hexToRgb(a);
-  const [r2,g2,b2] = hexToRgb(b);
-  return rgbToHex(r1+(r2-r1)*t, g1+(g2-g1)*t, b1+(b2-b1)*t);
+  const [r1, g1, b1] = hexToRgb(a);
+  const [r2, g2, b2] = hexToRgb(b);
+  return rgbToHex(r1 + (r2 - r1) * t, g1 + (g2 - g1) * t, b1 + (b2 - b1) * t);
 }
 
-// ── Slide data ─────────────────────────────────────────────
+// ── iOS PWA / bookmark fix — 100dvh lies in standalone mode ──
+function useIOSHeight() {
+  useEffect(() => {
+    const set = () => {
+      document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+    };
+    set();
+    window.addEventListener('resize', set);
+    window.addEventListener('orientationchange', set);
+    return () => {
+      window.removeEventListener('resize', set);
+      window.removeEventListener('orientationchange', set);
+    };
+  }, []);
+}
+
 const slides = [
   {
     icon: Calendar, title: 'Live Schedule',
@@ -45,18 +60,17 @@ export default function LandingPage() {
   const isLoading = status === 'loading';
   const isAuthenticated = !!session?.profile;
 
-  // ── React state only used for UI re-renders (dots, buttons) ──
   const [current, setCurrent] = useState(0);
 
-  // ── Refs for zero-lag DOM manipulation ──
-  const bgRef       = useRef(null);
-  const trackRef    = useRef(null);
-  const drag        = useRef({ active: false, startX: 0, startIdx: 0, currentX: 0 });
-  const slideIdx    = useRef(0);
-  const animFrame   = useRef(null);
-  const containerW  = useRef(0);
+  const bgRef = useRef(null);
+  const trackRef = useRef(null);
+  const drag = useRef({ active: false, startX: 0, startIdx: 0, currentX: 0 });
+  const slideIdx = useRef(0);
+  const animFrame = useRef(null);
+  const containerW = useRef(0);
 
-  // ── Redirect logic ──
+  useIOSHeight();
+
   useEffect(() => {
     if (session?.profile) {
       const level = session.profile.access_level ?? 0;
@@ -71,7 +85,6 @@ export default function LandingPage() {
     }
   }, [session, router, isLoading]);
 
-  // ── Paint the background gradient for given "virtual position" (0..n-1 float) ──
   const paintBg = useCallback((pos) => {
     if (!bgRef.current) return;
     const clamped = Math.max(0, Math.min(slides.length - 1, pos));
@@ -83,27 +96,25 @@ export default function LandingPage() {
     bgRef.current.style.background = `linear-gradient(135deg, ${blendC1} 0%, ${blendC2} 100%)`;
   }, []);
 
-  // ── Set track translateX (with or without transition) ──
   const moveTrack = useCallback((px, transition) => {
     if (!trackRef.current) return;
     trackRef.current.style.transition = transition || 'none';
     trackRef.current.style.transform = `translateX(${px}px)`;
   }, []);
 
-  // ── Initialize ──
-  useEffect(() => {
-    paintBg(0);
-  }, [paintBg]);
+  useEffect(() => { paintBg(0); }, [paintBg]);
 
-  // ── Calculate slide width on mount + resize ──
   useEffect(() => {
     const measure = () => { containerW.current = window.innerWidth; };
     measure();
     window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
+    window.addEventListener('orientationchange', measure);
+    return () => {
+      window.removeEventListener('resize', measure);
+      window.removeEventListener('orientationchange', measure);
+    };
   }, []);
 
-  // ── Pointer handlers ──
   const onPointerDown = useCallback((e) => {
     if (e.button !== 0 && e.pointerType === 'mouse') return;
     drag.current.active = true;
@@ -119,12 +130,8 @@ export default function LandingPage() {
     drag.current.currentX = e.clientX;
     const dx = drag.current.currentX - drag.current.startX;
     const w = containerW.current || window.innerWidth;
-    const baseOffset = -drag.current.startIdx * w;
-    // Move track 1:1
-    moveTrack(baseOffset + dx, null);
-    // Compute virtual position as a float
-    const virtualPos = drag.current.startIdx - dx / w;
-    paintBg(virtualPos);
+    moveTrack(-drag.current.startIdx * w + dx, null);
+    paintBg(drag.current.startIdx - dx / w);
   }, [moveTrack, paintBg]);
 
   const onPointerUp = useCallback(() => {
@@ -137,43 +144,33 @@ export default function LandingPage() {
     if (dx < -threshold && target < slides.length - 1) target++;
     if (dx > threshold && target > 0) target--;
 
-    // Snap track with CSS transition
     slideIdx.current = target;
     setCurrent(target);
     moveTrack(-target * w, 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)');
 
-    // Animate remaining gradient blend with rAF
     const startPos = drag.current.startIdx - dx / w;
-    const endPos = target;
     const startTime = performance.now();
-    const duration = 400;
     const tick = (now) => {
       const elapsed = now - startTime;
-      const progress = Math.min(1, elapsed / duration);
-      // ease-out cubic
+      const progress = Math.min(1, elapsed / 400);
       const eased = 1 - Math.pow(1 - progress, 3);
-      const pos = startPos + (endPos - startPos) * eased;
-      paintBg(pos);
+      paintBg(startPos + (target - startPos) * eased);
       if (progress < 1) animFrame.current = requestAnimationFrame(tick);
     };
     animFrame.current = requestAnimationFrame(tick);
   }, [moveTrack, paintBg]);
 
-  // ── Public goTo (for dots & buttons) ──
   const goTo = useCallback((i) => {
     const w = containerW.current || window.innerWidth;
     const from = slideIdx.current;
     slideIdx.current = i;
     setCurrent(i);
     moveTrack(-i * w, 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)');
-    // rAF gradient animate
     const startTime = performance.now();
-    const duration = 400;
     const tick = (now) => {
       const elapsed = now - startTime;
-      const progress = Math.min(1, elapsed / duration);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      paintBg(from + (i - from) * eased);
+      const progress = Math.min(1, elapsed / 400);
+      paintBg(from + (i - from) * (1 - Math.pow(1 - progress, 3)));
       if (progress < 1) animFrame.current = requestAnimationFrame(tick);
     };
     animFrame.current = requestAnimationFrame(tick);
@@ -187,12 +184,13 @@ export default function LandingPage() {
   const slide = slides[current];
   const isLast = current === slides.length - 1;
 
-  // ── Loading / redirect splash ──
   if (isLoading || isAuthenticated) {
     return (
       <div style={{
-        minHeight: '100dvh', background: 'var(--hero)',
+        height: 'var(--app-height, 100dvh)',
+        background: 'var(--hero)',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        overflow: 'hidden',
       }}>
         <div style={{
           width: 'clamp(56px, 12vh, 64px)', height: 'clamp(56px, 12vh, 64px)', borderRadius: 32,
@@ -215,20 +213,27 @@ export default function LandingPage() {
 
   return (
     <div
-      style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative', touchAction: 'pan-y' }}
+      style={{
+        height: 'var(--app-height, 100dvh)', // ← JS-measured, not 100dvh
+        display: 'flex', flexDirection: 'column',
+        overflow: 'hidden', // ← no scroll ever
+        position: 'relative',
+        touchAction: 'pan-y',
+      }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
       onPointerLeave={onPointerUp}
     >
-      {/* Realtime gradient background */}
+      {/* Background */}
       <div ref={bgRef} style={{ position: 'absolute', inset: 0, zIndex: 0 }} />
 
       {/* Top branding */}
       <div style={{
         padding: 'max(24px, env(safe-area-inset-top)) 24px 0',
         textAlign: 'center', zIndex: 10, position: 'relative',
+        flexShrink: 0,
       }}>
         <div style={{
           width: 'clamp(56px, 12vh, 64px)', height: 'clamp(56px, 12vh, 64px)', borderRadius: 32,
@@ -247,7 +252,7 @@ export default function LandingPage() {
           Annual Conference · 2026
         </p>
         <h1 style={{
-          fontFamily: 'var(--fh)', fontSize: 'clamp(32px, 8vh, 40px)', fontWeight: 800,
+          fontFamily: 'var(--fh)', fontSize: 'clamp(24px, 5vw, 36px)', fontWeight: 800,
           color: slide.textMode === 'light' ? '#fff' : 'var(--g)',
           lineHeight: 1, marginBottom: 6, transition: 'color 0.4s ease',
           textShadow: slide.textMode === 'light' ? '0 2px 10px rgba(0,0,0,0.1)' : 'none'
@@ -256,14 +261,11 @@ export default function LandingPage() {
         </h1>
       </div>
 
-      {/* Slide track — positioned via transform, NO scroll */}
-      <div style={{ flex: 1, position: 'relative', zIndex: 5, overflow: 'hidden' }}>
+      {/* Slide track */}
+      <div style={{ flex: 1, position: 'relative', zIndex: 5, overflow: 'hidden', minHeight: 0 }}>
         <div
           ref={trackRef}
-          style={{
-            display: 'flex', height: '100%',
-            willChange: 'transform',
-          }}
+          style={{ display: 'flex', height: '100%', willChange: 'transform' }}
         >
           {slides.map((s, i) => (
             <div key={i} style={{
@@ -283,16 +285,13 @@ export default function LandingPage() {
                 boxShadow: '0 25px 60px rgba(0,0,0,0.12)',
                 position: 'relative', overflow: 'hidden',
               }}>
-                {/* Subtle glow */}
                 <div style={{
                   position: 'absolute', top: '-50%', left: '-50%', width: '200%', height: '200%',
                   background: `radial-gradient(circle at center, ${s.c2}1A 0%, transparent 70%)`,
                   pointerEvents: 'none'
                 }} />
-
-                <s.icon size={containerW.current < 600 ? 44 : 64} color={s.textMode === 'light' ? '#fff' : 'var(--g)'} style={{
-                  display: 'block',
-                  margin: '0 auto clamp(20px, 4vh, 32px)',
+                <s.icon size={44} color={s.textMode === 'light' ? '#fff' : 'var(--g)'} style={{
+                  display: 'block', margin: '0 auto clamp(20px, 4vh, 32px)',
                   filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
                 }} />
                 <h2 style={{
@@ -312,8 +311,9 @@ export default function LandingPage() {
 
       {/* Dots + CTA */}
       <div style={{
-        padding: '0 24px calc(max(12px, env(safe-area-inset-bottom)) + 24px)',
+        padding: `0 24px max(24px, env(safe-area-inset-bottom))`,
         maxWidth: 420, width: '100%', margin: '0 auto', zIndex: 10, position: 'relative',
+        flexShrink: 0,
       }}>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginBottom: 24 }}>
           {slides.map((_, i) => (
@@ -346,8 +346,7 @@ export default function LandingPage() {
               flex: 1, padding: '15px 20px', textAlign: 'center',
               background: slide.textMode === 'light' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.03)',
               color: slide.textMode === 'light' ? 'rgba(255,255,255,.8)' : 'var(--muted)',
-              borderRadius: 20, fontFamily: 'var(--fb)',
-              fontSize: 15, fontWeight: 700,
+              borderRadius: 20, fontFamily: 'var(--fb)', fontSize: 15, fontWeight: 700,
               border: `1px solid ${slide.textMode === 'light' ? 'rgba(255,255,255,.2)' : 'rgba(0,0,0,0.08)'}`,
               cursor: 'pointer',
             }}>
@@ -356,8 +355,7 @@ export default function LandingPage() {
             <button onClick={() => goTo(Math.min(current + 1, slides.length - 1))} style={{
               flex: 2, padding: '15px 20px',
               background: slide.textMode === 'light' ? 'rgba(255,255,255,0.25)' : 'var(--g)',
-              color: '#fff',
-              borderRadius: 20, fontFamily: 'var(--fb)',
+              color: '#fff', borderRadius: 20, fontFamily: 'var(--fb)',
               fontSize: 16, fontWeight: 800, border: 'none', cursor: 'pointer',
               boxShadow: '0 12px 30px rgba(0,0,0,0.1)',
             }}>

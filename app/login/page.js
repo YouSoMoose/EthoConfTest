@@ -8,11 +8,29 @@ import { Info, Bell, ShieldCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Modal from '@/components/Modal';
 
+// iOS PWA / bookmark fix — 100dvh lies in standalone mode
+function useIOSHeight() {
+  useEffect(() => {
+    const set = () => {
+      document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+    };
+    set();
+    window.addEventListener('resize', set);
+    window.addEventListener('orientationchange', set);
+    return () => {
+      window.removeEventListener('resize', set);
+      window.removeEventListener('orientationchange', set);
+    };
+  }, []);
+}
+
 export default function LoginPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
+
+  useIOSHeight();
 
   useEffect(() => {
     if (status === 'authenticated' && session?.profile) {
@@ -25,7 +43,6 @@ export default function LoginPage() {
 
   async function handleGoogle() {
     setLoading(true);
-    // Single unified login — backend determines role from email
     signIn('google', { callbackUrl: '/' });
   }
 
@@ -41,8 +58,10 @@ export default function LoginPage() {
   if (status === 'loading' || (status === 'authenticated' && session?.profile)) {
     return (
       <div style={{
-        minHeight: '100dvh', background: 'var(--hero)',
+        height: 'var(--app-height, 100dvh)',
+        background: 'var(--hero)',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        overflow: 'hidden',
       }}>
         <div style={{
           width: 24, height: 24, border: '3px solid rgba(255,255,255,.2)',
@@ -56,29 +75,34 @@ export default function LoginPage() {
 
   return (
     <div style={{
-      minHeight: '100dvh',
+      height: 'var(--app-height, 100dvh)',
       background: 'linear-gradient(135deg, #FFE2D6 0%, #FCBD9D 100%)',
       display: 'flex',
       flexDirection: 'column',
       position: 'relative',
+      overflow: 'hidden', // ← key: prevent any overflow from causing scroll
       transition: 'background 0.6s cubic-bezier(0.23, 1, 0.32, 1)',
     }}>
-      {/* Info button to see carousel */}
+      {/* Info button */}
       <Link href="/?carousel=1" style={{
         position: 'absolute', top: 'max(24px, env(safe-area-inset-top))', right: 24,
         width: 32, height: 32, borderRadius: 16,
         background: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.5)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         color: 'var(--sub)', textDecoration: 'none', transition: 'all 0.2s', cursor: 'pointer',
+        zIndex: 10,
       }}>
         <Info size={18} />
       </Link>
 
-      {/* Hero branding — centered in the remaining space */}
+      {/* Hero branding */}
       <div style={{
         flex: 1, display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
         padding: '0 24px',
+        // Prevent content from overflowing this flex child
+        minHeight: 0,
+        overflow: 'hidden',
       }}>
         <div style={{
           width: 'clamp(64px, 14vh, 80px)', height: 'clamp(64px, 14vh, 80px)', borderRadius: '50%',
@@ -87,10 +111,11 @@ export default function LoginPage() {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           margin: '0 auto 24px', overflow: 'hidden', padding: 4,
           boxShadow: '0 12px 30px rgba(0,0,0,0.1)',
+          flexShrink: 0,
         }}>
           <img src="/assets/ethos-logo-insignia.png" alt="The Circular Economy Conference" style={{ width: '85%', height: '85%', objectFit: 'contain' }} />
         </div>
-        
+
         <div style={{ textAlign: 'center' }}>
           <p style={{
             fontSize: 11, fontWeight: 700, letterSpacing: '.25em',
@@ -98,7 +123,7 @@ export default function LoginPage() {
           }}>
             Annual Conference · 2026
           </p>
-          <h1 style={{ fontFamily: 'var(--fh)', fontSize: 36, fontWeight: 800, color: 'var(--text)', margin: '4px 0 8px', lineHeight: 1 }}>
+          <h1 style={{ fontFamily: 'var(--fh)', fontSize: 'clamp(24px, 5vw, 36px)', fontWeight: 800, color: 'var(--text)', margin: '4px 0 8px', lineHeight: 1 }}>
             The Circular Economy Conference
           </h1>
           <p style={{
@@ -114,8 +139,9 @@ export default function LoginPage() {
       <div style={{
         background: '#fff',
         borderRadius: '32px 32px 0 0',
-        padding: '32px 24px max(32px, env(safe-area-inset-bottom))',
+        padding: `32px 24px max(32px, env(safe-area-inset-bottom))`,
         boxShadow: '0 -15px 50px rgba(0,0,0,0.12)',
+        flexShrink: 0, // ← don't let this shrink and push content
       }}>
         <button
           onClick={handleGoogle}
@@ -147,7 +173,7 @@ export default function LoginPage() {
           {loading ? 'Processing…' : 'Sign in with Google'}
         </button>
 
-        <button 
+        <button
           onClick={() => setTermsOpen(true)}
           style={{
             width: '100%', padding: '10px 12px', background: 'transparent',
@@ -159,7 +185,7 @@ export default function LoginPage() {
           Terms of Use & Privacy Policy <ShieldCheck size={14} />
         </button>
 
-        <button 
+        <button
           onClick={requestNotifications}
           style={{
             width: '100%', padding: '10px 12px', background: 'transparent',
@@ -171,24 +197,19 @@ export default function LoginPage() {
           Enable Browser Notifications <Bell size={14} />
         </button>
 
-
-
-
         <Modal open={termsOpen} onClose={() => setTermsOpen(false)} title="Legal Information" center>
           <div style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: 8, textAlign: 'left', fontFamily: 'var(--fb)' }}>
             <h3 style={{ fontFamily: 'var(--fh)', fontSize: 18, marginBottom: 8 }}>Terms of Use</h3>
             <p style={{ fontSize: 12, color: 'var(--sub)', marginBottom: 16 }}>Effective Date: 03/21/2026</p>
-            
+
             <section style={{ marginBottom: 20 }}>
               <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>1. Acceptance of Terms</h4>
-              <p style={{ fontSize: 13, lineHeight: 1.5 }}>By accessing or using the Ethos Sustainability Conference App (“App”), you agree to be bound by these Terms of Use. If you do not agree, do not use the App.</p>
+              <p style={{ fontSize: 13, lineHeight: 1.5 }}>By accessing or using the Ethos Sustainability Conference App ("App"), you agree to be bound by these Terms of Use. If you do not agree, do not use the App.</p>
             </section>
-
             <section style={{ marginBottom: 20 }}>
               <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>2. Purpose of the App</h4>
-              <p style={{ fontSize: 13, lineHeight: 1.5 }}>The App is provided by Ethos Sustainable Business and STEAM Education (“Ethos”) to manage conference participation, provide schedules/updates, and enable networking.</p>
+              <p style={{ fontSize: 13, lineHeight: 1.5 }}>The App is provided by Ethos Sustainable Business and STEAM Education ("Ethos") to manage conference participation, provide schedules/updates, and enable networking.</p>
             </section>
-
             <section style={{ marginBottom: 20 }}>
               <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>3. User Accounts</h4>
               <ul style={{ fontSize: 13, lineHeight: 1.5, paddingLeft: 20 }}>
@@ -197,7 +218,6 @@ export default function LoginPage() {
                 <li>You are responsible for maintaining the confidentiality of your login credentials.</li>
               </ul>
             </section>
-
             <section style={{ marginBottom: 20 }}>
               <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>4. Acceptable Use</h4>
               <p style={{ fontSize: 13, marginBottom: 8 }}>You agree NOT to:</p>
@@ -209,32 +229,26 @@ export default function LoginPage() {
               </ul>
               <p style={{ fontSize: 13, marginTop: 8 }}>Ethos reserves the right to suspend or terminate accounts violating these rules.</p>
             </section>
-
             <section style={{ marginBottom: 20 }}>
               <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>5. Data Access and Visibility</h4>
               <p style={{ fontSize: 13, lineHeight: 1.5 }}>By using the App, you acknowledge: Ethos administrators may access and review user-submitted data (e.g., profiles, messages, submissions, attendance) strictly for event management, safety, and moderation.</p>
             </section>
-
             <section style={{ marginBottom: 20 }}>
               <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>6. Intellectual Property</h4>
               <p style={{ fontSize: 13, lineHeight: 1.5 }}>All content on the App (logos, branding, materials) is owned by Ethos or its partners and may not be reproduced without permission.</p>
             </section>
-
             <section style={{ marginBottom: 20 }}>
               <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>7. Event Changes</h4>
               <p style={{ fontSize: 13, lineHeight: 1.5 }}>Ethos may modify event schedules, speaker lineups, or App features at any time without prior notice.</p>
             </section>
-
             <section style={{ marginBottom: 20 }}>
               <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>8. Disclaimer of Warranties</h4>
-              <p style={{ fontSize: 13, lineHeight: 1.5 }}>The App is provided “as is” without warranties of any kind regarding availability, accuracy, or reliability.</p>
+              <p style={{ fontSize: 13, lineHeight: 1.5 }}>The App is provided "as is" without warranties of any kind regarding availability, accuracy, or reliability.</p>
             </section>
-
             <section style={{ marginBottom: 20 }}>
               <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>9. Limitation of Liability</h4>
               <p style={{ fontSize: 13, lineHeight: 1.5 }}>Ethos is not liable for technical issues, data loss, or indirect damages arising from App use.</p>
             </section>
-
             <section style={{ marginBottom: 20 }}>
               <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>10. Governing Law</h4>
               <p style={{ fontSize: 13, lineHeight: 1.5 }}>These Terms are governed by the laws of the State of Texas, United States.</p>
@@ -250,29 +264,25 @@ export default function LoginPage() {
               <p style={{ fontSize: 13, marginBottom: 8 }}><strong>a. Information You Provide:</strong> Name, email, organization, profile details, messages, or submissions.</p>
               <p style={{ fontSize: 13 }}><strong>b. Automatically Collected Data:</strong> Device information, log data, and IP address.</p>
             </section>
-
             <section style={{ marginBottom: 20 }}>
               <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>2. Data Access (Important Transparency Clause)</h4>
               <p style={{ fontSize: 13, lineHeight: 1.5 }}>Ethos administrators can view and access user data within the App. This includes profiles, messages, and activity logs. Access is limited to authorized personnel and used only for operational purposes.</p>
             </section>
-
             <section style={{ marginBottom: 20 }}>
               <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>3. Data Sharing</h4>
               <p style={{ fontSize: 13, lineHeight: 1.5 }}>We do NOT sell or rent your personal data to third parties. We may share data only with necessary service providers or if required by law.</p>
             </section>
-
             <section style={{ marginBottom: 20 }}>
               <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>4. Your Rights</h4>
               <p style={{ fontSize: 13, lineHeight: 1.5 }}>You may request access to, correction of, or deletion of your data by contacting: info@ethossustainability.org</p>
             </section>
-
             <p style={{ fontSize: 12, color: 'var(--sub)', marginTop: 32, textAlign: 'center' }}>
               For full details or questions, contact:<br />
               <strong>info@ethossustainability.org</strong>
             </p>
           </div>
           <div style={{ marginTop: 24 }}>
-            <button 
+            <button
               onClick={() => setTermsOpen(false)}
               style={{
                 width: '100%', padding: '14px', background: 'var(--g)', color: '#fff',
