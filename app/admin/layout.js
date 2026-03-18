@@ -47,15 +47,14 @@ export default function AdminLayout({ children }) {
           background: 'rgba(74, 63, 53, 0.85)',
           backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
           borderBottom: '1px solid var(--aborder)',
-          padding: '12px 16px',
+          padding: '12px 16px 16px',
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
+          flexDirection: 'column',
+          gap: 16,
           position: 'sticky', top: 0, zIndex: 60,
         }}>
-          <h1 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 16, color: 'var(--atext)' }}>Staff Scanner</h1>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <AdminSwitch initialMode="admin" admin />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+            <h1 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 16, color: 'var(--atext)' }}>Staff Scanner</h1>
             <button
               type="button"
               onClick={() => signOut({ redirect: true, callbackUrl: '/login' })}
@@ -68,6 +67,9 @@ export default function AdminLayout({ children }) {
             >
               Sign Out
             </button>
+          </div>
+          <div style={{ maxWidth: 500, width: '100%', margin: '0 auto' }}>
+            <AdminSwitch initialMode="admin" admin />
           </div>
         </header>
         <main style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', position: 'relative', minHeight: 0 }}>
@@ -146,25 +148,24 @@ export default function AdminLayout({ children }) {
         background: 'rgba(74, 63, 53, 0.85)',
         backdropFilter: 'blur(16px)',
         borderBottom: '1px solid var(--aborder)',
-        padding: '12px 16px',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        padding: '12px 16px 16px',
+        flexDirection: 'column',
+        gap: 16,
         position: 'sticky',
         top: 0,
         zIndex: 60,
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <button onClick={() => setMenuOpen(true)} style={{
-            background: 'none', border: 'none', color: 'var(--atext)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer', padding: 0
-          }} aria-label="Menu">
-            <Menu size={22} />
-          </button>
-          <Link href="/admin" style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 15, color: 'var(--atext)' }}>Admin</Link>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <AdminSwitch initialMode="admin" admin />
+        <div style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <button onClick={() => setMenuOpen(true)} style={{
+              background: 'none', border: 'none', color: 'var(--atext)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', padding: 0
+            }} aria-label="Menu">
+              <Menu size={22} />
+            </button>
+            <Link href="/admin" style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 15, color: 'var(--atext)' }}>Admin</Link>
+          </div>
           <button
             type="button"
             onClick={() => signOut({ redirect: true, callbackUrl: '/login' })}
@@ -177,6 +178,9 @@ export default function AdminLayout({ children }) {
           >
             Sign Out
           </button>
+        </div>
+        <div style={{ maxWidth: 500, width: '100%', margin: '0 auto' }}>
+          <AdminSwitch initialMode="admin" admin />
         </div>
       </header>
 

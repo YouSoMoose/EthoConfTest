@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Settings, Shield, User, Loader2 } from 'lucide-react';
+import { Shield, User, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function AdminSwitch({ initialMode, admin }) {
@@ -12,7 +12,10 @@ export default function AdminSwitch({ initialMode, admin }) {
   const [loading, setLoading] = useState(false);
   const isAdminMode = initialMode === 'admin' || session?.profile?.in_admin;
 
-  const handleToggle = async () => {
+  const handleToggle = async (e) => {
+    // Prevent double triggers if clicking container AND button
+    e?.stopPropagation();
+    
     setLoading(true);
     const newMode = !isAdminMode;
 
@@ -33,7 +36,7 @@ export default function AdminSwitch({ initialMode, admin }) {
         profile: updatedProfile
       });
 
-      toast.success(newMode ? 'Admin Mode Activated' : 'Attendee Mode Activated');
+      toast.success(newMode ? 'Staff Mode Activated' : 'Attendee Mode Activated');
       
       // Redirect based on mode
       if (newMode) {
@@ -58,79 +61,90 @@ export default function AdminSwitch({ initialMode, admin }) {
   const level = session.profile.access_level;
   const adminLabel = level >= 3 ? 'Admin Mode' : 'Scanner Mode';
 
-  const bg = admin ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.4)';
+  const containerBg = admin ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.4)';
   const borderColor = admin ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.5)';
+  const sliderBg = admin ? 'var(--accent)' : 'var(--white)';
+  const sliderShadow = admin ? '0 4px 12px rgba(0,0,0,0.3)' : '0 4px 12px rgba(0,0,0,0.08)';
+  const activeTextColor = admin ? '#000' : 'var(--g)';
   const inactiveTextColor = admin ? 'rgba(255, 255, 255, 0.5)' : 'var(--sub)';
 
   return (
-    <div style={{
-      background: bg,
-      backdropFilter: 'blur(10px)',
-      WebkitBackdropFilter: 'blur(10px)',
-      border: `1px solid ${borderColor}`,
-      borderRadius: 18,
-      padding: '4px',
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 4,
-      boxShadow: admin ? 'none' : '0 4px 15px rgba(0, 0, 0, 0.05)',
-      position: 'relative',
-      overflow: 'hidden',
-    }}>
-      <button
-        onClick={isAdminMode ? undefined : handleToggle}
-        disabled={loading}
-        style={{
-          padding: '8px 16px',
-          borderRadius: 14,
-          border: 'none',
-          background: isAdminMode ? 'transparent' : (admin ? 'rgba(255, 255, 255, 0.2)' : 'var(--white)'),
-          color: isAdminMode ? inactiveTextColor : (admin ? '#fff' : 'var(--g)'),
-          fontSize: 13,
-          fontWeight: 700,
-          cursor: isAdminMode ? 'default' : 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-          transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-          boxShadow: isAdminMode ? 'none' : '0 2px 8px rgba(0,0,0,0.05)',
-          opacity: loading && !isAdminMode ? 0.7 : 1,
-        }}
-      >
-        <User size={16} />
-        {admin ? 'Attendee' : 'Attendee View'}
-      </button>
+    <div 
+      onClick={handleToggle}
+      className="bubble-click"
+      style={{
+        width: '100%',
+        background: containerBg,
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        border: `1px solid ${borderColor}`,
+        borderRadius: 20,
+        padding: '6px',
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: 0,
+        boxShadow: admin ? 'none' : '0 10px 30px rgba(0, 0, 0, 0.04)',
+        position: 'relative',
+        overflow: 'hidden',
+        cursor: 'pointer',
+        userSelect: 'none',
+        height: 52,
+      }}
+    >
+      {/* Sliding Background */}
+      <div style={{
+        position: 'absolute',
+        top: 6,
+        bottom: 6,
+        left: 6,
+        width: 'calc(50% - 6px)',
+        background: sliderBg,
+        borderRadius: 16,
+        boxShadow: sliderShadow,
+        transition: 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        transform: isAdminMode ? 'translateX(100.5%)' : 'translateX(0)',
+        zIndex: 1,
+      }} />
 
-      <button
-        onClick={isAdminMode ? handleToggle : undefined}
-        disabled={loading}
-        style={{
-          padding: '8px 16px',
-          borderRadius: 14,
-          border: 'none',
-          background: isAdminMode ? (admin ? 'var(--accent)' : 'var(--text)') : 'transparent',
-          color: isAdminMode ? (admin ? '#000' : '#fff') : inactiveTextColor,
-          fontSize: 13,
-          fontWeight: 700,
-          cursor: isAdminMode ? 'pointer' : 'default',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-          transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-          boxShadow: isAdminMode ? '0 2px 8px rgba(0,0,0,0.2)' : 'none',
-          opacity: loading && isAdminMode ? 0.7 : 1,
-        }}
-      >
-        {loading ? <Loader2 size={16} className="animate-spin" /> : <Shield size={16} />}
-        {adminLabel}
-      </button>
+      <div style={{
+        zIndex: 2,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        color: isAdminMode ? inactiveTextColor : activeTextColor,
+        fontSize: 14,
+        fontWeight: 700,
+        transition: 'color 0.4s ease',
+        fontFamily: 'var(--fb)',
+      }}>
+        <User size={18} strokeWidth={isAdminMode ? 2 : 2.5} />
+        Attendee
+      </div>
+
+      <div style={{
+        zIndex: 2,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        color: isAdminMode ? activeTextColor : inactiveTextColor,
+        fontSize: 14,
+        fontWeight: 700,
+        transition: 'color 0.4s ease',
+        fontFamily: 'var(--fb)',
+      }}>
+        {loading ? <Loader2 size={18} className="animate-spin" /> : <Shield size={18} strokeWidth={isAdminMode ? 2.5 : 2} />}
+        {adminLabel.split(' ')[0]}
+      </div>
 
       {loading && (
         <div style={{
           position: 'absolute',
           inset: 0,
-          background: 'rgba(255,255,255,0.2)',
+          background: 'rgba(255,255,255,0.1)',
           zIndex: 10,
+          cursor: 'not-allowed',
         }} />
       )}
     </div>
