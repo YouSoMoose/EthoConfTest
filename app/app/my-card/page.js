@@ -141,9 +141,10 @@ function MyCardContent() {
   // 3. New Connection Realtime Listener (for "You got scanned")
   useEffect(() => {
     if (!profile?.id) return;
+    console.log('[DEBUG] Setting up Scanned listener for ID:', profile.id);
 
     const channel = supabase
-      .channel(`scanned-${profile.id}`)
+      .channel(`scanned-realtime-${profile.id}`)
       .on('postgres_changes', { 
         event: 'INSERT', 
         schema: 'public', 
@@ -154,9 +155,15 @@ function MyCardContent() {
         setIsBeingScanned(true);
         setTimeout(() => setIsBeingScanned(false), 4000);
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log('[DEBUG] Scanned Realtime Channel Status:', status);
+        if (status === 'SUBSCRIBED') {
+          console.log('[DEBUG] Successfully listening for scans on profile:', profile.id);
+        }
+      });
 
     return () => {
+      console.log('[DEBUG] Cleaning up Scanned listener');
       supabase.removeChannel(channel);
     };
   }, [profile?.id]);
