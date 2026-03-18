@@ -45,3 +45,30 @@ export async function POST(request) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data);
 }
+
+export async function DELETE(request) {
+  const session = await getServerSession(authOptions);
+  if (!session?.profile || session.profile.access_level < 3) {
+    return NextResponse.json({ error: 'Unauthorized (Super Admin only)' }, { status: 403 });
+  }
+
+  const { searchParams } = new URL(request.url);
+  const user_id = searchParams.get('user_id');
+
+  if (!user_id) {
+    return NextResponse.json({ error: 'user_id is required' }, { status: 400 });
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('profiles')
+    .update({
+      checked_in: false,
+      checked_in_at: null,
+    })
+    .eq('id', user_id)
+    .select()
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json(data);
+}

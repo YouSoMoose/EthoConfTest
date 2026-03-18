@@ -6,6 +6,7 @@ import Avatar from '@/components/Avatar';
 import Loader from '@/components/Loader';
 import RoleChip from '@/components/RoleChip';
 import { ACCESS_LABELS } from '@/lib/constants';
+import { RefreshCcw } from 'lucide-react';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
@@ -23,6 +24,18 @@ export default function AdminUsersPage() {
       setUsers(p => p.map(x => x.id === userId ? { ...x, access_level: u.access_level } : x));
       toast.success('Updated');
     } else toast.error('Failed');
+  };
+
+  const undoCheckin = async (userId) => {
+    if (!confirm('Revert check-in status for this user?')) return;
+    const res = await fetch(`/api/checkin?user_id=${userId}`, { method: 'DELETE' });
+    if (res.ok) {
+      setUsers(p => p.map(x => x.id === userId ? { ...x, checked_in: false } : x));
+      toast.success('Check-in reverted');
+    } else {
+      const d = await res.json();
+      toast.error(d.error || 'Failed to undo');
+    }
   };
 
   if (loading) return <Loader admin />;
@@ -74,9 +87,22 @@ export default function AdminUsersPage() {
                   </td>
                   <td style={{ padding: '12px 14px', color: 'var(--asub)' }}>{u.email}</td>
                   <td style={{ padding: '12px 14px' }}>
-                    <span style={{ color: u.checked_in ? 'var(--agreen)' : 'var(--amuted)', fontWeight: 600 }}>
-                      {u.checked_in ? '✅' : '—'}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ color: u.checked_in ? 'var(--agreen)' : 'var(--amuted)', fontWeight: 600 }}>
+                        {u.checked_in ? '✅' : '—'}
+                      </span>
+                      {u.checked_in && (
+                        <button 
+                          onClick={() => undoCheckin(u.id)}
+                          title="Undo Check-in"
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--asub)', display: 'flex', padding: 4, borderRadius: 4, transition: 'background 0.2s' }}
+                          onMouseOver={e => e.currentTarget.style.background = 'var(--as3)'}
+                          onMouseOut={e => e.currentTarget.style.background = 'none'}
+                        >
+                          <RefreshCcw size={14} />
+                        </button>
+                      )}
+                    </div>
                   </td>
                   <td style={{ padding: '12px 14px' }}>
                     <select
@@ -113,6 +139,14 @@ export default function AdminUsersPage() {
                 <p style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--amuted)' }}>{u.email}</p>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                {u.checked_in && (
+                  <button 
+                    onClick={() => undoCheckin(u.id)}
+                    style={{ background: 'var(--as1)', border: 'none', borderRadius: 6, padding: 6, color: 'var(--asub)', display: 'flex' }}
+                  >
+                    <RefreshCcw size={14} />
+                  </button>
+                )}
                 {u.checked_in && <span style={{ color: 'var(--agreen)' }}>✅</span>}
                 <select
                   value={u.access_level}
