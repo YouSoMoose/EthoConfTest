@@ -138,11 +138,33 @@ function MyCardContent() {
     };
   }, [profile?.id, profile?.checked_in, router, updateSession, showSuccessQR, isCheckinSuccess]);
 
-  // 3. New Connection Realtime Listener (for "You got scanned")
+  // 3. New Connection Realtime Listener + Polling Fallback (for "You got scanned")
   useEffect(() => {
     if (!profile?.id) return;
-    console.log('[DEBUG] Setting up Scanned listener (broad) for my ID:', profile.id);
+    
+    // Fallback: 1s polling to detect new connections where I am the "scanned_id"
+    let lastCount = -1;
+    const poll = async () => {
+      try {
+        const res = await fetch('/api/connections?type=received');
+        if (res.ok) {
+          const data = await res.json();
+          const currentCount = data.length;
+          if (lastCount !== -1 && currentCount > lastCount) {
+             console.log('[DEBUG] Poll detected new scan!');
+             setIsBeingScanned(true);
+             setTimeout(() => setIsBeingScanned(false), 4500);
+          }
+          lastCount = currentCount;
+        }
+      } catch (e) {}
+    };
 
+    // Initial poll
+    poll();
+    const pollInterval = setInterval(poll, 1000);
+
+    // Primary: Realtime listener
     const channel = supabase
       .channel(`scanned-realtime-${profile.id}`)
       .on('postgres_changes', { 
@@ -150,23 +172,16 @@ function MyCardContent() {
         schema: 'public', 
         table: 'connections'
       }, (payload) => {
-        console.log('[DEBUG] Connection Insert detected by Realtime:', payload);
-        // Client-side filtering for reliability
         if (payload.new && payload.new.scanned_id === profile.id) {
-          console.log('[DEBUG] Match found! Triggering "You got scanned" animation.');
+          console.log('[DEBUG] Realtime detected scan!');
           setIsBeingScanned(true);
           setTimeout(() => setIsBeingScanned(false), 4500);
         }
       })
-      .subscribe((status) => {
-        console.log('[DEBUG] Scanned Realtime Channel Status:', status);
-        if (status === 'SUBSCRIBED') {
-          console.log('[DEBUG] Listening for ALL inserts in connections (filtering for my ID in JS)');
-        }
-      });
+      .subscribe();
 
     return () => {
-      console.log('[DEBUG] Cleaning up Scanned listener');
+      clearInterval(pollInterval);
       supabase.removeChannel(channel);
     };
   }, [profile?.id]);

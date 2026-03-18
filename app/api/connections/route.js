@@ -8,17 +8,26 @@ export async function GET(req) {
     const session = await getServerSession(authOptions);
     if (!session?.profile?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { data: connections, error } = await supabaseAdmin
+    const { searchParams } = new URL(req.url);
+    const type = searchParams.get('type'); // 'sent' (default) or 'received'
+
+    let query = supabaseAdmin
       .from('connections')
-      .select('id, scanned_id, created_at')
-      .eq('user_id', session.profile.id)
-      .order('created_at', { ascending: false });
+      .select('id, scanned_id, user_id, created_at');
+
+    if (type === 'received') {
+      query = query.eq('scanned_id', session.profile.id);
+    } else {
+      query = query.eq('user_id', session.profile.id);
+    }
+
+    const { data: connections, error } = await query.order('created_at', { ascending: false });
 
     if (error) throw error;
 
     // Fetch profile details for each connection
     if (connections.length > 0) {
-      const ids = connections.map(c => c.scanned_id);
+      const ids = connections.map(c => type === 'received' ? c.user_id : c.scanned_id);
       const { data: profiles } = await supabaseAdmin
         .from('profiles')
         .select('id, name, email, avatar, resume_link, phone, bio')
@@ -28,7 +37,7 @@ export async function GET(req) {
       
       const enriched = connections.map(c => ({
         ...c,
-        profile: profileMap[c.scanned_id] || null
+        profile: profileMap[type === 'received' ? c.user_id : c.scanned_id] || null
       }));
       
       return NextResponse.json(enriched);
