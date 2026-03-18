@@ -224,9 +224,6 @@ function MyCardContent() {
   const cardRef = useRef(null);
   const domRefs = useRef({});
 
-
-
-  useEffect(() => {
     if (qrExpanded) {
       document.body.style.overflow = 'hidden';
     } else {
