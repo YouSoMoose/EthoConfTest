@@ -313,56 +313,85 @@ function MyCardContent() {
     return (
       <div className="page-enter" style={{ 
         minHeight: '100dvh', display: 'flex', flexDirection: 'column', 
-        alignItems: 'center', justifyContent: 'center', padding: 20, textAlign: 'center',
-        background: 'var(--bg)'
+        alignItems: 'center', padding: '40px 20px', textAlign: 'center',
+        background: 'var(--bg)', gap: 32, overflowY: 'auto'
       }}>
+        {/* 1. Card Preview */}
+        <div style={{ 
+          transform: 'scale(0.85)', 
+          transformOrigin: 'top center',
+          marginBottom: -40 // Offset the scale gap
+        }}>
+          <CardPreview
+            user={{ ...profile, name, avatar, role, company }}
+            style={DEFAULT_STYLE}
+            cardRef={cardRef}
+            domRefs={domRefs}
+          />
+        </div>
+
+        {/* 2. Edit Button */}
+        <button
+          onClick={() => {
+            setShowSuccessQR(false);
+            setIsEditing(true);
+          }}
+          style={{
+            background: 'var(--white)', border: '1px solid var(--border)', 
+            borderRadius: 16, padding: '12px 24px', fontSize: 14, fontWeight: 700,
+            color: 'var(--g)', cursor: 'pointer', display: 'flex', alignItems: 'center', 
+            gap: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.04)'
+          }}
+        >
+          <UserIcon size={16} /> Edit Profile Info
+        </button>
+
+        {/* 3. Enlarged QR Section */}
         <div style={{
           background: 'var(--white)', padding: 32, borderRadius: 32,
           boxShadow: '0 20px 60px rgba(0,0,0,0.08)', border: '1px solid var(--border)',
-          maxWidth: 400, width: '100%', animation: 'fadeUp 0.5s ease both'
+          maxWidth: 360, width: '100%', animation: 'fadeUp 0.5s ease both'
         }}>
-          <div style={{ marginBottom: 28 }}>
-            <div style={{ 
-              width: 56, height: 56, borderRadius: '50%', background: 'var(--as1)', 
-              display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px',
-              color: 'var(--g)'
-            }}>
-              <CheckCircle2 size={32} />
-            </div>
-            <h2 style={{ fontFamily: 'var(--fh)', fontSize: 24, fontWeight: 800, margin: '0 0 8px', color: 'var(--text)' }}>
-              Profile Ready
-            </h2>
-            <p style={{ color: 'var(--sub)', fontSize: 15, lineHeight: 1.5, fontWeight: 500 }}>
-              Show this QR code to any conference staff member to complete your check-in.
-            </p>
-          </div>
-
+          <p style={{ color: 'var(--sub)', fontSize: 14, fontWeight: 600, marginBottom: 20 }}>
+            Show this QR to staff to check in
+          </p>
           <div style={{
-            padding: 20, background: '#fff', borderRadius: 24,
+            padding: 16, background: '#fff', borderRadius: 24,
             border: '2px solid var(--g)', display: 'inline-block',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.06)', marginBottom: 28
+            boxShadow: '0 8px 32px rgba(0,0,0,0.06)', marginBottom: 20
           }}>
-            <QRCodeSVG value={qrValue} size={240} level="H" fgColor="#000" />
+            <QRCodeSVG value={qrValue} size={200} level="H" fgColor="#000" />
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
             <div className="loading-pulse" style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--g)' }} />
-            <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--g)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Waiting for Staff Scan
+            <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--g)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Waiting for Scan
             </span>
           </div>
         </div>
-        
-        <button 
-          onClick={() => setShowSuccessQR(false)}
-          style={{ 
-            marginTop: 32, background: 'none', border: 'none', 
-            color: 'var(--sub)', fontSize: 13, fontWeight: 700, 
-            cursor: 'pointer', opacity: 0.8, textDecoration: 'underline'
-          }}
-        >
-          Go Back to Edit Profile
-        </button>
+
+        {/* Success Overlay */}
+        {isCheckinSuccess && (
+          <div style={{
+            position: 'fixed', inset: 0, zIndex: 10000,
+            background: 'var(--white)', display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center', gap: 24,
+            animation: 'fadeIn 0.4s ease forwards'
+          }}>
+            <div style={{
+              width: 100, height: 100, borderRadius: '50%', background: 'var(--as1)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'var(--g)', animation: 'popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards'
+            }}>
+              <CheckCircle2 size={60} />
+            </div>
+            <div style={{ animation: 'fadeUp 0.6s ease 0.2s both' }}>
+              <h1 style={{ fontFamily: 'var(--fh)', fontSize: 32, fontWeight: 800, margin: 0 }}>Check-in Success!</h1>
+              <p style={{ color: 'var(--sub)', fontSize: 18, marginTop: 8, fontWeight: 500 }}>Welcome to the Conference</p>
+            </div>
+          </div>
+        )}
 
         <style>{`
           @keyframes pulse {
@@ -374,6 +403,14 @@ function MyCardContent() {
           @keyframes fadeUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          @keyframes popIn {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
           }
         `}</style>
       </div>
