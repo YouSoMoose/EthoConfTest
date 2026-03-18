@@ -217,33 +217,7 @@ function MyCardContent() {
   const [linkedin, setLinkedin] = useState('');
   const [resumeLink, setResumeLink] = useState('');
   const [saving, setSaving] = useState(false);
-  const [qrExpanded, setQrExpanded] = useState(false);
-  const [showSuccessQR, setShowSuccessQR] = useState(false);
 
-  const cardRef = useRef(null);
-  const domRefs = useRef({});
-
-  useEffect(() => {
-    if (!profile?.id || profile.checked_in) return;
-
-    const channel = supabase
-      .channel(`checkin-${profile.id}`)
-      .on('postgres_changes', { 
-        event: 'UPDATE', 
-        schema: 'public', 
-        table: 'profiles', 
-        filter: `id=eq.${profile.id}` 
-      }, (payload) => {
-        if (payload.new.checked_in) {
-          toast.success('Check-in Successful!', { duration: 3000 });
-          updateSession();
-          setTimeout(() => router.push('/app'), 1000);
-        }
-      })
-      .subscribe();
-
-    return () => { supabase.removeChannel(channel); };
-  }, [profile?.id, profile?.checked_in, router, updateSession]);
 
   useEffect(() => {
     if (qrExpanded) {
