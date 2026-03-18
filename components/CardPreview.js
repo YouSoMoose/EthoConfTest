@@ -11,9 +11,9 @@ export const DEFAULT_STYLE = {
   emailSize: 9, emailX: 0, emailY: 0, emailVisible: true,
   qrSize: 64, qrX: 0, qrY: 0, qrVisible: true,
   logoSize: 28, logoX: 0, logoY: 0, logoVisible: true,
-  accentColor: '#D49B7A',
-  textColor: '#413429',
-  subColor: '#7D6F63',
+  accentColor: '#000000',
+  textColor: '#000000',
+  subColor: '#333333',
 };
 
 export const CardPreview = memo(function CardPreview({ user = {}, style = DEFAULT_STYLE, cardRef, domRefs = { current: {} }, fullSize = true }) {
@@ -53,13 +53,7 @@ export const CardPreview = memo(function CardPreview({ user = {}, style = DEFAUL
 
   return (
     <div ref={cardRef} style={containerStyle}>
-      {/* Decorative corner gradient */}
-      <div style={{
-        position: 'absolute', top: 0, right: 0,
-        width: 140, height: 140,
-        background: `linear-gradient(135deg, ${s.accentColor}20 0%, transparent 100%)`,
-        borderRadius: '0 0 0 100%', pointerEvents: 'none', zIndex: 0
-      }} />
+      {/* Decorative corner removed for B&W */}
 
       {/* Text Info Section */}
       <div style={{ flex: 1, minWidth: 0, zIndex: 1, position: 'relative', paddingRight: 8 }}>
@@ -107,7 +101,7 @@ export const CardPreview = memo(function CardPreview({ user = {}, style = DEFAUL
             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
             transform: `translate(${s.companyX || 0}px, ${s.companyY || 0}px)`,
           }}>
-            {user?.company || 'Ethos Attendee'}
+            {user?.company || 'Conference Attendee'}
           </p>
         )}
 
@@ -141,7 +135,7 @@ export const CardPreview = memo(function CardPreview({ user = {}, style = DEFAUL
         fontFamily: 'var(--fb)', fontSize: 7, color: 'var(--muted)',
         margin: 0, opacity: 0.4, letterSpacing: '0.1em'
       }}>
-        ETHOS 2026 OFFICIAL BADGE
+        THE CIRCULAR ECONOMY CONFERENCE OFFICIAL BADGE
       </p>
     </div>
   );

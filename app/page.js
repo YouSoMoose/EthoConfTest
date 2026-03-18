@@ -205,7 +205,7 @@ export default function LandingPage() {
           margin: '0 auto 20px', overflow: 'hidden', padding: 6,
           boxShadow: '0 8px 32px rgba(0,0,0,0.08)', border: '1px solid rgba(255,255,255,0.4)'
         }}>
-          <img src="/assets/ethos-logo-insignia.png" alt="Ethos" style={{ width: '85%', height: '85%', objectFit: 'contain' }} />
+          <img src="/assets/ethos-logo-insignia.png" alt="The Circular Economy Conference" style={{ width: '85%', height: '85%', objectFit: 'contain' }} />
         </div>
         <div style={{
           width: 24, height: 24, border: '3px solid rgba(255,255,255,.2)',
@@ -241,7 +241,7 @@ export default function LandingPage() {
           margin: '0 auto clamp(12px, 2.5vh, 20px)', overflow: 'hidden', padding: 6,
           boxShadow: '0 8px 32px rgba(0,0,0,0.08)', border: '1px solid rgba(255,255,255,0.4)'
         }}>
-          <img src="/assets/ethos-logo-insignia.png" alt="Ethos" style={{ width: '85%', height: '85%', objectFit: 'contain' }} />
+          <img src="/assets/ethos-logo-insignia.png" alt="The Circular Economy Conference" style={{ width: '85%', height: '85%', objectFit: 'contain' }} />
         </div>
         <p style={{
           fontSize: 'clamp(10px, 2vh, 11px)', fontWeight: 800, letterSpacing: '.3em',

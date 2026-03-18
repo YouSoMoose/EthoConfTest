@@ -271,7 +271,7 @@ function CardRow({ user, initialStyle, globalUpdate, isPrinting, setPrintingId }
         ctx.rotate(90 * Math.PI / 180);
         ctx.drawImage(img, -img.width / 2, -img.height / 2);
         const link = document.createElement('a');
-        link.download = `Ethos-ID-${(user.name || 'User').replace(/\s+/g, '-')}.png`;
+        link.download = `Conference-ID-${(user.name || 'User').replace(/\s+/g, '-')}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
         toast.success('Downloaded!', { id: t });

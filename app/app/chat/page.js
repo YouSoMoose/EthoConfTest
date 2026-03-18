@@ -149,7 +149,7 @@ export default function ChatPage() {
               return (
                 <div key={msg.id} style={{ display: 'flex', justifyContent: isMe ? 'flex-end' : 'flex-start' }}>
                   <div style={{ display: 'flex', gap: 10, maxWidth: '85%', flexDirection: isMe ? 'row-reverse' : 'row', alignItems: 'flex-end' }}>
-                    {!isMe && <Avatar src={isAdmin ? '/assets/ethos-logo-insignia.png' : msg.sender?.avatar} name={isAdmin ? 'Ethos Admin' : msg.sender?.name} size={30} />}
+                    {!isMe && <Avatar src={isAdmin ? '/assets/ethos-logo-insignia.png' : msg.sender?.avatar} name={isAdmin ? 'Conference Admin' : msg.sender?.name} size={30} />}
                     <div style={{
                       borderRadius: 20,
                       padding: '12px 16px',

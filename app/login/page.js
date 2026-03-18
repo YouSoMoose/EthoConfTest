@@ -58,7 +58,7 @@ export default function LoginPage() {
           margin: '0 auto 24px', overflow: 'hidden', padding: 4,
           boxShadow: '0 12px 30px rgba(0,0,0,0.1)',
         }}>
-          <img src="/assets/ethos-logo-insignia.png" alt="Ethos" style={{ width: '85%', height: '85%', objectFit: 'contain' }} />
+          <img src="/assets/ethos-logo-insignia.png" alt="The Circular Economy Conference" style={{ width: '85%', height: '85%', objectFit: 'contain' }} />
         </div>
         
         <div style={{ textAlign: 'center' }}>

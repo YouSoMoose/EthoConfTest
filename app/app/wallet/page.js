@@ -63,7 +63,7 @@ const CardPreview = memo(function CardPreview({ user }) {
           color: style.subColor, margin: '2px 0',
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
         }}>
-          {user.company || 'Ethos Attendee'}
+          {user.company || 'Conference Attendee'}
         </p>
 
         <p style={{
@@ -150,7 +150,7 @@ export default function WalletPage() {
               {activeProfile.name || 'Anonymous User'}
             </h2>
             <p style={{ fontFamily: 'var(--fb)', fontSize: 13, fontWeight: 700, color: 'var(--g)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 12px' }}>
-              {activeProfile.role || 'Attendee'} @ {activeProfile.company || 'Ethos'}
+              {activeProfile.role || 'Attendee'} @ {activeProfile.company || 'Conference'}
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, background: 'var(--s2)', padding: 16, borderRadius: 16, textAlign: 'left', marginBottom: 20 }}>
