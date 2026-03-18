@@ -217,7 +217,34 @@ function MyCardContent() {
   const [linkedin, setLinkedin] = useState('');
   const [resumeLink, setResumeLink] = useState('');
   const [saving, setSaving] = useState(false);
+  const [qrExpanded, setQrExpanded] = useState(false);
+  const [showSuccessQR, setShowSuccessQR] = useState(false);
+  const [isCheckinSuccess, setIsCheckinSuccess] = useState(false);
 
+  const cardRef = useRef(null);
+  const domRefs = useRef({});
+
+  useEffect(() => {
+    if (!profile?.id || profile.checked_in) return;
+
+    const channel = supabase
+      .channel(`checkin-${profile.id}`)
+      .on('postgres_changes', { 
+        event: 'UPDATE', 
+        schema: 'public', 
+        table: 'profiles'
+      }, (payload) => {
+        // More robust: filter locally in the callback
+        if (payload.new.id === profile.id && payload.new.checked_in) {
+          setIsCheckinSuccess(true);
+          updateSession();
+          setTimeout(() => router.push('/app'), 2200);
+        }
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [profile?.id, profile?.checked_in, router, updateSession]);
 
   useEffect(() => {
     if (qrExpanded) {
@@ -290,11 +317,10 @@ function MyCardContent() {
         alignItems: 'center', padding: '40px 20px', textAlign: 'center',
         background: 'var(--bg)', gap: 32, overflowY: 'auto'
       }}>
-        {/* 1. Card Preview */}
         <div style={{ 
           transform: 'scale(0.85)', 
           transformOrigin: 'top center',
-          marginBottom: -40 // Offset the scale gap
+          marginBottom: -40 
         }}>
           <CardPreview
             user={{ ...profile, name, avatar, role, company }}
@@ -304,7 +330,6 @@ function MyCardContent() {
           />
         </div>
 
-        {/* 2. Edit Button */}
         <button
           onClick={() => {
             setShowSuccessQR(false);
@@ -320,7 +345,6 @@ function MyCardContent() {
           <UserIcon size={16} /> Edit Profile Info
         </button>
 
-        {/* 3. Enlarged QR Section */}
         <div style={{
           background: 'var(--white)', padding: 32, borderRadius: 32,
           boxShadow: '0 20px 60px rgba(0,0,0,0.08)', border: '1px solid var(--border)',
@@ -345,7 +369,6 @@ function MyCardContent() {
           </div>
         </div>
 
-        {/* Success Overlay */}
         {isCheckinSuccess && (
           <div style={{
             position: 'fixed', inset: 0, zIndex: 10000,
@@ -415,7 +438,6 @@ function MyCardContent() {
         alignItems: 'center', minHeight: '80dvh',
       }}>
 
-        {/* ── Card display ── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center', width: '100%', overflowX: 'hidden' }}>
           <div
             onClick={() => setQrExpanded(true)}
@@ -454,7 +476,6 @@ function MyCardContent() {
           )}
         </div>
 
-        {/* ── Edit form ── */}
         {isEditing && (
           <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 24 }} className="page-enter">
             <div style={{

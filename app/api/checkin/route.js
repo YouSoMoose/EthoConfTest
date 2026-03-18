@@ -16,10 +16,12 @@ export async function POST(request) {
     return NextResponse.json({ error: 'user_id is required' }, { status: 400 });
   }
 
+  // Handle both UUID and Email in user_id
+  const isEmail = user_id.includes('@');
   const { data: profile } = await supabaseAdmin
     .from('profiles')
     .select('*')
-    .eq('id', user_id)
+    .eq(isEmail ? 'email' : 'id', user_id)
     .single();
 
   if (!profile) {
@@ -36,7 +38,7 @@ export async function POST(request) {
       checked_in: true,
       checked_in_at: new Date().toISOString(),
     })
-    .eq('id', user_id)
+    .eq('id', profile.id) // Always use the primary key for the update
     .select()
     .single();
 
