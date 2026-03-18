@@ -89,6 +89,14 @@ export default function AttendeeDashboard() {
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [customizations, setCustomizations] = useState(null);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [notifPermission, setNotifPermission] = useState('default');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      setNotifPermission(Notification.permission);
+    }
+  }, []);
 
   const heroRef = useScrollHero({ minScale: 0.96, distance: 180 });
   const cardPreviewRef = useRef(null);
@@ -215,11 +223,13 @@ export default function AttendeeDashboard() {
 
       <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 24, paddingBottom: 120 }}>
 
-        {typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default' && (
+        {typeof window !== 'undefined' && 'Notification' in window && notifPermission === 'default' && (
           <div style={{
             background: 'var(--accent)', color: 'var(--text)', borderRadius: 16, padding: '16px 20px',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.1)', animation: 'fadeUp 0.5s ease both'
+            boxShadow: '0 8px 24px rgba(0,0,0,0.1)', 
+            animation: showSuccess ? 'notifExit 0.5s var(--liquid-slow) forwards' : 'fadeUp 0.5s ease both',
+            transition: 'all 0.5s var(--liquid-slow)',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <Bell size={20} />
@@ -229,7 +239,16 @@ export default function AttendeeDashboard() {
               </div>
             </div>
             <button
-              onClick={() => { Notification.requestPermission().then(() => window.location.reload()); }}
+              onClick={() => { 
+                Notification.requestPermission().then((p) => {
+                  if (p === 'granted') {
+                    setShowSuccess(true);
+                    setTimeout(() => window.location.reload(), 2600);
+                  } else {
+                    window.location.reload();
+                  }
+                }); 
+              }}
               className="bubble-click"
               style={{
                 background: 'var(--text)', color: 'var(--white)', border: 'none', borderRadius: 8,
@@ -239,6 +258,47 @@ export default function AttendeeDashboard() {
             >
               Turn On
             </button>
+          </div>
+        )}
+
+        {showSuccess && (
+          <div style={{
+            position: 'fixed', inset: 0, zIndex: 100000,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            pointerEvents: 'none',
+          }}>
+            <div style={{
+              textAlign: 'center', animation: 'successPop 0.8s var(--liquid) both',
+            }}>
+              <div style={{
+                width: 80, height: 80, borderRadius: 40, background: 'var(--g)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                margin: '0 auto 20px', color: '#fff', boxShadow: '0 12px 30px rgba(62, 92, 38, 0.3)',
+              }}>
+                <Bell size={40} />
+              </div>
+              <h2 style={{ fontFamily: 'var(--fh)', fontSize: 24, fontWeight: 800, color: 'var(--g)', margin: 0 }}>
+                Notifications Enabled!
+              </h2>
+              <p style={{ fontFamily: 'var(--fb)', fontSize: 16, color: 'var(--sub)', marginTop: 8, fontWeight: 600 }}>
+                You're all set! 🥳
+              </p>
+              
+              {/* Simple CSS Particles */}
+              {[...Array(12)].map((_, i) => (
+                <div key={i} style={{
+                  position: 'absolute', top: '40%', left: '50%',
+                  width: 8, height: 8, borderRadius: '50%',
+                  background: i % 2 === 0 ? 'var(--accent)' : 'var(--g)',
+                  '--tx': `${(Math.cos(i * 30 * Math.PI / 180) * 100)}px`,
+                  '--ty': `${(Math.sin(i * 30 * Math.PI / 180) * 100)}px`,
+                  animation: 'particleBurst 1s ease-out both',
+                  animationDelay: '0.2s',
+                }} />
+              ))}
+            </div>
           </div>
         )}
 

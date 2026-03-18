@@ -29,6 +29,14 @@ export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [notifPermission, setNotifPermission] = useState('default');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      setNotifPermission(Notification.permission);
+    }
+  }, []);
 
   useIOSHeight();
 
@@ -50,7 +58,8 @@ export default function LoginPage() {
     if ('Notification' in window) {
       const permission = await Notification.requestPermission();
       if (permission === 'granted') {
-        toast.success('Notifications enabled!');
+        setShowSuccess(true);
+        setTimeout(() => window.location.reload(), 2200);
       }
     }
   };
@@ -190,19 +199,23 @@ export default function LoginPage() {
           Terms of Use & Privacy Policy <ShieldCheck size={14} />
         </button>
 
-        <button
-          onClick={requestNotifications}
-          className="liquid-hover"
-          style={{
-            width: '100%', padding: '10px 12px', background: 'transparent',
-            border: 'none', color: 'var(--muted)', fontSize: 13, fontWeight: 600,
-            fontFamily: 'var(--fb)', cursor: 'pointer', marginBottom: 16,
-            textDecoration: 'underline', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            transition: 'all 0.4s var(--liquid)',
-          }}
-        >
-          Enable Browser Notifications <Bell size={14} />
-        </button>
+        {notifPermission === 'default' && (
+          <button
+            onClick={requestNotifications}
+            className="liquid-hover"
+            style={{
+              width: '100%', padding: '10px 12px', background: 'transparent',
+              border: 'none', color: 'var(--muted)', fontSize: 13, fontWeight: 600,
+              fontFamily: 'var(--fb)', cursor: 'pointer', marginBottom: 16,
+              textDecoration: 'underline', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              transition: 'all 0.4s var(--liquid)',
+              opacity: showSuccess ? 0 : 1,
+              transform: showSuccess ? 'translateY(10px)' : 'translateY(0)',
+            }}
+          >
+            Enable Browser Notifications <Bell size={14} />
+          </button>
+        )}
 
         <Modal open={termsOpen} onClose={() => setTermsOpen(false)} title="Legal Information" center>
           <div style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: 8, textAlign: 'left', fontFamily: 'var(--fb)' }}>
@@ -301,6 +314,47 @@ export default function LoginPage() {
             </button>
           </div>
         </Modal>
+
+        {showSuccess && (
+          <div style={{
+            position: 'fixed', inset: 0, zIndex: 100000,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            pointerEvents: 'none',
+          }}>
+            <div style={{
+              textAlign: 'center', animation: 'successPop 0.8s var(--liquid) both',
+            }}>
+              <div style={{
+                width: 80, height: 80, borderRadius: 40, background: 'var(--g)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                margin: '0 auto 20px', color: '#fff', boxShadow: '0 12px 30px rgba(62, 92, 38, 0.3)',
+              }}>
+                <Bell size={40} />
+              </div>
+              <h2 style={{ fontFamily: 'var(--fh)', fontSize: 24, fontWeight: 800, color: 'var(--g)', margin: 0 }}>
+                Notifications Enabled!
+              </h2>
+              <p style={{ fontFamily: 'var(--fb)', fontSize: 16, color: 'var(--sub)', marginTop: 8, fontWeight: 600 }}>
+                You're all set! 🥳
+              </p>
+              
+              {/* Simple CSS Particles */}
+              {[...Array(12)].map((_, i) => (
+                <div key={i} style={{
+                  position: 'absolute', top: '40%', left: '50%',
+                  width: 8, height: 8, borderRadius: '50%',
+                  background: i % 2 === 0 ? 'var(--accent)' : 'var(--g)',
+                  '--tx': `${(Math.cos(i * 30 * Math.PI / 180) * 100)}px`,
+                  '--ty': `${(Math.sin(i * 30 * Math.PI / 180) * 100)}px`,
+                  animation: 'particleBurst 1s ease-out both',
+                  animationDelay: '0.2s',
+                }} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

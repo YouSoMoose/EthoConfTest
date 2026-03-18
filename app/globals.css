@@ -242,6 +242,21 @@ a, button, [role="button"] {
   100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+@keyframes successPop {
+  0% { transform: scale(0.5) translateY(50px); opacity: 0; }
+  60% { transform: scale(1.15) translateY(-20px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+@keyframes particleBurst {
+  0% { transform: translate(0,0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* ── Modal overlay ─────────────────────────────────────── */
 .modal-overlay {
   position: fixed;
