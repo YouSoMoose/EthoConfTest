@@ -6,13 +6,14 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import PageTransition from '@/components/PageTransition';
 
-import { LayoutDashboard, CheckCircle, MessageSquare, Calendar, Users, User, Leaf, Menu, X } from 'lucide-react';
+import { LayoutDashboard, CheckCircle, MessageSquare, Calendar, Users, User, Leaf, Menu, X, CreditCard } from 'lucide-react';
 
 const tabs = [
   { label: 'Dashboard', href: '/admin', icon: LayoutDashboard, show: (level) => level >= 2 },
   { label: 'Check-in', href: '/admin/checkin', icon: CheckCircle, show: (level) => level >= 2 },
   { label: 'Messages', href: '/admin/messages', icon: MessageSquare, show: (level) => level >= 3 },
   { label: 'Schedule', href: '/admin/schedule', icon: Calendar, show: (level) => level >= 3 },
+  { label: 'ID Cards', href: '/admin/cards', icon: CreditCard, show: (level) => level >= 3 },
   { label: 'Users', href: '/admin/users', icon: Users, show: (level) => level >= 3 },
 ];
 
@@ -40,10 +41,10 @@ export default function AdminLayout({ children }) {
 
   if (level === 2) {
     return (
-      <div style={{ minHeight: '100vh', background: 'var(--abg)', color: 'var(--atext)', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ minHeight: 'var(--app-height, 100dvh)', height: 'var(--app-height, 100dvh)', background: 'var(--abg)', color: 'var(--atext)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <header style={{
           background: 'rgba(74, 63, 53, 0.85)',
-          backdropFilter: 'blur(16px)',
+          backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
           borderBottom: '1px solid var(--aborder)',
           padding: '12px 16px',
           display: 'flex',
@@ -75,7 +76,7 @@ export default function AdminLayout({ children }) {
             </button>
           </div>
         </header>
-        <main style={{ flex: 1, paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
+        <main style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', position: 'relative', minHeight: 0 }}>
           <PageTransition>{children}</PageTransition>
         </main>
       </div>
@@ -83,7 +84,7 @@ export default function AdminLayout({ children }) {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--abg)', color: 'var(--atext)' }}>
+    <div style={{ minHeight: 'var(--app-height, 100dvh)', height: 'var(--app-height, 100dvh)', background: 'var(--abg)', color: 'var(--atext)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
       {/* Desktop sidebar */}
       <aside className="admin-sidebar" style={{
         background: 'rgba(74, 63, 53, 0.85)',
@@ -206,7 +207,7 @@ export default function AdminLayout({ children }) {
             position: 'fixed', top: 0, left: 0, bottom: 0,
             width: 260,
             background: 'rgba(74, 63, 53, 0.95)',
-            backdropFilter: 'blur(20px)',
+            backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
             borderRight: '1px solid var(--aborder)',
             zIndex: 210, padding: '20px 0',
             display: 'flex', flexDirection: 'column',
@@ -267,7 +268,7 @@ export default function AdminLayout({ children }) {
       )}
 
       {/* Main content */}
-      <main className="admin-main">
+      <main className="admin-main" style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', position: 'relative', minHeight: 0 }}>
         <PageTransition>{children}</PageTransition>
       </main>
     </div>

@@ -66,7 +66,9 @@ export default function Modal({ open, onClose, title, subtitle, admin, center, c
         transition: 'opacity 0.2s',
         alignItems: center ? 'center' : 'flex-end',
         padding: center ? 16 : 0,
-        background: 'rgba(0, 0, 0, 0.75)' // Darker overlay as requested
+        background: 'rgba(0, 0, 0, 0.75)', // Darker overlay as requested
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
       }}
     >
       <div
@@ -88,7 +90,8 @@ export default function Modal({ open, onClose, title, subtitle, admin, center, c
                 : (center ? 'scale(0.95) translateY(10px)' : 'translateY(100%)')),
           transition: dragging ? 'none' : 'transform 0.25s cubic-bezier(0.22, 1, 0.36, 1)',
           paddingBottom: center ? 24 : 'max(32px, env(safe-area-inset-bottom))',
-          boxShadow: center ? '0 20px 40px rgba(0,0,0,0.1)' : 'none'
+          boxShadow: center ? '0 20px 40px rgba(0,0,0,0.1)' : 'none',
+          WebkitOverflowScrolling: 'touch',
         }}
       >
         {/* Drag handle (only for bottom sheets) */}

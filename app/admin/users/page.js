@@ -46,7 +46,7 @@ export default function AdminUsersPage() {
   );
 
   return (
-    <div className="page-enter" style={{ padding: '24px 16px' }}>
+    <div className="page-enter" style={{ padding: '24px 16px', height: '100%', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 22, color: 'var(--atext)', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
           <Users size={24} /> Users
@@ -88,9 +88,26 @@ export default function AdminUsersPage() {
                   <td style={{ padding: '12px 14px', color: 'var(--asub)' }}>{u.email}</td>
                   <td style={{ padding: '12px 14px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ color: u.checked_in ? 'var(--agreen)' : 'var(--amuted)', fontWeight: 600, display: 'flex', alignItems: 'center' }}>
-                        {u.checked_in ? <Check size={18} strokeWidth={3} /> : '—'}
-                      </span>
+                      <button 
+                        onClick={() => {
+                          if (u.checked_in) undoCheckin(u.id);
+                          else {
+                            // Logic to check-in
+                            fetch('/api/checkin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: u.id }) })
+                              .then(res => {
+                                if (res.ok) {
+                                  setUsers(p => p.map(x => x.id === u.id ? { ...x, checked_in: true } : x));
+                                  toast.success('Checked in');
+                                } else toast.error('Check-in failed');
+                              });
+                          }
+                        }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}
+                      >
+                        <span style={{ color: u.checked_in ? 'var(--agreen)' : 'var(--amuted)', fontWeight: 600, display: 'flex', alignItems: 'center' }}>
+                          {u.checked_in ? <Check size={18} strokeWidth={3} /> : <div style={{ width: 18, height: 18, border: '2px solid var(--aborder)', borderRadius: 4 }} />}
+                        </span>
+                      </button>
                       {u.checked_in && (
                         <button 
                           onClick={() => undoCheckin(u.id)}
@@ -138,16 +155,24 @@ export default function AdminUsersPage() {
                 <h3 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 14, color: 'var(--atext)' }}>{u.name || 'No name'}</h3>
                 <p style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--amuted)' }}>{u.email}</p>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                {u.checked_in && (
-                  <button 
-                    onClick={() => undoCheckin(u.id)}
-                    style={{ background: 'var(--as1)', border: 'none', borderRadius: 6, padding: 6, color: 'var(--asub)', display: 'flex' }}
-                  >
-                    <RefreshCcw size={14} />
-                  </button>
-                )}
-                {u.checked_in && <Check size={18} strokeWidth={3} color="var(--agreen)" />}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <button 
+                  onClick={() => {
+                    if (u.checked_in) undoCheckin(u.id);
+                    else {
+                      fetch('/api/checkin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: u.id }) })
+                        .then(res => {
+                          if (res.ok) {
+                            setUsers(p => p.map(x => x.id === u.id ? { ...x, checked_in: true } : x));
+                            toast.success('Checked in');
+                          } else toast.error('Check-in failed');
+                        });
+                    }
+                  }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}
+                >
+                  {u.checked_in ? <Check size={18} strokeWidth={3} color="var(--agreen)" /> : <div style={{ width: 18, height: 18, border: '2px solid var(--aborder)', borderRadius: 4 }} />}
+                </button>
                 <select
                   value={u.access_level}
                   onChange={e => updateRole(u.id, e.target.value)}

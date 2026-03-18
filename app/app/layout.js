@@ -23,14 +23,16 @@ function AttendeeLayoutContent({ children }) {
 
   return (
     <div style={{ 
-      height: '100dvh', 
+      minHeight: 'var(--app-height, 100dvh)',
+      height: 'var(--app-height, 100dvh)',
       background: 'var(--bg)', 
       display: 'flex', 
       flexDirection: 'column', 
       overflow: 'hidden',
-      position: 'relative'
+      position: 'relative',
+      touchAction: 'none'
     }}>
-      <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+      <div style={{ flex: 1, position: 'relative', overflow: 'hidden', minHeight: 0 }}>
         <PageTransition>{children}</PageTransition>
       </div>
       {!isOnboarding && <BottomNav />}

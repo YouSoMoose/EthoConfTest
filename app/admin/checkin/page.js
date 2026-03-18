@@ -108,7 +108,7 @@ export default function AdminCheckinPage() {
   }, [stopCamera]);
 
   return (
-    <div className="page-enter" style={{ padding: '24px 16px', minHeight: '100dvh' }}>
+    <div className="page-enter" style={{ padding: '24px 16px', height: '100%', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
       <div style={{ maxWidth: 600, margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
           <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 800, fontSize: 24, color: 'var(--atext)', margin: 0 }}>
@@ -202,7 +202,7 @@ export default function AdminCheckinPage() {
               </div>
 
               <div style={{ position: 'absolute', bottom: 20, left: 0, right: 0, textAlign: 'center' }}>
-                <span style={{ background: 'rgba(0,0,0,0.6)', color: '#fff', padding: '6px 16px', borderRadius: 20, fontSize: 12, fontWeight: 700, backdropFilter: 'blur(4px)' }}>
+                <span style={{ background: 'rgba(0,0,0,0.6)', color: '#fff', padding: '6px 16px', borderRadius: 20, fontSize: 12, fontWeight: 700, backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}>
                   {multiMode ? "Multi-Person Active" : "Single Scan Active"}
                 </span>
               </div>

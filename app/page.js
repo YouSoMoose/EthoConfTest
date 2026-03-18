@@ -187,14 +187,13 @@ export default function LandingPage() {
   if (isLoading || isAuthenticated) {
     return (
       <div style={{
-        height: 'var(--app-height, 100dvh)',
-        background: 'var(--hero)',
+        minHeight: 'var(--app-height, 100dvh)', height: 'var(--app-height, 100dvh)', background: 'var(--hero)',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        overflow: 'hidden',
+        overflow: 'hidden'
       }}>
         <div style={{
           width: 'clamp(56px, 12vh, 64px)', height: 'clamp(56px, 12vh, 64px)', borderRadius: 32,
-          background: 'rgba(255,255,255,0.3)', backdropFilter: 'blur(12px)',
+          background: 'rgba(255,255,255,0.3)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           margin: '0 auto 20px', overflow: 'hidden', padding: 6,
           boxShadow: '0 8px 32px rgba(0,0,0,0.08)', border: '1px solid rgba(255,255,255,0.4)'
@@ -213,13 +212,7 @@ export default function LandingPage() {
 
   return (
     <div
-      style={{
-        height: 'var(--app-height, 100dvh)', // ← JS-measured, not 100dvh
-        display: 'flex', flexDirection: 'column',
-        overflow: 'hidden', // ← no scroll ever
-        position: 'relative',
-        touchAction: 'pan-y',
-      }}
+      style={{ minHeight: 'var(--app-height, 100dvh)', height: 'var(--app-height, 100dvh)', display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative', touchAction: 'pan-y' }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
@@ -237,7 +230,7 @@ export default function LandingPage() {
       }}>
         <div style={{
           width: 'clamp(56px, 12vh, 64px)', height: 'clamp(56px, 12vh, 64px)', borderRadius: 32,
-          background: 'rgba(255,255,255,0.3)', backdropFilter: 'blur(12px)',
+          background: 'rgba(255,255,255,0.3)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           margin: '0 auto clamp(12px, 2.5vh, 20px)', overflow: 'hidden', padding: 6,
           boxShadow: '0 8px 32px rgba(0,0,0,0.08)', border: '1px solid rgba(255,255,255,0.4)'
@@ -311,7 +304,7 @@ export default function LandingPage() {
 
       {/* Dots + CTA */}
       <div style={{
-        padding: `0 24px max(24px, env(safe-area-inset-bottom))`,
+        padding: '0 24px calc(max(24px, env(safe-area-inset-bottom)) + 24px)',
         maxWidth: 420, width: '100%', margin: '0 auto', zIndex: 10, position: 'relative',
         flexShrink: 0,
       }}>

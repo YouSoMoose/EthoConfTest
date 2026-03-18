@@ -404,7 +404,7 @@ function MyCardContent() {
         <div style={{
           position: 'fixed', inset: 0, zIndex: 1000, 
           background: 'var(--bg)', display: 'flex', flexDirection: 'column', 
-          alignItems: 'center', padding: 'max(24px, env(safe-area-inset-top)) 24px',
+          alignItems: 'center', padding: 'max(24px, env(safe-area-inset-top)) 24px calc(max(24px, env(safe-area-inset-bottom)) + 24px)',
           animation: 'fadeUp 0.6s var(--liquid) both'
         }}>
           <div style={{ maxWidth: 500, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 32 }}>
@@ -450,7 +450,7 @@ function MyCardContent() {
           onClick={() => setQrExpanded(false)}
           className="modal-overlay" 
           style={{ 
-            background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(20px)', 
+            background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
             zIndex: 1001, alignItems: 'center' 
           }}
         >

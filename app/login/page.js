@@ -58,7 +58,7 @@ export default function LoginPage() {
   if (status === 'loading' || (status === 'authenticated' && session?.profile)) {
     return (
       <div style={{
-        height: 'var(--app-height, 100dvh)',
+        minHeight: 'var(--app-height, 100dvh)', height: 'var(--app-height, 100dvh)',
         background: 'var(--hero)',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         overflow: 'hidden',
@@ -75,7 +75,7 @@ export default function LoginPage() {
 
   return (
     <div style={{
-      height: 'var(--app-height, 100dvh)',
+      minHeight: 'var(--app-height, 100dvh)', height: 'var(--app-height, 100dvh)',
       background: 'linear-gradient(135deg, #FFE2D6 0%, #FCBD9D 100%)',
       display: 'flex',
       flexDirection: 'column',
@@ -107,7 +107,7 @@ export default function LoginPage() {
         <div style={{
           width: 'clamp(64px, 14vh, 80px)', height: 'clamp(64px, 14vh, 80px)', borderRadius: '50%',
           background: 'rgba(255,255,255,0.4)',
-          backdropFilter: 'blur(15px)',
+          backdropFilter: 'blur(15px)', WebkitBackdropFilter: 'blur(15px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           margin: '0 auto 24px', overflow: 'hidden', padding: 4,
           boxShadow: '0 12px 30px rgba(0,0,0,0.1)',
@@ -139,7 +139,7 @@ export default function LoginPage() {
       <div style={{
         background: '#fff',
         borderRadius: '32px 32px 0 0',
-        padding: `32px 24px max(32px, env(safe-area-inset-bottom))`,
+        padding: `32px 24px calc(max(24px, env(safe-area-inset-bottom)) + 32px)`,
         boxShadow: '0 -15px 50px rgba(0,0,0,0.12)',
         flexShrink: 0, // ← don't let this shrink and push content
       }}>

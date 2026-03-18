@@ -181,7 +181,7 @@ export default function AttendeeDashboard() {
           <div style={{ marginTop: 28, display: 'flex', gap: 12 }}>
             {profile?.access_level >= 3 && (
               <Link href="/admin" style={{
-                flex: 1, background: 'rgba(0,0,0,0.06)', backdropFilter: 'blur(10px)', border: '1px solid rgba(0,0,0,0.1)',
+                flex: 1, background: 'rgba(0,0,0,0.06)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', border: '1px solid rgba(0,0,0,0.1)',
                 borderRadius: 14, padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 color: 'var(--g)', fontSize: 13, fontWeight: 700, textDecoration: 'none',
                 transition: `transform 0.4s ${SPRING}`,

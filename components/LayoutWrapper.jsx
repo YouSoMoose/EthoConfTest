@@ -7,7 +7,10 @@ export default function LayoutWrapper({ children }) {
   const isAdmin = pathname?.startsWith('/admin');
 
   return (
-    <div className={isAdmin ? 'full-container' : 'mobile-container'}>
+    <div 
+      className={isAdmin ? 'full-container' : 'mobile-container'}
+      style={{ overflow: 'hidden' }}
+    >
       {children}
     </div>
   );

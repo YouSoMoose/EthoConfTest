@@ -361,7 +361,7 @@ function AdminIDCardsContent() {
   if (loading) return <Loader admin />;
 
   return (
-    <div className={`page-enter ${printingId ? 'is-printing-single' : ''}`} style={{ padding: '32px 20px', background: 'var(--as2)' }}>
+    <div className={`page-enter ${printingId ? 'is-printing-single' : ''}`} style={{ padding: '32px 20px', background: 'var(--as2)', height: '100%', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
       <style>{`
         @media print {
           .is-printing-single .hide-when-printing-single { display: none !important; }
