@@ -159,7 +159,7 @@ export default function AnnouncementBanner() {
                   fontFamily: 'var(--fb)', fontWeight: 700, fontSize: 13,
                   color: 'rgba(255,255,255,0.95)',
                   textTransform: 'uppercase', letterSpacing: '0.02em',
-                }}>ETHOS 2026</span>
+                }}>The Circular Economy Conference</span>
                 <span style={{
                   fontFamily: 'var(--fb)', fontSize: 11, color: 'rgba(255,255,255,0.4)',
                 }}>{timeLabel}</span>

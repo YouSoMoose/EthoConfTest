@@ -5,8 +5,8 @@ import MessageNotification from '@/components/MessageNotification';
 import AnnouncementBanner from '@/components/AnnouncementBanner';
 
 export const metadata = {
-  title: 'Ethos 2026 — Sustainability Conference',
-  description: 'The official app for Ethos 2026, a sustainability and innovation conference.',
+  title: 'The Circular Economy Conference',
+  description: 'The official app for The Circular Economy Conference, a sustainability and innovation conference.',
   icons: {
     icon: '/assets/ethos-logo-insignia.png',
     apple: '/assets/ethos-logo-insignia.png',

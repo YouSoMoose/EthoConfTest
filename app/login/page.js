@@ -68,11 +68,8 @@ export default function LoginPage() {
           }}>
             Annual Conference · 2026
           </p>
-          <h1 style={{
-            fontFamily: 'var(--fh)', fontSize: 'clamp(42px, 10vh, 52px)', fontWeight: 800,
-            color: 'var(--text)', lineHeight: 1, marginBottom: 8,
-          }}>
-            Ethos
+          <h1 style={{ fontFamily: 'var(--fh)', fontSize: 36, fontWeight: 800, color: 'var(--text)', margin: '4px 0 8px', lineHeight: 1 }}>
+            The Circular Economy Conference
           </h1>
           <p style={{
             fontSize: 14, color: 'var(--sub)',

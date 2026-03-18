@@ -20,9 +20,9 @@ const DEFAULT_STYLE = {
   emailSize: 10, emailX: 0, emailY: 0, emailVisible: true,
   qrSize: 90, qrX: 0, qrY: 0, qrVisible: true,
   logoSize: 36, logoX: 0, logoY: 0, logoVisible: true,
-  accentColor: '#D49B7A',
-  textColor: '#413429',
-  subColor: '#7D6F63',
+  accentColor: '#000000',
+  textColor: '#000000',
+  subColor: '#333333',
 };
 
 const LIVE_MAP = {
@@ -291,7 +291,7 @@ function MyCardContent() {
 
   if (!profile) return <Loader />;
 
-  const qrValue = profile.id || profile.email || 'ethos-placeholder';
+  const qrValue = profile.id || profile.email || 'conference-placeholder';
 
   return (
     <div className="page-enter" style={{ paddingBottom: 100 }}>
@@ -413,7 +413,7 @@ function MyCardContent() {
                     <label className="section-label">{label}</label>
                     <div style={{ 
                       display: 'flex', alignItems: 'center', gap: 12, 
-                      background: '#f8f5f2', padding: '0 16px', borderRadius: 16,
+                      padding: '0 16px', borderRadius: 16,
                       border: 'none', transition: 'all 0.2s'
                     }}>
                       {icon}
@@ -440,7 +440,7 @@ function MyCardContent() {
                     onChange={e => setBio(e.target.value)}
                     placeholder="Tell us about yourself..."
                     style={{ 
-                      width: '100%', background: '#f8f5f2', border: 'none', 
+                      width: '100%', background: 'transparent', border: 'none', 
                       padding: '16px', fontSize: 15, outline: 'none', fontWeight: 500,
                       borderRadius: 16, minHeight: 120, fontFamily: 'inherit', resize: 'none',
                       color: 'var(--text)'
@@ -453,7 +453,7 @@ function MyCardContent() {
                   <label className="section-label">Email Address</label>
                   <div style={{ 
                     display: 'flex', alignItems: 'center', gap: 12, 
-                    background: '#f8f5f2', padding: '0 16px', borderRadius: 16, 
+                    padding: '0 16px', borderRadius: 16, 
                     border: 'none', opacity: 0.6 
                   }}>
                     <Mail size={18} color="var(--muted)" />

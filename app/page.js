@@ -28,7 +28,7 @@ const slides = [
   },
   {
     icon: '🛂', title: 'Passport Stamps',
-    desc: 'Visit booths and collect stamps on your digital passport. Complete your journey through Ethos.',
+    desc: 'Visit booths and collect stamps on your digital passport. Complete your journey through the conference.',
     c1: '#F5F0EA', c2: '#D4CCC4', textMode: 'dark',
   },
   {
@@ -256,7 +256,7 @@ export default function LandingPage() {
           lineHeight: 1, marginBottom: 6, transition: 'color 0.4s ease',
           textShadow: slide.textMode === 'light' ? '0 2px 10px rgba(0,0,0,0.1)' : 'none'
         }}>
-          Ethos
+          Circular Economy
         </h1>
       </div>
 

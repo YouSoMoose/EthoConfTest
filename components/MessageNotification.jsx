@@ -19,7 +19,11 @@ export default function MessageNotification() {
   useEffect(() => {
     if (!session?.profile?.id) return;
     if (pathname === '/app/chat' || pathname === '/admin/messages') return;
-    if (realtimeTrigger === 0) return; // Skip initial mount, only respond to Realtime
+    // Only run if triggered by Realtime to avoid double on load
+    if (realtimeTrigger === 0) return; 
+
+    // Local state to track the active fetch, debounce-like
+    let isSubscribed = true;
 
     (async () => {
       try {
@@ -27,20 +31,27 @@ export default function MessageNotification() {
         if (res.ok) {
           const msg = await res.json();
           // Don't notify if the message is from ourselves, or if it's the exact same message
-          if (msg && msg.id !== lastNotifiedId && msg.sender_id !== session.profile.id) {
+          if (isSubscribed && msg && msg.id !== lastNotifiedId && msg.sender_id !== session.profile.id) {
             setLastNotifiedId(msg.id);
             setActiveMsg(msg);
             setExiting(false);
             
             setTimeout(() => {
+              if (!isSubscribed) return;
               setExiting(true);
-              setTimeout(() => setActiveMsg(null), 400);
+              setTimeout(() => {
+                if (isSubscribed) setActiveMsg(null);
+              }, 400);
             }, 6000); // 6s auto-dismiss
           }
         }
       } catch {}
     })();
-  }, [realtimeTrigger]);
+
+    return () => {
+      isSubscribed = false;
+    };
+  }, [realtimeTrigger, session?.profile?.id, pathname, lastNotifiedId]);
 
   // Supabase Realtime — listen for ALL new messages (no filter = works for everyone)
   useEffect(() => {

@@ -99,7 +99,7 @@ export default function AttendeeDashboard() {
   useEffect(() => {
     const fetchSched = fetch('/api/schedule').then(r => r.json());
     const fetchAnn = fetch(`/api/announcements?_t=${Date.now()}`).then(r => r.json());
-    
+
     Promise.all([fetchSched, fetchAnn]).then(([sched, ann]) => {
       setSchedule(sched || []);
       setAnnouncements(ann || []);
@@ -132,7 +132,7 @@ export default function AttendeeDashboard() {
           if (parsed[session.profile.id]) {
             setCustomizations(parsed[session.profile.id]);
           }
-        } catch(e) {}
+        } catch (e) { }
       }
     }
   }, [session]);
@@ -177,12 +177,12 @@ export default function AttendeeDashboard() {
                 Hey, {firstName}!
               </h1>
               <p style={{ fontFamily: 'var(--fb)', fontSize: 13, opacity: 0.9, marginTop: 2, color: 'var(--sub)', fontWeight: 500 }}>
-                Welcome to Ethos 2026
+                Welcome to The Circular Economy Conference
               </p>
             </div>
             <img src="/assets/ethos-logo-insignia.png" alt="" style={{ width: 44, height: 44, objectFit: 'contain' }} />
           </div>
-          
+
           <div style={{ marginTop: 28, display: 'flex', gap: 12 }}>
             {profile?.access_level >= 3 && (
               <Link href="/admin" style={{
@@ -195,17 +195,17 @@ export default function AttendeeDashboard() {
                 <Settings size={16} /> Admin Panel
               </Link>
             )}
-            <button 
+            <button
               type="button"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 signOut({ redirect: true, callbackUrl: '/login' });
-              }} 
+              }}
               className="signout-btn"
               style={{
-                flex: profile?.access_level >= 3 ? 0.4 : 1, 
-                background: 'rgba(0,0,0,0.04)', 
+                flex: profile?.access_level >= 3 ? 0.4 : 1,
+                background: 'rgba(0,0,0,0.04)',
                 border: '1px solid rgba(0,0,0,0.08)',
                 borderRadius: 14, padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 color: 'var(--g)', fontSize: 13, fontWeight: 700, cursor: 'pointer',
@@ -219,7 +219,7 @@ export default function AttendeeDashboard() {
       </div>
 
       <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 24 }}>
-        
+
         {/* Notification Permission Request */}
         {typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default' && (
           <div style={{
@@ -241,7 +241,7 @@ export default function AttendeeDashboard() {
                 <p style={{ margin: '2px 0 0', fontSize: 11, opacity: 0.9 }}>Get alerted about announcements & updates.</p>
               </div>
             </div>
-            <button 
+            <button
               onClick={() => {
                 Notification.requestPermission().then(() => window.location.reload());
               }}
@@ -254,7 +254,7 @@ export default function AttendeeDashboard() {
             </button>
           </div>
         )}
-        
+
         {/* 1. Schedule (Up Next) */}
         {upNext && (
           <div>
@@ -310,9 +310,9 @@ export default function AttendeeDashboard() {
         {/* 3. RESPONSIVE ID CARD PREVIEW — Landscape */}
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-             <p className="section-label" style={{ margin: 0 }}>MY CARD</p>
+            <p className="section-label" style={{ margin: 0 }}>MY CARD</p>
           </div>
-          
+
           <Link
             href="/app/my-card"
             style={{ textDecoration: 'none', display: 'flex', justifyContent: 'center', width: '100%' }}
@@ -322,49 +322,49 @@ export default function AttendeeDashboard() {
           >
             <div
               ref={cardPreviewRef}
-              style={{ 
-                transformOrigin: 'top center', 
+              style={{
+                transformOrigin: 'top center',
                 transform: 'scale(calc((100vw - 32px) / 320))',
                 width: 320, height: 152,
                 transition: `transform 0.4s ${SPRING}`,
               }}
             >
-               <CardPreview user={profile || {}} style={customizations || undefined} />
+              <CardPreview user={profile || {}} style={customizations || undefined} />
             </div>
           </Link>
         </div>
 
         {/* 4. NOTES APP LINK — with spring press */}
         <div>
-           <p className="section-label">WORKSPACE</p>
-           <Link
-             href="/app/notes"
-             ref={notesCardRef}
-             onPointerDown={() => springDown(notesCardRef)}
-             onPointerUp={() => springUp(notesCardRef)}
-             onPointerLeave={() => springUp(notesCardRef)}
-             style={{
-               background: 'var(--white)',
-               border: '1px solid var(--border)',
-               borderRadius: 'var(--r)',
-               padding: 24,
-               display: 'flex', alignItems: 'center', gap: 16,
-               textDecoration: 'none',
-               boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
-               transform: 'scale(1)',
-               transition: `transform 0.4s ${SPRING}`,
-               WebkitTapHighlightColor: 'transparent',
+          <p className="section-label">WORKSPACE</p>
+          <Link
+            href="/app/notes"
+            ref={notesCardRef}
+            onPointerDown={() => springDown(notesCardRef)}
+            onPointerUp={() => springUp(notesCardRef)}
+            onPointerLeave={() => springUp(notesCardRef)}
+            style={{
+              background: 'var(--white)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--r)',
+              padding: 24,
+              display: 'flex', alignItems: 'center', gap: 16,
+              textDecoration: 'none',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
+              transform: 'scale(1)',
+              transition: `transform 0.4s ${SPRING}`,
+              WebkitTapHighlightColor: 'transparent',
             }}
-           >
-              <div style={{ width: 48, height: 48, borderRadius: 14, background: 'var(--s1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--g)' }}>
-                 <FileText size={24} />
-              </div>
-              <div style={{ flex: 1 }}>
-                 <h3 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 16, color: 'var(--text)', margin: 0 }}>Capture Notes</h3>
-                 <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--sub)', margin: '4px 0 0 0' }}>Jot down insights from your current session.</p>
-              </div>
-              <ChevronRight color="var(--muted)" />
-           </Link>
+          >
+            <div style={{ width: 48, height: 48, borderRadius: 14, background: 'var(--s1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--g)' }}>
+              <FileText size={24} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <h3 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 16, color: 'var(--text)', margin: 0 }}>Capture Notes</h3>
+              <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--sub)', margin: '4px 0 0 0' }}>Jot down insights from your current session.</p>
+            </div>
+            <ChevronRight color="var(--muted)" />
+          </Link>
         </div>
       </div>
     </div>

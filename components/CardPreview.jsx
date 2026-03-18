@@ -11,9 +11,9 @@ const DEFAULT_STYLE = {
   emailSize: 10,   emailX: 0,   emailY: 0,   emailVisible: true,
   qrSize: 90,      qrX: 0,      qrY: 0,      qrVisible: true,
   logoSize: 36,    logoX: 0,    logoY: 0,    logoVisible: true,
-  accentColor: '#D49B7A',
-  textColor: '#413429',
-  subColor: '#7D6F63',
+  accentColor: '#000000',
+  textColor: '#000000',
+  subColor: '#333333',
 };
 
 /**
@@ -78,18 +78,7 @@ export const CardPreview = memo(function CardPreview({
         boxSizing: 'border-box',
       }}
     >
-      {/* Decorative corner gradient */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0, right: 0,
-          width: 180, height: 180,
-          background: `linear-gradient(135deg, ${s.accentColor}25 0%, transparent 100%)`,
-          borderRadius: '0 0 0 100%',
-          pointerEvents: 'none',
-          zIndex: 0,
-        }}
-      />
+      {/* Decorative corner removed for B&W */}
 
       {/* ── Top section: logo + avatar + text ── */}
       <div style={{ zIndex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0 }}>
@@ -219,10 +208,10 @@ export const CardPreview = memo(function CardPreview({
           fontSize: 9,
           color: 'var(--muted)',
           margin: 0,
-          opacity: 0.6,
+          opacity: 0.9,
           letterSpacing: '0.1em',
         }}>
-          ETHOS 2026 OFFICIAL BADGE
+          THE CIRCULAR ECONOMY CONFERENCE OFFICIAL BADGE
         </p>
       </div>
     </div>
