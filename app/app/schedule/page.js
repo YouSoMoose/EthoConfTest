@@ -69,10 +69,6 @@ export default function SchedulePage() {
                         <span style={{ fontFamily: 'var(--fb)', fontSize: 11, fontWeight: 700 }}>{item.location}</span>
                       </div>
                     )}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--g)', background: 'var(--s2)', padding: '5px 12px', borderRadius: 20, border: '1px solid var(--warm-border)' }}>
-                      <Info size={12} />
-                      <span style={{ fontFamily: 'var(--fb)', fontSize: 11, fontWeight: 800 }}>EVENT INFO</span>
-                    </div>
                   </div>
                 </div>
               </div>

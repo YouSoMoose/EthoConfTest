@@ -25,35 +25,64 @@ export default function AnnouncementBanner() {
   const [announcements, setAnnouncements] = useState([]);
   const [visible, setVisible] = useState([]);
   const [exiting, setExiting] = useState([]);
-  // Fetch announcements ONCE when session loads
+  // Fetch announcements periodically since Realtime might not be enabled for announcements
   useEffect(() => {
-    if (!session?.profile) return;
-    (async () => {
+    if (!session?.profile?.id) return;
+
+    const fetchAnnouncements = async () => {
       try {
         const res = await fetch(`/api/announcements?_t=${Date.now()}`);
         if (res.ok) {
           const data = await res.json();
           const dismissed = getDismissed(session.profile.id);
+          
+          // Data is sorted descending (latest first). We only care about the latest ONE. 
           const fresh = (data || []).filter(a => !dismissed.includes(a.id));
-          setAnnouncements(fresh);
-          setVisible(prev => {
-            const newIds = fresh.map(a => a.id).filter(id => !prev.includes(id));
-            if (newIds.length === 0) return prev;
-            return [...prev, ...newIds];
-          });
+          
+          if (fresh.length > 0) {
+            const latest = fresh[0];
+            const olderIds = fresh.slice(1).map(a => a.id);
+            
+            // Auto-dismiss older announcements so they don't pop up sequentially
+            if (olderIds.length > 0) {
+              const newDismissed = [...dismissed, ...olderIds];
+              localStorage.setItem(`ethos_dismissed_${session.profile.id}`, JSON.stringify(newDismissed));
+            }
+
+            setAnnouncements(prev => {
+              if (prev.some(p => p.id === latest.id)) return prev;
+              return [latest, ...prev];
+            });
+            
+            setVisible(prev => {
+              // Only add if not already visible
+              if (prev.includes(latest.id)) return prev;
+              return [...prev, latest.id];
+            });
+          }
         }
       } catch {}
-    })();
-  }, [session?.profile]);
+    };
 
-  // Supabase Realtime — directly inject new announcements avoiding API race condition
+    fetchAnnouncements();
+    const interval = setInterval(fetchAnnouncements, 10000); // Check every 10s
+    return () => clearInterval(interval);
+  }, [session?.profile?.id]);
+
+  // Keep Supabase Realtime just in case it is enabled, but also limit it to 1 popup
   useEffect(() => {
-    if (!session?.profile) return;
+    if (!session?.profile?.id) return;
     const channel = supabase
       .channel('announcements-realtime')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'announcements' }, (payload) => {
         const newAnn = payload.new;
-        setAnnouncements(prev => [newAnn, ...prev]);
+        const dismissed = getDismissed(session.profile.id);
+        if (dismissed.includes(newAnn.id)) return;
+
+        setAnnouncements(prev => {
+          if (prev.some(p => p.id === newAnn.id)) return prev;
+          return [newAnn, ...prev];
+        });
         setVisible(prev => {
           if (prev.includes(newAnn.id)) return prev;
           return [...prev, newAnn.id];
@@ -62,7 +91,7 @@ export default function AnnouncementBanner() {
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [session?.profile]);
+  }, [session?.profile?.id]);
 
   const dismiss = (id) => {
     setExiting(e => [...e, id]);
