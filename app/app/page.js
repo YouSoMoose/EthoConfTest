@@ -18,7 +18,6 @@ function AnnouncementCard({ a, index }) {
   const timeSince = Math.round((Date.now() - new Date(a.created_at).getTime()) / 60000);
   const timeLabel = timeSince < 1 ? 'just now' : timeSince < 60 ? `${timeSince}m ago` : `${Math.round(timeSince / 60)}h ago`;
 
-  // Spring press on the card
   const handlePointerDown = () => {
     if (!cardRef.current) return;
     cardRef.current.style.transition = 'transform 0.12s ease-out';
@@ -55,16 +54,17 @@ function AnnouncementCard({ a, index }) {
           {timeLabel}
         </span>
       </div>
-      {/* Animated content expand — never display:none */}
       {a.content && (
         <div style={{
           overflow: 'hidden',
-          transition: `max-height 0.4s ${APPLE}, margin 0.4s ${APPLE}, opacity 0.35s ${APPLE}`,
+          transition: expanded 
+            ? `max-height 0.4s ${APPLE}, margin 0.4s ${APPLE}, opacity 0.35s ${APPLE}`
+            : `max-height 0.3s ease-in, margin 0.3s ease-in, opacity 0.2s ease-in`,
           maxHeight: expanded ? 500 : 0,
           marginTop: expanded ? 8 : 0,
           opacity: expanded ? 1 : 0,
         }}>
-          <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--sub)', lineHeight: 1.4 }}>
+          <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--sub)', lineHeight: 1.4, paddingBottom: 4 }}>
             {a.content}
           </p>
         </div>
@@ -89,10 +89,7 @@ export default function AttendeeDashboard() {
   const [loading, setLoading] = useState(true);
   const [customizations, setCustomizations] = useState(null);
 
-  // Scroll-linked hero scale effect
   const heroRef = useScrollHero({ minScale: 0.96, distance: 180 });
-
-  // Spring press refs for interactive cards
   const cardPreviewRef = useRef(null);
   const notesCardRef = useRef(null);
 
@@ -107,9 +104,8 @@ export default function AttendeeDashboard() {
     }).catch(() => setLoading(false));
   }, []);
 
-  // Listen for Realtime inserts and update state directly
   useEffect(() => {
-    const channel = import('@/lib/supabase').then(({ supabase }) => {
+    const channelPromise = import('@/lib/supabase').then(({ supabase }) => {
       return supabase
         .channel('homepage-announcements')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'announcements' }, (payload) => {
@@ -119,7 +115,7 @@ export default function AttendeeDashboard() {
     });
 
     return () => {
-      channel.then(c => import('@/lib/supabase').then(({ supabase }) => supabase.removeChannel(c)));
+      channelPromise.then(c => import('@/lib/supabase').then(({ supabase }) => supabase.removeChannel(c)));
     };
   }, []);
 
@@ -137,7 +133,6 @@ export default function AttendeeDashboard() {
     }
   }, [session]);
 
-  // Spring press helpers
   const springDown = (ref) => {
     if (!ref.current) return;
     ref.current.style.transition = 'transform 0.12s ease-out';
@@ -156,7 +151,8 @@ export default function AttendeeDashboard() {
   const upNext = schedule[0];
 
   return (
-
+    <div className="page-enter" style={{ height: '100%', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+      <div
         ref={heroRef}
         style={{
           background: 'var(--hero)',
@@ -197,7 +193,6 @@ export default function AttendeeDashboard() {
               type="button"
               onClick={(e) => {
                 e.preventDefault();
-                e.stopPropagation();
                 signOut({ redirect: true, callbackUrl: '/login' });
               }}
               className="signout-btn"
@@ -216,21 +211,13 @@ export default function AttendeeDashboard() {
         </div>
       </div>
 
-      <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 24, paddingBottom: 120 }}>
 
-        {/* Notification Permission Request */}
         {typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default' && (
           <div style={{
-            background: 'var(--accent)',
-            color: 'var(--text)',
-            borderRadius: 16,
-            padding: '16px 20px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
-            animation: 'fadeUp 0.5s ease both'
+            background: 'var(--accent)', color: 'var(--text)', borderRadius: 16, padding: '16px 20px',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+            boxShadow: '0 8px 24px rgba(0,0,0,0.1)', animation: 'fadeUp 0.5s ease both'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <Bell size={20} />
@@ -240,9 +227,7 @@ export default function AttendeeDashboard() {
               </div>
             </div>
             <button
-              onClick={() => {
-                Notification.requestPermission().then(() => window.location.reload());
-              }}
+              onClick={() => { Notification.requestPermission().then(() => window.location.reload()); }}
               style={{
                 background: 'var(--text)', color: 'var(--white)', border: 'none', borderRadius: 8,
                 padding: '6px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer'
@@ -253,49 +238,24 @@ export default function AttendeeDashboard() {
           </div>
         )}
 
-        {/* 1. Schedule (Up Next) */}
         {upNext && (
           <div>
             <p className="section-label">📍 UP NEXT</p>
-            <div style={{
-              background: 'var(--gl)',
-              border: '1px solid var(--gb)',
-              borderRadius: 'var(--r)',
-              padding: 16,
-            }}>
+            <div style={{ background: 'var(--gl)', border: '1px solid var(--gb)', borderRadius: 'var(--r)', padding: 16 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
-                  <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 16, color: 'var(--text)' }}>
-                    {upNext.title}
-                  </h3>
-                  <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--sub)', marginTop: 4 }}>
-                    {upNext.description}
-                  </p>
+                  <h3 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 16, color: 'var(--text)' }}>{upNext.title}</h3>
+                  <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--sub)', marginTop: 4 }}>{upNext.description}</p>
                 </div>
-                <span style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  fontFamily: 'var(--fb)',
-                  background: 'var(--gl)',
-                  border: '1px solid var(--gb)',
-                  color: 'var(--g)',
-                  padding: '4px 10px',
-                  borderRadius: 20,
-                  flexShrink: 0,
-                }}>
+                <span style={{ fontSize: 11, fontWeight: 700, fontFamily: 'var(--fb)', background: 'var(--gl)', border: '1px solid var(--gb)', color: 'var(--g)', padding: '4px 10px', borderRadius: 20, flexShrink: 0 }}>
                   {upNext.start_time}
                 </span>
               </div>
-              {upNext.location && (
-                <p style={{ fontFamily: 'var(--fb)', fontSize: 12, color: 'var(--sub)', marginTop: 10 }}>
-                  📍 {upNext.location}
-                </p>
-              )}
+              {upNext.location && <p style={{ fontFamily: 'var(--fb)', fontSize: 12, color: 'var(--sub)', marginTop: 10 }}>📍 {upNext.location}</p>}
             </div>
           </div>
         )}
 
-        {/* 2. Announcements */}
         {announcements.length > 0 && (
           <div>
             <p className="section-label">📢 ANNOUNCEMENTS</p>
@@ -305,12 +265,8 @@ export default function AttendeeDashboard() {
           </div>
         )}
 
-        {/* 3. RESPONSIVE ID CARD PREVIEW — Landscape */}
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <p className="section-label" style={{ margin: 0 }}>MY CARD</p>
-          </div>
-
+          <p className="section-label" style={{ margin: 0 }}>MY CARD</p>
           <Link
             href="/app/my-card"
             style={{ textDecoration: 'none', display: 'flex', justifyContent: 'center', width: '100%' }}
@@ -332,7 +288,6 @@ export default function AttendeeDashboard() {
           </Link>
         </div>
 
-        {/* 4. NOTES APP LINK — with spring press */}
         <div>
           <p className="section-label">WORKSPACE</p>
           <Link
@@ -342,16 +297,9 @@ export default function AttendeeDashboard() {
             onPointerUp={() => springUp(notesCardRef)}
             onPointerLeave={() => springUp(notesCardRef)}
             style={{
-              background: 'var(--white)',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--r)',
-              padding: 24,
-              display: 'flex', alignItems: 'center', gap: 16,
-              textDecoration: 'none',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
-              transform: 'scale(1)',
-              transition: `transform 0.4s ${SPRING}`,
-              WebkitTapHighlightColor: 'transparent',
+              background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 'var(--r)', padding: 24,
+              display: 'flex', alignItems: 'center', gap: 16, textDecoration: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
+              transform: 'scale(1)', transition: `transform 0.4s ${SPRING}`, WebkitTapHighlightColor: 'transparent',
             }}
           >
             <div style={{ width: 48, height: 48, borderRadius: 14, background: 'var(--s1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--g)' }}>

@@ -62,7 +62,8 @@ function MyCardContent() {
   const searchParams = useSearchParams();
   const isOnboarding = searchParams.get('onboarding') === '1';
 
-  const [isEditing, setIsEditing] = useState(isOnboarding);
+  // If card_made is false, open editing page. Otherwise, show QR.
+  const [isEditing, setIsEditing] = useState(isOnboarding || profile?.card_made === false);
   const [name, setName] = useState('');
   const [avatar, setAvatar] = useState('');
   const [role, setRole] = useState('');
@@ -200,7 +201,7 @@ function MyCardContent() {
   if (isCheckinSuccess) return <SuccessAnimation />;
 
   return (
-    <div className="page-enter" style={{ paddingBottom: 100 }}>
+    <div className="page-enter" style={{ height: '100%', overflowY: 'auto', paddingBottom: 100 }}>
       {isCheckedIn(profile?.checked_in) && (
         <div style={{ padding: '16px 16px 0', maxWidth: 500, margin: '0 auto', width: '100%' }}>
           <button 
@@ -369,10 +370,10 @@ function MyCardContent() {
               </div>
               <div>
                 <h3 style={{ fontFamily: 'var(--fh)', fontSize: 18, fontWeight: 800, color: 'var(--g)', marginBottom: 4 }}>
-                  Conference QR
+                   Wallet Sharing
                 </h3>
                 <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--sub)', fontWeight: 500 }}>
-                  Show this to staff for check-in and access.
+                  Share this QR to get yourself added to others' wallet.
                 </p>
               </div>
               
@@ -463,7 +464,7 @@ function MyCardContent() {
               <QRCode value={profile.id} size={280} level="H" />
             </div>
             <p style={{ color: '#fff', marginTop: 32, fontFamily: 'var(--fh)', fontSize: 20, fontWeight: 700 }}>
-              Scan for Check-in
+               Share your profile
             </p>
             <button 
               onClick={() => setQrExpanded(false)}
