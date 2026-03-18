@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { Calendar, ShieldCheck, MessageCircle, FileText, ArrowRight, Zap } from 'lucide-react';
 
 // ── Color helpers ──────────────────────────────────────────
 function hexToRgb(hex) {
@@ -22,22 +23,22 @@ function lerpColor(a, b, t) {
 // ── Slide data ─────────────────────────────────────────────
 const slides = [
   {
-    icon: '📅', title: 'Live Schedule',
+    icon: Calendar, title: 'Live Schedule',
     desc: 'Stay on track with the real-time event timeline. Never miss a session, workshop, or keynote.',
     c1: '#FFE2D6', c2: '#FCBD9D', textMode: 'dark',
   },
   {
-    icon: '🛂', title: 'Passport Stamps',
+    icon: ShieldCheck, title: 'Passport Stamps',
     desc: 'Visit booths and collect stamps on your digital passport. Complete your journey through the conference.',
     c1: '#F5F0EA', c2: '#D4CCC4', textMode: 'dark',
   },
   {
-    icon: '💬', title: 'Live Chat',
+    icon: MessageCircle, title: 'Live Chat',
     desc: 'Message event staff in real-time. Get answers, share feedback, and stay connected.',
     c1: '#D4CCC4', c2: '#A89E94', textMode: 'dark',
   },
   {
-    icon: '📝', title: 'Smart Notes',
+    icon: FileText, title: 'Smart Notes',
     desc: 'Take notes during sessions and save them to your account. Access them anytime, anywhere.',
     c1: '#A89E94', c2: '#514033', textMode: 'dark',
   },
@@ -294,11 +295,11 @@ export default function LandingPage() {
                   pointerEvents: 'none'
                 }} />
 
-                <span style={{
-                  fontSize: 'clamp(56px, 12vh, 72px)', display: 'block',
-                  marginBottom: 'clamp(20px, 4vh, 32px)',
+                <s.icon size={containerW.current < 600 ? 56 : 72} color={s.textMode === 'light' ? '#fff' : 'var(--g)'} style={{
+                  display: 'block',
+                  margin: '0 auto clamp(20px, 4vh, 32px)',
                   filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
-                }}>{s.icon}</span>
+                }} />
                 <h2 style={{
                   fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 'clamp(28px, 5vh, 32px)',
                   color: s.textMode === 'light' ? '#fff' : 'var(--g)', marginBottom: 14,
@@ -334,7 +335,7 @@ export default function LandingPage() {
 
         {isLast ? (
           <button onClick={finishCarousel} style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
             width: '100%', padding: '20px 24px',
             background: slide.textMode === 'light' ? '#fff' : 'var(--g)',
             color: slide.textMode === 'light' ? '#1a1814' : '#fff',
@@ -342,7 +343,7 @@ export default function LandingPage() {
             fontSize: 17, fontWeight: 800, cursor: 'pointer',
             border: 'none', boxShadow: '0 12px 35px rgba(0,0,0,0.15)',
           }}>
-            Begin the Journey 🚀
+            Begin the Journey <ArrowRight size={20} />
           </button>
         ) : (
           <div style={{ display: 'flex', gap: 14 }}>

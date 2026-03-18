@@ -4,7 +4,7 @@ import { signIn, useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Info } from 'lucide-react';
+import { Info, Bell } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function LoginPage() {
@@ -151,10 +151,10 @@ export default function LoginPage() {
             width: '100%', padding: '12px', background: 'transparent',
             border: 'none', color: 'var(--muted)', fontSize: 13, fontWeight: 600,
             fontFamily: 'var(--fb)', cursor: 'pointer', marginBottom: 20,
-            textDecoration: 'underline'
+            textDecoration: 'underline', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6
           }}
         >
-          Enable Browser Notifications 🔔
+          Enable Browser Notifications <Bell size={14} />
         </button>
 
         <p style={{

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Topbar from '@/components/Topbar';
 import Loader from '@/components/Loader';
 import Empty from '@/components/Empty';
-import { Calendar, MapPin, Clock, Info } from 'lucide-react';
+import { Calendar, MapPin, Clock, Info, Mic } from 'lucide-react';
 
 export default function SchedulePage() {
   const [schedule, setSchedule] = useState([]);
@@ -44,9 +44,10 @@ export default function SchedulePage() {
                   </div>
                   
                   {item.speaker && (
-                    <p style={{ fontFamily: 'var(--fb)', fontSize: 13, fontWeight: 700, color: 'var(--sub)', marginBottom: 8 }}>
-                      🎤 {item.speaker}
-                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, color: 'var(--sub)' }}>
+                      <Mic size={14} />
+                      <span style={{ fontFamily: 'var(--fb)', fontSize: 13, fontWeight: 700 }}>{item.speaker}</span>
+                    </div>
                   )}
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, color: 'var(--g)' }}>

@@ -7,6 +7,7 @@ import Loader from '@/components/Loader';
 import toast from 'react-hot-toast';
 import Modal from '@/components/Modal';
 import QRScanner from '@/components/QRScanner';
+import { LayoutDashboard, Users, CheckCircle, MessageSquare, CreditCard, Printer, Send } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { data: session } = useSession();
@@ -113,18 +114,18 @@ export default function AdminDashboard() {
   }
 
   const cards = [
-    { label: 'Total Users', value: stats?.totalUsers || 0, icon: '👥', href: '/admin/users', minLevel: 3 },
-    { label: 'Checked In', value: stats?.checkedIn || 0, icon: '✅', href: '/admin/checkin', minLevel: 2 },
-    { label: 'Unread Messages', value: stats?.unreadMessages || 0, icon: '💬', href: '/admin/messages', minLevel: 2 },
-    { label: 'Print ID Cards', value: '🪪', icon: '🖨️', href: '/admin/cards', minLevel: 3 },
+    { label: 'Total Users', value: stats?.totalUsers || 0, icon: Users, href: '/admin/users', minLevel: 3 },
+    { label: 'Checked In', value: stats?.checkedIn || 0, icon: CheckCircle, href: '/admin/checkin', minLevel: 2 },
+    { label: 'Unread Messages', value: stats?.unreadMessages || 0, icon: MessageSquare, href: '/admin/messages', minLevel: 2 },
+    { label: 'Print ID Cards', value: <CreditCard size={28} />, icon: Printer, href: '/admin/cards', minLevel: 3 },
   ];
 
   return (
     <div className="page-enter" style={{ padding: '24px 16px' }}>
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-          <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 22, color: 'var(--atext)' }}>
-            📊 Dashboard
+          <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 22, color: 'var(--atext)', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <LayoutDashboard size={24} /> Dashboard
           </h2>
           {level >= 3 && (
             <button onClick={() => setShowAnnounce(true)} style={{
@@ -159,7 +160,7 @@ export default function AdminDashboard() {
                 opacity: (card.minLevel && level < card.minLevel) ? 0.45 : 1,
                 height: '100%',
               }}>
-                <span style={{ fontSize: 24, display: 'block', marginBottom: 8 }}>{card.icon}</span>
+                <card.icon size={24} style={{ display: 'block', margin: '0 auto 8px', color: 'var(--amuted)' }} />
                 <p style={{ fontFamily: 'var(--fhs)', fontWeight: 800, fontSize: 28, color: 'var(--accent)' }}>
                   {card.value}
                 </p>
@@ -261,7 +262,11 @@ export default function AdminDashboard() {
             color: '#fff', cursor: sending ? 'not-allowed' : 'pointer',
             opacity: sending ? 0.7 : 1,
           }}>
-            {sending ? 'Sending...' : '🚀 Send to Everyone'}
+            {sending ? 'Sending...' : (
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <Send size={18} /> Send to Everyone
+              </span>
+            )}
           </button>
         </div>
       </Modal>

@@ -5,9 +5,21 @@ import PageTransition from '@/components/PageTransition';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
 function AttendeeLayoutContent({ children }) {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const isOnboarding = searchParams.get('onboarding') === '1';
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.replace('/login');
+    }
+  }, [status, router]);
 
   return (
     <div style={{ 

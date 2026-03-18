@@ -2,6 +2,7 @@
 
 import { signOut, useSession } from 'next-auth/react';
 import { useEffect, useState, useRef } from 'react';
+import { MapPin } from 'lucide-react';
 import Link from 'next/link';
 import Avatar from '@/components/Avatar';
 import Loader from '@/components/Loader';
@@ -251,7 +252,12 @@ export default function AttendeeDashboard() {
                   {upNext.start_time}
                 </span>
               </div>
-              {upNext.location && <p style={{ fontFamily: 'var(--fb)', fontSize: 12, color: 'var(--sub)', marginTop: 10 }}>📍 {upNext.location}</p>}
+              {upNext.location && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 10, color: 'var(--sub)' }}>
+                  <MapPin size={14} />
+                  <span style={{ fontFamily: 'var(--fb)', fontSize: 12 }}>{upNext.location}</span>
+                </div>
+              )}
             </div>
           </div>
         )}

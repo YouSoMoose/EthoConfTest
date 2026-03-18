@@ -6,16 +6,18 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import PageTransition from '@/components/PageTransition';
 
+import { LayoutDashboard, CheckCircle, MessageSquare, Calendar, Users, User, Leaf, Menu, X } from 'lucide-react';
+
 const tabs = [
-  { label: 'Dashboard', href: '/admin', icon: '📊', show: (level) => level >= 2 },
-  { label: 'Check-in', href: '/admin/checkin', icon: '✅', show: (level) => level >= 2 },
-  { label: 'Messages', href: '/admin/messages', icon: '💬', show: (level) => level >= 3 },
-  { label: 'Schedule', href: '/admin/schedule', icon: '📅', show: (level) => level >= 3 },
-  { label: 'Users', href: '/admin/users', icon: '👥', show: (level) => level >= 3 },
+  { label: 'Dashboard', href: '/admin', icon: LayoutDashboard, show: (level) => level >= 2 },
+  { label: 'Check-in', href: '/admin/checkin', icon: CheckCircle, show: (level) => level >= 2 },
+  { label: 'Messages', href: '/admin/messages', icon: MessageSquare, show: (level) => level >= 3 },
+  { label: 'Schedule', href: '/admin/schedule', icon: Calendar, show: (level) => level >= 3 },
+  { label: 'Users', href: '/admin/users', icon: Users, show: (level) => level >= 3 },
 ];
 
 export default function AdminLayout({ children }) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -23,10 +25,16 @@ export default function AdminLayout({ children }) {
   const visibleTabs = tabs.filter(t => t.show(level));
 
   useEffect(() => {
-    if (level === 2 && pathname !== '/admin') {
+    if (status === 'unauthenticated') {
+      router.replace('/login');
+    }
+  }, [status, router]);
+
+  useEffect(() => {
+    if (level === 2 && pathname !== '/admin' && status === 'authenticated') {
       router.replace('/admin');
     }
-  }, [level, pathname, router]);
+  }, [level, pathname, router, status]);
 
   const isActive = (href) => href === '/admin' ? pathname === '/admin' : pathname.startsWith(href);
 
@@ -48,9 +56,10 @@ export default function AdminLayout({ children }) {
             <Link href="/app" style={{
               background: 'var(--ad)', border: '1px solid var(--ab)', borderRadius: 8,
               padding: '6px 12px', fontFamily: 'var(--fb)', fontSize: 12,
-              fontWeight: 600, color: 'var(--accent)', textDecoration: 'none'
+              fontWeight: 600, color: 'var(--accent)', textDecoration: 'none',
+              display: 'flex', alignItems: 'center', gap: 6
             }}>
-              👤 Attendee View
+              <User size={14} /> Attendee View
             </Link>
             <button 
               type="button"
@@ -84,7 +93,7 @@ export default function AdminLayout({ children }) {
       }}>
         <div style={{ padding: '0 16px', marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: 24 }}>🌿</span>
+            <Leaf size={24} color="var(--accent)" />
             <div>
               <h1 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 16, color: 'var(--atext)' }}>
                 Admin
@@ -97,7 +106,6 @@ export default function AdminLayout({ children }) {
         </div>
 
         <nav style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: '0 8px' }}>
-          {visibleTabs.map(tab => (
             <Link key={tab.href} href={tab.href} style={{
               display: 'flex', alignItems: 'center', gap: 10,
               padding: '10px 12px', borderRadius: 10,
@@ -106,10 +114,9 @@ export default function AdminLayout({ children }) {
               fontFamily: 'var(--fb)', fontSize: 13, fontWeight: isActive(tab.href) ? 600 : 400,
               transition: 'background 0.15s, color 0.15s',
             }}>
-              <span style={{ fontSize: 16 }}>{tab.icon}</span>
+              <tab.icon size={16} />
               {tab.label}
             </Link>
-          ))}
         </nav>
 
         <div style={{ marginTop: 'auto', padding: '12px 16px' }}>
@@ -119,7 +126,7 @@ export default function AdminLayout({ children }) {
             background: 'var(--ad)', color: 'var(--accent)',
             fontFamily: 'var(--fb)', fontSize: 13, fontWeight: 500,
           }}>
-            <span style={{ fontSize: 16 }}>👤</span> Attendee View
+            <User size={16} /> Attendee View
           </Link>
           <button 
             type="button"
@@ -153,8 +160,11 @@ export default function AdminLayout({ children }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <button onClick={() => setMenuOpen(true)} style={{
             background: 'none', border: 'none', color: 'var(--atext)',
-            fontSize: 22, cursor: 'pointer', padding: 0, lineHeight: 1,
-          }}>☰</button>
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', padding: 0
+          }} aria-label="Menu">
+            <Menu size={22} />
+          </button>
           <Link href="/admin" style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 15, color: 'var(--atext)' }}>Admin</Link>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -162,8 +172,9 @@ export default function AdminLayout({ children }) {
             background: 'var(--ad)', border: '1px solid var(--ab)', borderRadius: 8,
             padding: '5px 10px', fontFamily: 'var(--fb)', fontSize: 11,
             fontWeight: 600, color: 'var(--accent)', whiteSpace: 'nowrap',
+            display: 'flex', alignItems: 'center', gap: 4
           }}>
-            👤 Attendee
+            <User size={12} /> Attendee
           </Link>
           <button 
             type="button"
@@ -202,7 +213,7 @@ export default function AdminLayout({ children }) {
             <div style={{ padding: '0 16px', marginBottom: 24 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{ fontSize: 24 }}>🌿</span>
+                  <Leaf size={24} color="var(--accent)" />
                   <div>
                     <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 16, color: 'var(--atext)' }}>Admin</h2>
                     <p style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--asub)' }}>{session?.profile?.name}</p>
@@ -210,13 +221,15 @@ export default function AdminLayout({ children }) {
                 </div>
                 <button onClick={() => setMenuOpen(false)} style={{
                   background: 'none', border: 'none', color: 'var(--asub)',
-                  fontSize: 20, cursor: 'pointer', padding: 4,
-                }}>✕</button>
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', padding: 4,
+                }} aria-label="Close">
+                  <X size={20} />
+                </button>
               </div>
             </div>
 
             <nav style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: '0 8px', flex: 1 }}>
-              {visibleTabs.map(tab => (
                 <Link key={tab.href} href={tab.href} onClick={() => setMenuOpen(false)} style={{
                   display: 'flex', alignItems: 'center', gap: 10,
                   padding: '12px 12px', borderRadius: 10,
@@ -225,10 +238,9 @@ export default function AdminLayout({ children }) {
                   fontFamily: 'var(--fb)', fontSize: 14, fontWeight: isActive(tab.href) ? 600 : 400,
                   transition: 'background 0.15s, color 0.15s',
                 }}>
-                  <span style={{ fontSize: 18 }}>{tab.icon}</span>
+                  <tab.icon size={18} />
                   {tab.label}
                 </Link>
-              ))}
             </nav>
 
             <div style={{ padding: '16px', borderTop: '1px solid var(--aborder)' }}>
