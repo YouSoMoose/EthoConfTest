@@ -224,8 +224,31 @@ function MyCardContent() {
   const cardRef = useRef(null);
   const domRefs = useRef({});
 
+  // Helper to handle both boolean and string "TRUE"
+  const isCheckedIn = (val) => val === true || val === 'TRUE';
+
+  // Direct fetch on mount to bypass potentially stale NextAuth session
   useEffect(() => {
-    if (!profile?.id || profile.checked_in) return;
+    if (!profile?.id) return;
+    
+    const checkStatus = async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('checked_in')
+        .eq('id', profile.id)
+        .single();
+        
+      if (!error && data && isCheckedIn(data.checked_in)) {
+        console.log('User already checked in (direct fetch)');
+        router.replace('/app');
+      }
+    };
+    
+    checkStatus();
+  }, [profile?.id, router]);
+
+  useEffect(() => {
+    if (!profile?.id || isCheckedIn(profile.checked_in)) return;
 
     console.log('Subscribing to check-in for:', profile.id);
     const channel = supabase
@@ -237,7 +260,7 @@ function MyCardContent() {
         filter: `id=eq.${profile.id}`
       }, (payload) => {
         console.log('Profile update detected:', payload);
-        if (payload.new.checked_in) {
+        if (isCheckedIn(payload.new.checked_in)) {
           setIsCheckinSuccess(true);
           updateSession();
           setTimeout(() => router.push('/app'), 2200);
@@ -287,7 +310,7 @@ function MyCardContent() {
       if (res.ok) {
         toast.success('Profile saved', { id: t });
         updateSession(); 
-        if (!profile.checked_in) {
+        if (!isCheckedIn(profile.checked_in)) {
           setShowSuccessQR(true);
         } else {
           router.push('/app');
@@ -420,7 +443,7 @@ function MyCardContent() {
 
   return (
     <div className="page-enter" style={{ paddingBottom: 100 }}>
-      {!!profile.checked_in && (
+      {isCheckedIn(profile?.checked_in) && (
         <div style={{ padding: '16px 16px 0', maxWidth: 500, margin: '0 auto', width: '100%' }}>
           <button 
             onClick={() => router.push('/app')}
