@@ -4,13 +4,15 @@ import { signIn, useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Info, Bell } from 'lucide-react';
+import { Info, Bell, ShieldCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
+import Modal from '@/components/Modal';
 
 export default function LoginPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [termsOpen, setTermsOpen] = useState(false);
 
   useEffect(() => {
     if (status === 'authenticated' && session?.profile) {
@@ -146,11 +148,23 @@ export default function LoginPage() {
         </button>
 
         <button 
+          onClick={() => setTermsOpen(true)}
+          style={{
+            width: '100%', padding: '10px 12px', background: 'transparent',
+            border: 'none', color: 'var(--sub)', fontSize: 13, fontWeight: 700,
+            fontFamily: 'var(--fb)', cursor: 'pointer', marginBottom: 4,
+            textDecoration: 'underline', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6
+          }}
+        >
+          Terms of Use & Privacy Policy <ShieldCheck size={14} />
+        </button>
+
+        <button 
           onClick={requestNotifications}
           style={{
-            width: '100%', padding: '12px', background: 'transparent',
+            width: '100%', padding: '10px 12px', background: 'transparent',
             border: 'none', color: 'var(--muted)', fontSize: 13, fontWeight: 600,
-            fontFamily: 'var(--fb)', cursor: 'pointer', marginBottom: 20,
+            fontFamily: 'var(--fb)', cursor: 'pointer', marginBottom: 16,
             textDecoration: 'underline', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6
           }}
         >
@@ -163,6 +177,117 @@ export default function LoginPage() {
         }}>
           Sign in with your organizational Google account — staff/admin access is assigned automatically based on your email.
         </p>
+
+        <Modal open={termsOpen} onClose={() => setTermsOpen(false)} title="Legal Information" center>
+          <div style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: 8, textAlign: 'left', fontFamily: 'var(--fb)' }}>
+            <h3 style={{ fontFamily: 'var(--fh)', fontSize: 18, marginBottom: 8 }}>Terms of Use</h3>
+            <p style={{ fontSize: 12, color: 'var(--sub)', marginBottom: 16 }}>Effective Date: 03/21/2026</p>
+            
+            <section style={{ marginBottom: 20 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>1. Acceptance of Terms</h4>
+              <p style={{ fontSize: 13, lineHeight: 1.5 }}>By accessing or using the Ethos Sustainability Conference App (“App”), you agree to be bound by these Terms of Use. If you do not agree, do not use the App.</p>
+            </section>
+
+            <section style={{ marginBottom: 20 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>2. Purpose of the App</h4>
+              <p style={{ fontSize: 13, lineHeight: 1.5 }}>The App is provided by Ethos Sustainable Business and STEAM Education (“Ethos”) to manage conference participation, provide schedules/updates, and enable networking.</p>
+            </section>
+
+            <section style={{ marginBottom: 20 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>3. User Accounts</h4>
+              <ul style={{ fontSize: 13, lineHeight: 1.5, paddingLeft: 20 }}>
+                <li>You may be required to create an account.</li>
+                <li>You agree to provide accurate, complete information.</li>
+                <li>You are responsible for maintaining the confidentiality of your login credentials.</li>
+              </ul>
+            </section>
+
+            <section style={{ marginBottom: 20 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>4. Acceptable Use</h4>
+              <p style={{ fontSize: 13, marginBottom: 8 }}>You agree NOT to:</p>
+              <ul style={{ fontSize: 13, lineHeight: 1.5, paddingLeft: 20 }}>
+                <li>Use the App for unlawful purposes</li>
+                <li>Harass, abuse, or harm other users</li>
+                <li>Upload malicious code or attempt to disrupt the App</li>
+                <li>Misrepresent your identity</li>
+              </ul>
+              <p style={{ fontSize: 13, marginTop: 8 }}>Ethos reserves the right to suspend or terminate accounts violating these rules.</p>
+            </section>
+
+            <section style={{ marginBottom: 20 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>5. Data Access and Visibility</h4>
+              <p style={{ fontSize: 13, lineHeight: 1.5 }}>By using the App, you acknowledge: Ethos administrators may access and review user-submitted data (e.g., profiles, messages, submissions, attendance) strictly for event management, safety, and moderation.</p>
+            </section>
+
+            <section style={{ marginBottom: 20 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>6. Intellectual Property</h4>
+              <p style={{ fontSize: 13, lineHeight: 1.5 }}>All content on the App (logos, branding, materials) is owned by Ethos or its partners and may not be reproduced without permission.</p>
+            </section>
+
+            <section style={{ marginBottom: 20 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>7. Event Changes</h4>
+              <p style={{ fontSize: 13, lineHeight: 1.5 }}>Ethos may modify event schedules, speaker lineups, or App features at any time without prior notice.</p>
+            </section>
+
+            <section style={{ marginBottom: 20 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>8. Disclaimer of Warranties</h4>
+              <p style={{ fontSize: 13, lineHeight: 1.5 }}>The App is provided “as is” without warranties of any kind regarding availability, accuracy, or reliability.</p>
+            </section>
+
+            <section style={{ marginBottom: 20 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>9. Limitation of Liability</h4>
+              <p style={{ fontSize: 13, lineHeight: 1.5 }}>Ethos is not liable for technical issues, data loss, or indirect damages arising from App use.</p>
+            </section>
+
+            <section style={{ marginBottom: 20 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>10. Governing Law</h4>
+              <p style={{ fontSize: 13, lineHeight: 1.5 }}>These Terms are governed by the laws of the State of Texas, United States.</p>
+            </section>
+
+            <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '32px 0' }} />
+
+            <h3 style={{ fontFamily: 'var(--fh)', fontSize: 18, marginBottom: 8 }}>Privacy Policy</h3>
+            <p style={{ fontSize: 12, color: 'var(--sub)', marginBottom: 16 }}>Effective Date: 03/21/2026</p>
+
+            <section style={{ marginBottom: 20 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>1. Information We Collect</h4>
+              <p style={{ fontSize: 13, marginBottom: 8 }}><strong>a. Information You Provide:</strong> Name, email, organization, profile details, messages, or submissions.</p>
+              <p style={{ fontSize: 13 }}><strong>b. Automatically Collected Data:</strong> Device information, log data, and IP address.</p>
+            </section>
+
+            <section style={{ marginBottom: 20 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>2. Data Access (Important Transparency Clause)</h4>
+              <p style={{ fontSize: 13, lineHeight: 1.5 }}>Ethos administrators can view and access user data within the App. This includes profiles, messages, and activity logs. Access is limited to authorized personnel and used only for operational purposes.</p>
+            </section>
+
+            <section style={{ marginBottom: 20 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>3. Data Sharing</h4>
+              <p style={{ fontSize: 13, lineHeight: 1.5 }}>We do NOT sell or rent your personal data to third parties. We may share data only with necessary service providers or if required by law.</p>
+            </section>
+
+            <section style={{ marginBottom: 20 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>4. Your Rights</h4>
+              <p style={{ fontSize: 13, lineHeight: 1.5 }}>You may request access to, correction of, or deletion of your data by contacting: info@ethossustainability.org</p>
+            </section>
+
+            <p style={{ fontSize: 12, color: 'var(--sub)', marginTop: 32, textAlign: 'center' }}>
+              For full details or questions, contact:<br />
+              <strong>info@ethossustainability.org</strong>
+            </p>
+          </div>
+          <div style={{ marginTop: 24 }}>
+            <button 
+              onClick={() => setTermsOpen(false)}
+              style={{
+                width: '100%', padding: '14px', background: 'var(--g)', color: '#fff',
+                border: 'none', borderRadius: 12, fontWeight: 700, cursor: 'pointer',
+                fontFamily: 'var(--fb)'
+              }}
+            >
+              I Understand & Accept
+            </button>
+          </div>
+        </Modal>
       </div>
     </div>
   );
