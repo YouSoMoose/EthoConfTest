@@ -394,9 +394,7 @@ function MyCardContent() {
               </p>
             </div>
 
-            <Btn variant="text" onClick={() => setIsEditing(true)} style={{ width: '100%', padding: 12 }}>
-              Edit Profile Details
-            </Btn>
+
           </div>
         )}
       </div>
