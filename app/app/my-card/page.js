@@ -224,27 +224,7 @@ function MyCardContent() {
   const cardRef = useRef(null);
   const domRefs = useRef({});
 
-  useEffect(() => {
-    if (!profile?.id || profile.checked_in) return;
 
-    const channel = supabase
-      .channel(`checkin-${profile.id}`)
-      .on('postgres_changes', { 
-        event: 'UPDATE', 
-        schema: 'public', 
-        table: 'profiles'
-      }, (payload) => {
-        // More robust: filter locally in the callback
-        if (payload.new.id === profile.id && payload.new.checked_in) {
-          setIsCheckinSuccess(true);
-          updateSession();
-          setTimeout(() => router.push('/app'), 2200);
-        }
-      })
-      .subscribe();
-
-    return () => { supabase.removeChannel(channel); };
-  }, [profile?.id, profile?.checked_in, router, updateSession]);
 
   useEffect(() => {
     if (qrExpanded) {
