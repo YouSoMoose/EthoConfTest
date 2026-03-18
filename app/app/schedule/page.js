@@ -25,7 +25,7 @@ export default function SchedulePage() {
         {schedule.length === 0 ? (
           <Empty icon={<Calendar size={48} />} text="No events scheduled yet" />
         ) : (
-          <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div className="bottom-stagger" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {schedule.map((item) => (
               <div key={item.id} style={{
                 background: 'var(--white)',

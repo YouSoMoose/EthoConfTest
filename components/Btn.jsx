@@ -44,16 +44,45 @@ const variants = {
 export default function Btn({ variant = 'green', sm, children, style, disabled, ...props }) {
   const [pressed, setPressed] = useState(false);
   const v = variants[variant] || variants.green;
+  const isAccent = variant === 'accent';
 
   return (
     <button
       {...props}
       disabled={disabled}
-      onMouseDown={() => setPressed(true)}
-      onMouseUp={() => setPressed(false)}
-      onMouseLeave={() => setPressed(false)}
+      onMouseDown={e => {
+        setPressed(true);
+        if (!disabled) {
+          e.currentTarget.style.transform = 'scale(0.92)';
+        }
+      }}
+      onMouseUp={e => {
+        setPressed(false);
+        if (!disabled) {
+          e.currentTarget.style.transform = 'scale(1.03) translateY(-2px)';
+        }
+      }}
+      onMouseLeave={e => {
+        setPressed(false);
+        if (!disabled) {
+          e.currentTarget.style.transform = 'scale(1) translateY(0)';
+          e.currentTarget.style.boxShadow = isAccent ? '0 8px 20px rgba(252, 189, 157, 0.2)' : '0 4px 12px rgba(0,0,0,0.1)';
+        }
+      }}
       onTouchStart={() => setPressed(true)}
       onTouchEnd={() => setPressed(false)}
+      onMouseOver={e => {
+        if (!disabled) {
+          e.currentTarget.style.transform = 'scale(1.03) translateY(-2px)';
+          e.currentTarget.style.boxShadow = isAccent ? '0 12px 28px rgba(252, 189, 157, 0.3)' : '0 8px 20px rgba(0,0,0,0.15)';
+        }
+      }}
+      onMouseOut={e => {
+        if (!disabled) {
+          e.currentTarget.style.transform = 'scale(1) translateY(0)';
+          e.currentTarget.style.boxShadow = isAccent ? '0 8px 20px rgba(252, 189, 157, 0.2)' : '0 4px 12px rgba(0,0,0,0.1)';
+        }
+      }}
       style={{
         ...v,
         borderRadius: 11,
@@ -67,8 +96,9 @@ export default function Btn({ variant = 'green', sm, children, style, disabled, 
         alignItems: 'center',
         justifyContent: 'center',
         gap: 6,
-        transition: 'transform .1s, opacity .2s',
-        transform: pressed ? 'scale(0.97)' : 'scale(1)',
+        transition: 'all 0.4s var(--liquid)',
+        transform: pressed ? 'scale(0.92)' : 'scale(1)',
+        boxShadow: isAccent ? '0 8px 20px rgba(252, 189, 157, 0.2)' : '0 4px 12px rgba(0,0,0,0.1)',
         ...style,
       }}
     >

@@ -91,26 +91,26 @@ export default function PageTransition({ children }) {
 
   if (phase === 'out') {
     if (swipeAnim) {
-      transform = `translateX(${dir * -12}vw) scale(0.97)`;
+      transform = `translateX(${dir * -15}vw) scale(0.92) rotate(${dir * -1}deg)`;
     } else {
-      transform = `scale(0.92) translateY(10px)`;
+      transform = `scale(0.88) translateY(20px)`;
     }
     opacity = 0;
-    transition = `transform 0.15s ${easeIn}, opacity 0.15s ease`;
+    transition = `transform 0.25s var(--liquid-slow), opacity 0.2s ease`;
   } else if (phase === 'prep') {
     if (swipeAnim) {
-      transform = `translateX(${dir * 25}vw) scale(0.97)`;
+      transform = `translateX(${dir * 35}vw) scale(0.92) rotate(${dir * 2}deg)`;
     } else {
-      transform = `scale(1.05) translateY(-5px)`;
+      transform = `scale(1.15) translateY(120px)`;
     }
     opacity = 0;
     transition = 'none'; 
   } else if (phase === 'in') {
-    transform = 'translateX(0) scale(1) translateY(0)';
+    transform = 'translateX(0) scale(1) translateY(0) rotate(0)';
     opacity = 1;
-    transition = `transform 0.4s ${easeOutBack}, opacity 0.4s ease`;
+    transition = `transform 0.6s var(--liquid), opacity 0.4s ease`;
   } else {
-    transition = 'none';
+    transition = `transform 0.4s var(--liquid)`;
   }
 
   return (

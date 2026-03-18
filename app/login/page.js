@@ -81,16 +81,17 @@ export default function LoginPage() {
       flexDirection: 'column',
       position: 'relative',
       overflow: 'hidden', // ← key: prevent any overflow from causing scroll
-      transition: 'background 0.6s cubic-bezier(0.23, 1, 0.32, 1)',
+      transition: 'background 0.8s var(--liquid-slow)',
     }}>
       {/* Info button */}
-      <Link href="/?carousel=1" style={{
+      <Link href="/?carousel=1" className="bubble-click" style={{
         position: 'absolute', top: 'max(24px, env(safe-area-inset-top))', right: 24,
         width: 32, height: 32, borderRadius: 16,
         background: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.5)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: 'var(--sub)', textDecoration: 'none', transition: 'all 0.2s', cursor: 'pointer',
+        color: 'var(--sub)', textDecoration: 'none', transition: 'all 0.4s var(--liquid)', cursor: 'pointer',
         zIndex: 10,
+        transform: 'scale(1)',
       }}>
         <Info size={18} />
       </Link>
@@ -146,6 +147,7 @@ export default function LoginPage() {
         <button
           onClick={handleGoogle}
           disabled={loading}
+          className="bubble-click"
           style={{
             width: '100%',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
@@ -159,9 +161,10 @@ export default function LoginPage() {
             fontFamily: 'var(--fb)',
             cursor: loading ? 'not-allowed' : 'pointer',
             opacity: loading ? 0.7 : 1,
-            transition: 'all 0.2s',
+            transition: 'all 0.4s var(--liquid)',
             marginBottom: 16,
             boxShadow: '0 8px 25px rgba(0,0,0,0.1)',
+            transform: 'scale(1)',
           }}
         >
           <svg width="20" height="20" viewBox="0 0 24 24">
@@ -175,11 +178,13 @@ export default function LoginPage() {
 
         <button
           onClick={() => setTermsOpen(true)}
+          className="liquid-hover"
           style={{
             width: '100%', padding: '10px 12px', background: 'transparent',
             border: 'none', color: 'var(--sub)', fontSize: 13, fontWeight: 700,
             fontFamily: 'var(--fb)', cursor: 'pointer', marginBottom: 4,
-            textDecoration: 'underline', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6
+            textDecoration: 'underline', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            transition: 'all 0.4s var(--liquid)',
           }}
         >
           Terms of Use & Privacy Policy <ShieldCheck size={14} />
@@ -187,11 +192,13 @@ export default function LoginPage() {
 
         <button
           onClick={requestNotifications}
+          className="liquid-hover"
           style={{
             width: '100%', padding: '10px 12px', background: 'transparent',
             border: 'none', color: 'var(--muted)', fontSize: 13, fontWeight: 600,
             fontFamily: 'var(--fb)', cursor: 'pointer', marginBottom: 16,
-            textDecoration: 'underline', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6
+            textDecoration: 'underline', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            transition: 'all 0.4s var(--liquid)',
           }}
         >
           Enable Browser Notifications <Bell size={14} />

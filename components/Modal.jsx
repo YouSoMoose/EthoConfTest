@@ -88,7 +88,7 @@ export default function Modal({ open, onClose, title, subtitle, admin, center, c
             : (visible 
                 ? (center ? 'scale(1) translateY(0)' : 'translateY(0)') 
                 : (center ? 'scale(0.95) translateY(10px)' : 'translateY(100%)')),
-          transition: dragging ? 'none' : 'transform 0.25s cubic-bezier(0.22, 1, 0.36, 1)',
+          transition: dragging ? 'none' : 'transform 0.5s var(--liquid)',
           paddingBottom: center ? 24 : 'max(32px, env(safe-area-inset-bottom))',
           boxShadow: center ? '0 20px 40px rgba(0,0,0,0.1)' : 'none',
           WebkitOverflowScrolling: 'touch',

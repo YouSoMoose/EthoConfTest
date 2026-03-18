@@ -114,8 +114,12 @@ export default function AdminLayout({ children }) {
               background: isActive(tab.href) ? 'var(--ad)' : 'transparent',
               color: isActive(tab.href) ? 'var(--accent)' : 'var(--asub)',
               fontFamily: 'var(--fb)', fontSize: 13, fontWeight: isActive(tab.href) ? 600 : 400,
-              transition: 'background 0.15s, color 0.15s',
-            }}>
+              transition: 'all 0.4s var(--liquid)',
+            }}
+            onMouseOver={e => !isActive(tab.href) && (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+            onMouseOut={e => !isActive(tab.href) && (e.currentTarget.style.background = 'transparent')}
+            className="liquid-hover"
+            >
               <tab.icon size={16} />
               {tab.label}
             </Link>
@@ -240,8 +244,10 @@ export default function AdminLayout({ children }) {
                   background: isActive(tab.href) ? 'var(--ad)' : 'transparent',
                   color: isActive(tab.href) ? 'var(--accent)' : 'var(--asub)',
                   fontFamily: 'var(--fb)', fontSize: 14, fontWeight: isActive(tab.href) ? 600 : 400,
-                  transition: 'background 0.15s, color 0.15s',
-                }}>
+                  transition: 'all 0.4s var(--liquid)',
+                }}
+                className="liquid-hover"
+                >
                   <tab.icon size={18} />
                   {tab.label}
                 </Link>

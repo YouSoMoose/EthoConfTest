@@ -50,7 +50,7 @@ export default function BottomNav({ items, admin }) {
   const bg = admin ? 'var(--as1)' : 'var(--white)';
   const border = admin ? 'var(--aborder)' : 'var(--border)';
   const activeColor = admin ? 'var(--accent)' : 'var(--g)';
-  const inactiveColor = admin ? 'var(--amuted)' : 'var(--muted)';
+  const inactiveColor = admin ? 'var(--amuted)' : '#000000';
 
   if (!admin && !session?.profile?.id) return null;
 
@@ -92,14 +92,15 @@ export default function BottomNav({ items, admin }) {
               gap: 4,
               padding: '8px 12px',
               position: 'relative',
-              color: isActive ? activeColor : inactiveColor,
               fontFamily: 'var(--fb)',
               fontSize: 10,
               fontWeight: isActive ? 600 : 500,
-              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              transition: 'all 0.4s var(--liquid)',
               minWidth: 64,
               flexShrink: 0,
               textDecoration: 'none',
+              transform: isActive ? 'translateY(-2px)' : 'none',
+              color: isActive ? activeColor : inactiveColor,
             }}>
               {isActive && (
                 <span style={{
@@ -113,8 +114,8 @@ export default function BottomNav({ items, admin }) {
                   background: activeColor,
                 }} />
               )}
-              <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
-              <span style={{ opacity: isActive ? 1 : 0.8 }}>{tab.label}</span>
+              <Icon size={20} strokeWidth={isActive ? 2.5 : 2} style={{ transition: 'transform 0.4s var(--liquid)', transform: isActive ? 'scale(1.2)' : 'scale(1)' }} />
+              <span style={{ opacity: isActive ? 1 : 0.8, transition: 'all 0.4s var(--liquid)', transform: isActive ? 'scale(1.1)' : 'scale(1)' }}>{tab.label}</span>
               {!admin && tab.label === 'Chat' && unread > 0 && (
                 <span style={{
                   position: 'absolute',

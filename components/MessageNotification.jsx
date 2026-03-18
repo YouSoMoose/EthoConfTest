@@ -112,7 +112,7 @@ export default function MessageNotification() {
         width: '100%',
         animation: exiting 
           ? 'notifExit 0.3s ease forwards' 
-          : 'notifEnter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both',
+          : 'notifEnter 0.5s var(--liquid) both',
       }}>
         <div style={{
           width: 38, height: 38, borderRadius: 10,

@@ -125,8 +125,8 @@ export default function AnnouncementBanner() {
               margin: '0 auto',
               width: '100%',
               animation: isExiting
-                ? 'notifExit 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards'
-                : 'notifEnter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both',
+                ? 'notifExit 0.4s var(--liquid-slow) forwards'
+                : 'notifEnter 0.5s var(--liquid) both',
               animationDelay: isExiting ? '0s' : `${i * 0.08}s`,
             }}
           >

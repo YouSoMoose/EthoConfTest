@@ -146,7 +146,7 @@ export default function LandingPage() {
 
     slideIdx.current = target;
     setCurrent(target);
-    moveTrack(-target * w, 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)');
+    moveTrack(-target * w, 'transform 0.6s var(--liquid)');
 
     const startPos = drag.current.startIdx - dx / w;
     const startTime = performance.now();
@@ -165,7 +165,7 @@ export default function LandingPage() {
     const from = slideIdx.current;
     slideIdx.current = i;
     setCurrent(i);
-    moveTrack(-i * w, 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)');
+    moveTrack(-i * w, 'transform 0.6s var(--liquid)');
     const startTime = performance.now();
     const tick = (now) => {
       const elapsed = now - startTime;
@@ -316,13 +316,13 @@ export default function LandingPage() {
                 ? (slide.textMode === 'light' ? '#fff' : 'var(--g)')
                 : (slide.textMode === 'light' ? 'rgba(255,255,255,.3)' : 'rgba(0,0,0,0.12)'),
               border: 'none', cursor: 'pointer', padding: 0,
-              transition: 'all 0.5s cubic-bezier(0.22, 1, 0.36, 1)',
+              transition: 'all 0.5s var(--liquid)',
             }} />
           ))}
         </div>
 
         {isLast ? (
-          <button onClick={finishCarousel} style={{
+          <button onClick={finishCarousel} className="bubble-click" style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
             width: '100%', padding: '16px 24px',
             background: slide.textMode === 'light' ? '#fff' : 'var(--g)',
@@ -330,27 +330,30 @@ export default function LandingPage() {
             borderRadius: 20, fontFamily: 'var(--fb)',
             fontSize: 17, fontWeight: 800, cursor: 'pointer',
             border: 'none', boxShadow: '0 12px 35px rgba(0,0,0,0.15)',
+            transform: 'scale(1)',
           }}>
             Begin the Journey <ArrowRight size={20} />
           </button>
         ) : (
           <div style={{ display: 'flex', gap: 14 }}>
-            <button onClick={finishCarousel} style={{
+            <button onClick={finishCarousel} className="bubble-click" style={{
               flex: 1, padding: '15px 20px', textAlign: 'center',
               background: slide.textMode === 'light' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.03)',
               color: slide.textMode === 'light' ? 'rgba(255,255,255,.8)' : 'var(--muted)',
               borderRadius: 20, fontFamily: 'var(--fb)', fontSize: 15, fontWeight: 700,
               border: `1px solid ${slide.textMode === 'light' ? 'rgba(255,255,255,.2)' : 'rgba(0,0,0,0.08)'}`,
               cursor: 'pointer',
+              transform: 'scale(1)',
             }}>
               Skip
             </button>
-            <button onClick={() => goTo(Math.min(current + 1, slides.length - 1))} style={{
+            <button onClick={() => goTo(Math.min(current + 1, slides.length - 1))} className="bubble-click" style={{
               flex: 2, padding: '15px 20px',
               background: slide.textMode === 'light' ? 'rgba(255,255,255,0.25)' : 'var(--g)',
               color: '#fff', borderRadius: 20, fontFamily: 'var(--fb)',
               fontSize: 16, fontWeight: 800, border: 'none', cursor: 'pointer',
               boxShadow: '0 12px 30px rgba(0,0,0,0.1)',
+              transform: 'scale(1)',
             }}>
               Continue →
             </button>

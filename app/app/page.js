@@ -10,8 +10,8 @@ import { Home, Calendar, Wallet, Scan, MessageCircle, FileText, CreditCard, Chev
 import { CardPreview } from '@/components/CardPreview';
 import { useScrollHero } from '@/lib/animations';
 
-const APPLE = 'cubic-bezier(0.32, 0.72, 0, 1)';
-const SPRING = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
+const LIQUID = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
+const LIQUID_SLOW = 'cubic-bezier(0.32, 0.72, 0, 1)';
 
 function AnnouncementCard({ a, index }) {
   const [expanded, setExpanded] = useState(false);
@@ -26,7 +26,7 @@ function AnnouncementCard({ a, index }) {
   };
   const handlePointerUp = () => {
     if (!cardRef.current) return;
-    cardRef.current.style.transition = `transform 0.4s ${SPRING}`;
+    cardRef.current.style.transition = `transform 0.5s ${LIQUID}`;
     cardRef.current.style.transform = 'scale(1)';
   };
 
@@ -59,7 +59,7 @@ function AnnouncementCard({ a, index }) {
         <div style={{
           overflow: 'hidden',
           transition: expanded 
-            ? `max-height 0.4s ${APPLE}, margin 0.4s ${APPLE}, opacity 0.35s ${APPLE}`
+            ? `max-height 0.5s ${LIQUID_SLOW}, margin 0.5s ${LIQUID_SLOW}, opacity 0.4s ${LIQUID_SLOW}`
             : `max-height 0.3s ease-in, margin 0.3s ease-in, opacity 0.2s ease-in`,
           maxHeight: expanded ? 500 : 0,
           marginTop: expanded ? 8 : 0,
@@ -73,7 +73,7 @@ function AnnouncementCard({ a, index }) {
       {a.content && !expanded && (
         <div style={{
           display: 'flex', justifyContent: 'center', marginTop: 8,
-          transition: `opacity 0.3s ${APPLE}`,
+          transition: `opacity 0.3s ${LIQUID_SLOW}`,
           opacity: expanded ? 0 : 1,
         }}>
           <div style={{ width: 32, height: 4, background: 'var(--s1)', borderRadius: 2 }} />
@@ -141,7 +141,7 @@ export default function AttendeeDashboard() {
   };
   const springUp = (ref) => {
     if (!ref.current) return;
-    ref.current.style.transition = `transform 0.45s ${SPRING}`;
+    ref.current.style.transition = `transform 0.5s ${LIQUID}`;
     ref.current.style.transform = 'scale(1)';
   };
 
@@ -184,7 +184,7 @@ export default function AttendeeDashboard() {
                 flex: 1, background: 'rgba(0,0,0,0.06)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', border: '1px solid rgba(0,0,0,0.1)',
                 borderRadius: 14, padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 color: 'var(--g)', fontSize: 13, fontWeight: 700, textDecoration: 'none',
-                transition: `transform 0.4s ${SPRING}`,
+                transition: `transform 0.4s ${LIQUID}`,
                 WebkitTapHighlightColor: 'transparent',
               }}>
                 <Settings size={16} /> Admin Panel
@@ -196,7 +196,7 @@ export default function AttendeeDashboard() {
                 e.preventDefault();
                 signOut({ redirect: true, callbackUrl: '/login' });
               }}
-              className="signout-btn"
+              className="signout-btn bubble-click"
               style={{
                 flex: profile?.access_level >= 3 ? 0.4 : 1,
                 background: 'rgba(0,0,0,0.04)',
@@ -204,6 +204,7 @@ export default function AttendeeDashboard() {
                 borderRadius: 14, padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 color: 'var(--g)', fontSize: 13, fontWeight: 700, cursor: 'pointer',
                 WebkitTapHighlightColor: 'transparent',
+                transition: 'all 0.4s var(--liquid)',
               }}
             >
               <LogOut size={16} /> Sign Out
@@ -229,9 +230,11 @@ export default function AttendeeDashboard() {
             </div>
             <button
               onClick={() => { Notification.requestPermission().then(() => window.location.reload()); }}
+              className="bubble-click"
               style={{
                 background: 'var(--text)', color: 'var(--white)', border: 'none', borderRadius: 8,
-                padding: '6px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer'
+                padding: '6px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                transition: 'all 0.4s var(--liquid)',
               }}
             >
               Turn On
@@ -240,7 +243,7 @@ export default function AttendeeDashboard() {
         )}
 
         {upNext && (
-          <div>
+          <div className="bottom-stagger">
             <p className="section-label">UP NEXT</p>
             <div style={{ background: 'var(--gl)', border: '1px solid var(--gb)', borderRadius: 'var(--r)', padding: 16 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -262,7 +265,7 @@ export default function AttendeeDashboard() {
         )}
 
         {announcements.length > 0 && (
-          <div>
+          <div className="bottom-stagger">
             <p className="section-label">ANNOUNCEMENTS</p>
             <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {announcements.map((a, i) => <AnnouncementCard key={a.id} a={a} index={i} />)}
@@ -270,7 +273,7 @@ export default function AttendeeDashboard() {
           </div>
         )}
 
-        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div className="bottom-stagger" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
           <p className="section-label" style={{ margin: 0 }}>MY CARD</p>
           <Link
             href="/app/my-card"
@@ -285,7 +288,7 @@ export default function AttendeeDashboard() {
                 transformOrigin: 'top center',
                 transform: 'scale(calc((100vw - 32px) / 320))',
                 width: 320, height: 152,
-                transition: `transform 0.4s ${SPRING}`,
+                transition: `transform 0.4s ${LIQUID}`,
               }}
             >
               <CardPreview user={profile || {}} style={customizations || undefined} />
@@ -293,7 +296,7 @@ export default function AttendeeDashboard() {
           </Link>
         </div>
 
-        <div>
+        <div className="bottom-stagger">
           <p className="section-label">WORKSPACE</p>
           <Link
             href="/app/notes"
@@ -304,7 +307,7 @@ export default function AttendeeDashboard() {
             style={{
               background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 'var(--r)', padding: 24,
               display: 'flex', alignItems: 'center', gap: 16, textDecoration: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
-              transform: 'scale(1)', transition: `transform 0.4s ${SPRING}`, WebkitTapHighlightColor: 'transparent',
+              transform: 'scale(1)', transition: `transform 0.4s ${LIQUID}`, WebkitTapHighlightColor: 'transparent',
             }}
           >
             <div style={{ width: 48, height: 48, borderRadius: 14, background: 'var(--s1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--g)' }}>

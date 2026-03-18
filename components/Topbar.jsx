@@ -24,6 +24,7 @@ export default function Topbar({ title, onBack, rightEl, admin }) {
         {onBack && (
           <button
             onClick={onBack}
+            className="bubble-click"
             style={{
               background: 'none',
               border: 'none',
@@ -32,6 +33,8 @@ export default function Topbar({ title, onBack, rightEl, admin }) {
               padding: 4,
               display: 'flex',
               alignItems: 'center',
+              transition: 'transform 0.4s var(--liquid)',
+              transform: 'scale(1)',
             }}
           >
             <ChevronLeft size={20} />
