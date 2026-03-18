@@ -46,24 +46,24 @@ export async function middleware(request) {
     }
     
     // Level 2 (Event Staff) restriction: Redirect away from management pages to QR Scanner
-    // Management pages: /admin/users, /admin/cards, /admin/announcements, /admin/voting-settings
     const isManagementPage = pathname === '/admin' || 
                              pathname.startsWith('/admin/users') || 
                              pathname.startsWith('/admin/cards') ||
                              pathname.startsWith('/admin/announcements') ||
                              pathname.startsWith('/admin/voting-settings');
                              
-    if (accessLevel === 2 && isManagementPage && pathname !== '/admin/qr-scanner') {
-      return NextResponse.redirect(new URL('/admin/qr-scanner', request.url));
+    if (accessLevel === 2 && isManagementPage && pathname !== '/admin/checkin') {
+      return NextResponse.redirect(new URL('/admin/checkin', request.url));
     }
   }
 
-  // Onboarding check for ALL logged-in users
+  // Check-in gating for attendees
   const isPublicPath = pathname.startsWith('/api/auth') || pathname.startsWith('/_next') || pathname === '/favicon.ico' || pathname === '/' || pathname === '/login';
   
   if (token && !isPublicPath && !pathname.startsWith('/api') && pathname !== '/app/my-card') {
     const profile = token.profile || {};
-    if (!profile.card_made) {
+    // Gated by checked_in status
+    if (!profile.checked_in && accessLevel < 2) {
       return NextResponse.redirect(new URL('/app/my-card?onboarding=1', request.url));
     }
   }

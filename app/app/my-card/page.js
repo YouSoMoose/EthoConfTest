@@ -287,7 +287,7 @@ function MyCardContent() {
       if (res.ok) {
         toast.success('Profile saved', { id: t });
         updateSession(); 
-        if (profile.checked_in === false) {
+        if (!profile.checked_in) {
           setShowSuccessQR(true);
         } else {
           router.push('/app');
@@ -420,7 +420,7 @@ function MyCardContent() {
 
   return (
     <div className="page-enter" style={{ paddingBottom: 100 }}>
-      {profile.checked_in !== false && (
+      {!!profile.checked_in && (
         <div style={{ padding: '16px 16px 0', maxWidth: 500, margin: '0 auto', width: '100%' }}>
           <button 
             onClick={() => router.push('/app')}
