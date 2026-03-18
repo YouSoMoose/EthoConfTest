@@ -6,7 +6,7 @@ import Avatar from '@/components/Avatar';
 import Loader from '@/components/Loader';
 import RoleChip from '@/components/RoleChip';
 import { ACCESS_LABELS } from '@/lib/constants';
-import { RefreshCcw } from 'lucide-react';
+import { RefreshCcw, Users, Check } from 'lucide-react';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
@@ -48,8 +48,8 @@ export default function AdminUsersPage() {
   return (
     <div className="page-enter" style={{ padding: '24px 16px' }}>
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
-        <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 22, color: 'var(--atext)', marginBottom: 20 }}>
-          👥 Users
+        <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 22, color: 'var(--atext)', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <Users size={24} /> Users
         </h2>
 
         <input
@@ -88,8 +88,8 @@ export default function AdminUsersPage() {
                   <td style={{ padding: '12px 14px', color: 'var(--asub)' }}>{u.email}</td>
                   <td style={{ padding: '12px 14px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ color: u.checked_in ? 'var(--agreen)' : 'var(--amuted)', fontWeight: 600 }}>
-                        {u.checked_in ? '✅' : '—'}
+                      <span style={{ color: u.checked_in ? 'var(--agreen)' : 'var(--amuted)', fontWeight: 600, display: 'flex', alignItems: 'center' }}>
+                        {u.checked_in ? <Check size={18} strokeWidth={3} /> : '—'}
                       </span>
                       {u.checked_in && (
                         <button 
@@ -147,7 +147,7 @@ export default function AdminUsersPage() {
                     <RefreshCcw size={14} />
                   </button>
                 )}
-                {u.checked_in && <span style={{ color: 'var(--agreen)' }}>✅</span>}
+                {u.checked_in && <Check size={18} strokeWidth={3} color="var(--agreen)" />}
                 <select
                   value={u.access_level}
                   onChange={e => updateRole(u.id, e.target.value)}

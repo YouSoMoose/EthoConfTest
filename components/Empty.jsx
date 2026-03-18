@@ -1,6 +1,6 @@
-'use client';
+import { Search } from 'lucide-react';
 
-export default function Empty({ icon = '📭', text = 'Nothing here yet', admin }) {
+export default function Empty({ icon = <Search size={48} />, text = 'Nothing here yet', admin }) {
   return (
     <div style={{
       display: 'flex',

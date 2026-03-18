@@ -253,8 +253,7 @@ export default function AttendeeDashboard() {
                 </span>
               </div>
               {upNext.location && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 10, color: 'var(--sub)' }}>
-                  <MapPin size={14} />
+                <div style={{ marginTop: 10, color: 'var(--sub)' }}>
                   <span style={{ fontFamily: 'var(--fb)', fontSize: 12 }}>{upNext.location}</span>
                 </div>
               )}

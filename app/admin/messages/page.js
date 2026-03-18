@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import Avatar from '@/components/Avatar';
 import Loader from '@/components/Loader';
 import { supabase } from '@/lib/supabase';
+import { Search, Trash2, MessageSquare, ChevronLeft, ArrowUp } from 'lucide-react';
 
 export default function AdminMessagesPage() {
   const { data: session } = useSession();
@@ -161,7 +162,7 @@ export default function AdminMessagesPage() {
               alignItems: 'center',
               border: '1px solid var(--aborder)',
             }}>
-              <span style={{ fontSize: 14, marginRight: 8, opacity: 0.5 }}>🔍</span>
+              <Search size={14} style={{ marginRight: 8, opacity: 0.5 }} />
               <input
                 type="text"
                 placeholder="Search attendees..."
@@ -228,9 +229,9 @@ export default function AdminMessagesPage() {
                 <button
                   className="mobile-back"
                   onClick={() => setSelectedUserId(null)}
-                  style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: 24, cursor: 'pointer', padding: 0, marginRight: 4, display: 'none' }}
+                  style={{ background: 'none', border: 'none', color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: 4, marginRight: 4 }}
                 >
-                  ‹
+                  <ChevronLeft size={24} />
                 </button>
                 <Avatar src={activeConvo.user?.avatar} name={activeConvo.user?.name} size={36} />
                 <div>
@@ -265,8 +266,8 @@ export default function AdminMessagesPage() {
                               {new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </span>
                             {isMe && (
-                              <button onClick={() => handleDelete(m.id)} style={{ background: 'none', border: 'none', color: 'rgba(0,0,0,0.5)', fontSize: 10, cursor: 'pointer', padding: 0 }}>
-                                🗑️
+                              <button onClick={() => handleDelete(m.id)} style={{ background: 'none', border: 'none', color: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: 2 }}>
+                                <Trash2 size={12} />
                               </button>
                             )}
                           </div>
@@ -296,17 +297,17 @@ export default function AdminMessagesPage() {
                     background: 'var(--accent)', color: '#000', border: 'none',
                     width: 44, height: 44, borderRadius: '50%',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    cursor: 'pointer', fontSize: 20, fontWeight: 700, paddingBottom: 2,
+                    cursor: 'pointer',
                     opacity: (!replyContent.trim() || sending) ? 0.5 : 1, transition: 'opacity 0.2s',
                   }}>
-                    ↑
+                    <ArrowUp size={20} strokeWidth={3} />
                   </button>
                 </form>
               </div>
             </>
           ) : (
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--abg)', color: 'var(--amuted)' }}>
-              <span style={{ fontSize: 48, marginBottom: 16, opacity: 0.5 }}>💬</span>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--abg)', color: 'var(--amuted)', gap: 16 }}>
+              <MessageSquare size={48} style={{ opacity: 0.5 }} />
               <p style={{ fontFamily: 'var(--fb)', fontSize: 15, fontWeight: 500 }}>Select a conversation to start messaging</p>
             </div>
           )}

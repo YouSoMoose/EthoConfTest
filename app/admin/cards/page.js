@@ -6,7 +6,7 @@ import Loader from '@/components/Loader';
 import { CardPreview, DEFAULT_STYLE } from '@/components/CardPreview';
 import { toPng } from 'html-to-image';
 import toast from 'react-hot-toast';
-import { Search, X, ChevronLeft, Layout, Settings, Printer, Download } from 'lucide-react';
+import { Search, X, ChevronLeft, Layout, Settings, Printer, Download, PencilRuler, ShieldCheck, Sparkles } from 'lucide-react';
 
 
 // Direct DOM mutations per attribute — bypasses React entirely during drag
@@ -141,7 +141,9 @@ function CardEditor({ style, onUpdate, onReset, onClose, cardDOMRefs }) {
       animation: 'fadeUp 0.15s ease both', boxShadow: '0 12px 40px rgba(0,0,0,0.3)', zIndex: 100
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-        <h4 style={{ fontFamily: 'var(--fhs)', fontSize: 15, color: 'var(--atext)', margin: 0 }}>📐 Design Suite</h4>
+        <h4 style={{ fontFamily: 'var(--fhs)', fontSize: 15, color: 'var(--atext)', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <PencilRuler size={16} /> Design Suite
+        </h4>
         <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--amuted)', cursor: 'pointer', fontSize: 24, lineHeight: 1 }}>×</button>
       </div>
 
@@ -303,9 +305,12 @@ function CardRow({ user, initialStyle, globalUpdate, isPrinting, setPrintingId }
 
         <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
           <Btn sm variant="accent" onClick={() => setEditing(!editing)}>
-            {editing ? '🛡️ Save Settings' : '✨ Advanced Designer'}
+            {editing ? <ShieldCheck size={14} /> : <Sparkles size={14} />}
+            {editing ? 'Save Settings' : 'Advanced Designer'}
           </Btn>
-          <Btn sm onClick={handleDownload}>💾 Export ID</Btn>
+          <Btn sm onClick={handleDownload}>
+            <Download size={14} /> Export ID
+          </Btn>
         </div>
 
         {editing && (

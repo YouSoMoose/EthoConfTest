@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Star } from 'lucide-react';
 
 export default function StarRating({ value = 0, onChange, readonly, size = 22, label }) {
   const [hover, setHover] = useState(0);
@@ -21,21 +22,17 @@ export default function StarRating({ value = 0, onChange, readonly, size = 22, l
       )}
       <div style={{ display: 'flex', gap: 2 }}>
         {[1, 2, 3, 4, 5].map((star) => (
-          <span
-            key={star}
-            onClick={() => !readonly && onChange?.(star)}
-            onMouseEnter={() => !readonly && setHover(star)}
-            onMouseLeave={() => !readonly && setHover(0)}
-            style={{
-              fontSize: size,
-              cursor: readonly ? 'default' : 'pointer',
-              transition: 'transform 0.1s',
-              transform: hover === star ? 'scale(1.2)' : 'scale(1)',
-              filter: (hover || value) >= star ? 'none' : 'grayscale(1) opacity(0.3)',
-            }}
-          >
-            ⭐
-          </span>
+            <Star
+              size={size}
+              fill={(hover || value) >= star ? 'var(--accent)' : 'none'}
+              color={(hover || value) >= star ? 'var(--accent)' : 'var(--amuted)'}
+              style={{
+                cursor: readonly ? 'default' : 'pointer',
+                transition: 'transform 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
+                transform: hover === star ? 'scale(1.2)' : 'scale(1)',
+                opacity: (hover || value) >= star ? 1 : 0.4,
+              }}
+            />
         ))}
       </div>
     </div>

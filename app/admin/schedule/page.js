@@ -6,6 +6,7 @@ import Loader from '@/components/Loader';
 import Btn from '@/components/Btn';
 import FormInput from '@/components/FormInput';
 import Empty from '@/components/Empty';
+import { Calendar, MapPin, Pencil, Trash2 } from 'lucide-react';
 
 export default function AdminSchedulePage() {
   const [schedule, setSchedule] = useState([]);
@@ -49,7 +50,9 @@ export default function AdminSchedulePage() {
     <div className="page-enter" style={{ padding: '24px 16px' }}>
       <div style={{ maxWidth: 700, margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-          <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 22, color: 'var(--atext)' }}>📅 Schedule</h2>
+          <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 22, color: 'var(--atext)', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Calendar size={24} /> Schedule
+          </h2>
           <Btn variant="accent" sm onClick={() => { resetForm(); setShowForm(!showForm); }}>{showForm ? 'Cancel' : '+ Add'}</Btn>
         </div>
 
@@ -70,7 +73,7 @@ export default function AdminSchedulePage() {
         )}
 
         {schedule.length === 0 ? (
-          <Empty icon="📅" text="No events yet" admin />
+          <Empty icon={<Calendar size={48} />} text="No events yet" admin />
         ) : (
           <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {schedule.map(item => (
@@ -82,13 +85,17 @@ export default function AdminSchedulePage() {
                   <h3 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 15, color: 'var(--atext)' }}>{item.title}</h3>
                   {item.description && <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--asub)', marginTop: 4 }}>{item.description}</p>}
                   <div style={{ display: 'flex', gap: 12, marginTop: 8, fontSize: 11, color: 'var(--amuted)', fontFamily: 'var(--fb)' }}>
-                    {item.location && <span>📍 {item.location}</span>}
+                    {item.location && <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><MapPin size={12} /> {item.location}</span>}
                     <span>{item.start_time} — {item.end_time}</span>
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: 6, marginLeft: 12 }}>
-                  <button onClick={() => handleEdit(item)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14 }}>✏️</button>
-                  <button onClick={() => handleDelete(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14 }}>🗑️</button>
+                  <button onClick={() => handleEdit(item)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--asub)', display: 'flex', padding: 4 }}>
+                    <Pencil size={14} />
+                  </button>
+                  <button onClick={() => handleDelete(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ared)', display: 'flex', padding: 4 }}>
+                    <Trash2 size={14} />
+                  </button>
                 </div>
               </div>
             ))}

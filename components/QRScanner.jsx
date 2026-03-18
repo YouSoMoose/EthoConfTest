@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import jsQR from 'jsqr';
 import Btn from '@/components/Btn';
 import Link from 'next/link';
+import { Camera, User, Phone, CheckCircle, FileText, XCircle, Wallet, Info } from 'lucide-react';
 
 export default function QRScanner() {
   const videoRef = useRef(null);
@@ -68,8 +69,8 @@ export default function QRScanner() {
       });
       const data = await res.json();
       if (res.ok) {
-        setResult({ success: true, message: data.message || 'Added to Wallet! 💼', profile: data.profile });
-        toast.success(data.message || 'Added to Wallet! 💼');
+        setResult({ success: true, message: data.message || 'Added to Wallet!', profile: data.profile });
+        toast.success(data.message || 'Added to Wallet!');
       } else {
         setResult({ success: false, error: data.error, raw: cleanId });
         toast.error(data.error || 'Failed');
@@ -81,7 +82,7 @@ export default function QRScanner() {
     <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px', textAlign: 'center' }}>
       {!scanning && !result && (
         <div style={{ padding: '60px 0' }}>
-          <span style={{ fontSize: 56, display: 'block', marginBottom: 16 }}>📷</span>
+          <Camera size={56} color="var(--amuted)" style={{ marginBottom: 16, display: 'block', margin: '0 auto 16px' }} />
           <p style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'var(--sub)', marginBottom: 24 }}>
             Point your camera at a person's QR code
           </p>
@@ -116,7 +117,7 @@ export default function QRScanner() {
               <div style={{ width: 80, height: 80, borderRadius: 40, background: 'var(--s1)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', marginBottom: 16 }}>
                 {result.profile.avatar ? (
                   <img src={result.profile.avatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : <span style={{ fontSize: 40 }}>👤</span>}
+                ) : <User size={40} color="var(--amuted)" />}
               </div>
               <h2 style={{ fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 24, color: 'var(--text)', margin: '0 0 4px', textAlign: 'center' }}>
                 {result.profile.name || 'Anonymous User'}
@@ -126,9 +127,9 @@ export default function QRScanner() {
               </p>
               
               {result.profile.phone && (
-                <p style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'var(--sub)', margin: '0 0 16px', textAlign: 'center' }}>
-                  📞 {result.profile.phone}
-                </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--sub)', marginBottom: 16, fontSize: 14, fontFamily: 'var(--fb)' }}>
+                  <Phone size={14} /> {result.profile.phone}
+                </div>
               )}
               
               {result.profile.bio && (
@@ -138,20 +139,20 @@ export default function QRScanner() {
               )}
 
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(52, 199, 89, 0.15)', color: '#28a745', padding: '6px 12px', borderRadius: 20, fontSize: 13, fontWeight: 700, fontFamily: 'var(--fb)', marginBottom: 24 }}>
-                <span>✓</span> {result.message}
+                <CheckCircle size={14} /> {result.message}
               </div>
 
               {result.profile.resume_link && (
                 <a href={result.profile.resume_link} target="_blank" rel="noopener noreferrer" style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'var(--ad)', color: 'var(--accent)', textDecoration: 'none', padding: '12px 20px', borderRadius: 12, fontFamily: 'var(--fb)', fontWeight: 600, fontSize: 14, width: '100%', marginBottom: 12
                 }}>
-                  📄 View Resume
+                  <FileText size={16} /> View Resume
                 </a>
               )}
             </div>
           ) : (
             <div style={{ textAlign: 'center' }}>
-              <span style={{ fontSize: 56, display: 'block', marginBottom: 16 }}>❌</span>
+              <XCircle size={56} color="var(--red)" style={{ marginBottom: 16, display: 'block', margin: '0 auto 16px' }} />
               <h2 style={{ fontFamily: 'var(--fh)', fontWeight: 700, fontSize: 20, color: 'var(--text)', marginBottom: 8 }}>Oops</h2>
               <p style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'var(--sub)', marginBottom: 24 }}>{result.error}</p>
             </div>
@@ -160,10 +161,10 @@ export default function QRScanner() {
           <div style={{ marginTop: 12 }}>
             <Link href="/app/wallet" style={{ 
               fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--sub)', 
-              textDecoration: 'underline', cursor: 'pointer', display: 'inline-block',
+              textDecoration: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
               padding: '8px'
             }}>
-              Go to Wallet →
+              Go to Wallet <Wallet size={14} />
             </Link>
           </div>
         </div>

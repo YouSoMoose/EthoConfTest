@@ -6,6 +6,7 @@ import Avatar from '@/components/Avatar';
 import Loader from '@/components/Loader';
 import Btn from '@/components/Btn';
 import Empty from '@/components/Empty';
+import { Ticket, Dices, Trophy } from 'lucide-react';
 
 export default function AdminRafflePage() {
   const [entries, setEntries] = useState([]);
@@ -19,7 +20,7 @@ export default function AdminRafflePage() {
   const pickWinner = () => {
     if (!entries.length) { toast.error('No entries'); return; }
     setWinner(entries[Math.floor(Math.random() * entries.length)]);
-    toast.success('Winner picked! 🎉');
+    toast.success('Winner picked!');
   };
 
   if (loading) return <Loader admin />;
@@ -28,8 +29,12 @@ export default function AdminRafflePage() {
     <div className="page-enter" style={{ padding: '24px 16px' }}>
       <div style={{ maxWidth: 700, margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-          <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 22, color: 'var(--atext)' }}>🎰 Raffle</h2>
-          <Btn variant="accent" sm onClick={pickWinner}>🎲 Pick Winner</Btn>
+          <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 22, color: 'var(--atext)', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Ticket size={24} /> Raffle
+          </h2>
+          <Btn variant="accent" sm onClick={pickWinner} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Dices size={16} /> Pick Winner
+          </Btn>
         </div>
 
         {winner && (
@@ -38,7 +43,12 @@ export default function AdminRafflePage() {
             padding: 32, textAlign: 'center', marginBottom: 20,
             animation: 'scaleIn 0.3s ease both',
           }}>
-            <span style={{ fontSize: 48, display: 'block', marginBottom: 12 }}>🏆</span>
+            <div style={{ background: 'var(--accent)', color: 'var(--white)', padding: '8px 16px', borderRadius: 20, display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+              <Trophy size={20} />
+              <span style={{ fontFamily: 'var(--fb)', fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Lucky Winner
+              </span>
+            </div>
             <p style={{ fontFamily: 'var(--fhs)', fontWeight: 600, fontSize: 14, color: 'var(--asub)', marginBottom: 8 }}>Winner!</p>
             <Avatar src={winner.profiles?.avatar} name={winner.profiles?.name} size={56} />
             <h3 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 20, color: 'var(--accent)', marginTop: 12 }}>
@@ -55,7 +65,7 @@ export default function AdminRafflePage() {
         </p>
 
         {entries.length === 0 ? (
-          <Empty icon="🎰" text="No raffle entries yet" admin />
+          <Empty icon={<Ticket size={48} />} text="No raffle entries yet" admin />
         ) : (
           <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {entries.map(e => (
