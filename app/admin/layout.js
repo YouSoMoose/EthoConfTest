@@ -61,9 +61,9 @@ export default function AdminLayout({ children }) {
             }}>
               <User size={14} /> Attendee View
             </Link>
-            <button 
+            <button
               type="button"
-              onClick={() => signOut({ redirect: true, callbackUrl: '/login' })} 
+              onClick={() => signOut({ redirect: true, callbackUrl: '/login' })}
               className="signout-btn"
               style={{
                 background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8,
@@ -106,6 +106,7 @@ export default function AdminLayout({ children }) {
         </div>
 
         <nav style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: '0 8px' }}>
+          {visibleTabs.map((tab) => (
             <Link key={tab.href} href={tab.href} style={{
               display: 'flex', alignItems: 'center', gap: 10,
               padding: '10px 12px', borderRadius: 10,
@@ -117,6 +118,7 @@ export default function AdminLayout({ children }) {
               <tab.icon size={16} />
               {tab.label}
             </Link>
+          ))}
         </nav>
 
         <div style={{ marginTop: 'auto', padding: '12px 16px' }}>
@@ -128,12 +130,12 @@ export default function AdminLayout({ children }) {
           }}>
             <User size={16} /> Attendee View
           </Link>
-          <button 
+          <button
             type="button"
-            onClick={() => signOut({ redirect: true, callbackUrl: '/login' })} 
+            onClick={() => signOut({ redirect: true, callbackUrl: '/login' })}
             className="signout-btn"
             style={{
-              background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', 
+              background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
               color: 'var(--amuted)', borderRadius: 10,
               fontFamily: 'var(--fb)', fontSize: 13, cursor: 'pointer',
               padding: '8px 12px', width: '100%', textAlign: 'left',
@@ -176,9 +178,9 @@ export default function AdminLayout({ children }) {
           }}>
             <User size={12} /> Attendee
           </Link>
-          <button 
+          <button
             type="button"
-            onClick={() => signOut({ redirect: true, callbackUrl: '/login' })} 
+            onClick={() => signOut({ redirect: true, callbackUrl: '/login' })}
             className="signout-btn"
             style={{
               background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8,
@@ -230,6 +232,7 @@ export default function AdminLayout({ children }) {
             </div>
 
             <nav style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: '0 8px', flex: 1 }}>
+              {visibleTabs.map((tab) => (
                 <Link key={tab.href} href={tab.href} onClick={() => setMenuOpen(false)} style={{
                   display: 'flex', alignItems: 'center', gap: 10,
                   padding: '12px 12px', borderRadius: 10,
@@ -241,15 +244,16 @@ export default function AdminLayout({ children }) {
                   <tab.icon size={18} />
                   {tab.label}
                 </Link>
+              ))}
             </nav>
 
             <div style={{ padding: '16px', borderTop: '1px solid var(--aborder)' }}>
-              <button 
+              <button
                 type="button"
-                onClick={() => signOut({ redirect: true, callbackUrl: '/login' })} 
+                onClick={() => signOut({ redirect: true, callbackUrl: '/login' })}
                 className="signout-btn"
                 style={{
-                  background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', 
+                  background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
                   color: 'var(--amuted)', borderRadius: 10,
                   fontFamily: 'var(--fb)', fontSize: 13, cursor: 'pointer',
                   padding: '10px 12px', width: '100%', textAlign: 'left',

@@ -28,11 +28,6 @@ const slides = [
     c1: '#FFE2D6', c2: '#FCBD9D', textMode: 'dark',
   },
   {
-    icon: ShieldCheck, title: 'Passport Stamps',
-    desc: 'Visit booths and collect stamps on your digital passport. Complete your journey through the conference.',
-    c1: '#F5F0EA', c2: '#D4CCC4', textMode: 'dark',
-  },
-  {
     icon: MessageCircle, title: 'Live Chat',
     desc: 'Message event staff in real-time. Get answers, share feedback, and stay connected.',
     c1: '#D4CCC4', c2: '#A89E94', textMode: 'dark',
