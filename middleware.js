@@ -62,8 +62,9 @@ export async function middleware(request) {
   
   if (token && !isPublicPath && !pathname.startsWith('/api') && pathname !== '/app/my-card') {
     const profile = token.profile || {};
-    // Gated by checked_in status
-    if (!profile.checked_in && accessLevel < 2) {
+    // Gated by checked_in status (handles both boolean and TRUE/FALSE strings)
+    const isCheckedIn = profile.checked_in === true || profile.checked_in === 'TRUE';
+    if (!isCheckedIn && accessLevel < 2) {
       return NextResponse.redirect(new URL('/app/my-card?onboarding=1', request.url));
     }
   }
