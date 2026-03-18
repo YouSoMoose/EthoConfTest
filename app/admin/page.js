@@ -84,7 +84,7 @@ export default function AdminDashboard() {
 
     toast.promise(p, {
       loading: 'Sending announcement...',
-      success: '📢 Announcement sent to all users!',
+      success: 'Announcement sent to all users!',
       error: err => err.message
     });
   };
@@ -135,7 +135,7 @@ export default function AdminDashboard() {
               display: 'flex', alignItems: 'center', gap: 6,
               boxShadow: '0 2px 12px rgba(240,112,112,0.3)',
             }}>
-              📢 Mega Announcement
+              Mega Announcement
             </button>
           )}
         </div>
@@ -220,7 +220,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Mega Announcement Modal */}
-      <Modal open={showAnnounce} onClose={() => setShowAnnounce(false)} title="📢 Mega Announcement" subtitle="This will appear as a banner for ALL users" admin>
+      <Modal open={showAnnounce} onClose={() => setShowAnnounce(false)} title="Mega Announcement" subtitle="This will appear as a banner for ALL users" admin>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div>
             <label style={{ fontFamily: 'var(--fb)', fontSize: 12, fontWeight: 600, color: 'var(--asub)', display: 'block', marginBottom: 6 }}>

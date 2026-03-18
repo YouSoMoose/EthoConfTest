@@ -240,7 +240,7 @@ export default function AttendeeDashboard() {
 
         {upNext && (
           <div>
-            <p className="section-label">📍 UP NEXT</p>
+            <p className="section-label">UP NEXT</p>
             <div style={{ background: 'var(--gl)', border: '1px solid var(--gb)', borderRadius: 'var(--r)', padding: 16 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
@@ -258,7 +258,7 @@ export default function AttendeeDashboard() {
 
         {announcements.length > 0 && (
           <div>
-            <p className="section-label">📢 ANNOUNCEMENTS</p>
+            <p className="section-label">ANNOUNCEMENTS</p>
             <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {announcements.map((a, i) => <AnnouncementCard key={a.id} a={a} index={i} />)}
             </div>
