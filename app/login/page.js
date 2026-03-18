@@ -43,9 +43,18 @@ export default function LoginPage() {
   useEffect(() => {
     if (status === 'authenticated' && session?.profile) {
       const level = session.profile.access_level ?? 0;
-      if (level >= 2) router.replace('/admin');
-      else if (level === 1) router.replace('/company');
-      else router.replace('/app');
+      const inAdmin = session.profile.in_admin ?? false;
+
+      if (level >= 3) {
+        if (inAdmin) router.replace('/admin');
+        else router.replace('/app');
+      } else if (level === 2) {
+        router.replace('/admin');
+      } else if (level === 1) {
+        router.replace('/company');
+      } else {
+        router.replace('/app');
+      }
     }
   }, [session, status, router]);
 

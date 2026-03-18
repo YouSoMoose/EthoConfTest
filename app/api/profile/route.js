@@ -27,19 +27,23 @@ export async function PUT(request) {
 
   const body = await request.json();
 
+  // Create update object dynamically based on what's in body
+  const updateData = {};
+  if (body.resume_link !== undefined) updateData.resume_link = body.resume_link;
+  if (body.phone !== undefined) updateData.phone = body.phone;
+  if (body.bio !== undefined) updateData.bio = body.bio;
+  if (body.role !== undefined) updateData.role = body.role;
+  if (body.name !== undefined) updateData.name = body.name;
+  if (body.avatar !== undefined) updateData.avatar = body.avatar;
+  if (body.company !== undefined) updateData.company = body.company;
+  if (body.linkedin !== undefined) updateData.linkedin = body.linkedin;
+  if (body.in_admin !== undefined) updateData.in_admin = body.in_admin;
+  
+  updateData.card_made = true;
+
   const { data, error } = await supabaseAdmin
     .from('profiles')
-    .update({ 
-      resume_link: body.resume_link,
-      phone: body.phone,
-      bio: body.bio,
-      role: body.role,
-      name: body.name,
-      avatar: body.avatar,
-      company: body.company,
-      linkedin: body.linkedin,
-      card_made: true
-    })
+    .update(updateData)
     .eq('id', session.profile.id)
     .select()
     .single();
