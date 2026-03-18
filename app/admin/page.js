@@ -122,7 +122,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="page-enter" style={{ padding: '24px 16px' }}>
-      <div style={{ maxWidth: 900, margin: '0 auto' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
           <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 22, color: 'var(--atext)', display: 'flex', alignItems: 'center', gap: 10 }}>
             <LayoutDashboard size={24} /> Dashboard
@@ -143,7 +143,6 @@ export default function AdminDashboard() {
 
         <div className="stagger admin-stat-grid" style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
           gap: 12,
         }}>
           {cards.map(card => {

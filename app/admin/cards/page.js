@@ -434,7 +434,7 @@ function AdminIDCardsContent() {
         }
       `}</style>
 
-      <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+      <div style={{ maxWidth: 1300, margin: '0 auto' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24, marginBottom: 32 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
             <Link href="/admin" style={{

@@ -109,7 +109,7 @@ export default function AdminCheckinPage() {
 
   return (
     <div className="page-enter" style={{ padding: '24px 16px', minHeight: '100dvh' }}>
-      <div style={{ maxWidth: 500, margin: '0 auto' }}>
+      <div style={{ maxWidth: 600, margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
           <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 800, fontSize: 24, color: 'var(--atext)', margin: 0 }}>
             Scanner

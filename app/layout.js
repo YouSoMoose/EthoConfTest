@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import SessionProvider from '@/components/SessionProvider';
 import MessageNotification from '@/components/MessageNotification';
 import AnnouncementBanner from '@/components/AnnouncementBanner';
+import LayoutWrapper from '@/components/LayoutWrapper';
 
 export const metadata = {
   title: 'The Circular Economy Conference',
@@ -39,9 +40,9 @@ export default function RootLayout({ children }) {
           />
           <MessageNotification />
           <AnnouncementBanner />
-          <div className="mobile-container">
+          <LayoutWrapper>
             {children}
-          </div>
+          </LayoutWrapper>
         </SessionProvider>
       </body>
     </html>

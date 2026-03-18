@@ -27,7 +27,7 @@ export default function AdminRafflePage() {
 
   return (
     <div className="page-enter" style={{ padding: '24px 16px' }}>
-      <div style={{ maxWidth: 700, margin: '0 auto' }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
           <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 22, color: 'var(--atext)', display: 'flex', alignItems: 'center', gap: 10 }}>
             <Ticket size={24} /> Raffle

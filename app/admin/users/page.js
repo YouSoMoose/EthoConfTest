@@ -47,7 +47,7 @@ export default function AdminUsersPage() {
 
   return (
     <div className="page-enter" style={{ padding: '24px 16px' }}>
-      <div style={{ maxWidth: 900, margin: '0 auto' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <h2 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 22, color: 'var(--atext)', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
           <Users size={24} /> Users
         </h2>

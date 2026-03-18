@@ -59,22 +59,28 @@ html, body {
 
 body {
   font-family: var(--fb);
-  background: #111; /* Dark background for desktop desktop */
+  background: #111; /* Dark background for desktop */
   color: var(--text);
   min-height: 100dvh;
-  display: flex;
-  justify-content: center;
 }
 
 .mobile-container {
   width: 100%;
   max-width: 500px;
+  margin: 0 auto;
   background: var(--bg);
   min-height: 100dvh;
   position: relative;
   box-shadow: 0 0 100px rgba(0,0,0,0.5);
   display: flex;
   flex-direction: column;
+}
+
+.full-container {
+  width: 100%;
+  min-height: 100dvh;
+  background: var(--abg);
+  position: relative;
 }
 
 /* ── Scrollbar hidden ──────────────────────────────────── */

@@ -252,7 +252,7 @@ export default function LandingPage() {
           lineHeight: 1, marginBottom: 6, transition: 'color 0.4s ease',
           textShadow: slide.textMode === 'light' ? '0 2px 10px rgba(0,0,0,0.1)' : 'none'
         }}>
-          Circular Economy
+          The Circular Economy Conference
         </h1>
       </div>
 
