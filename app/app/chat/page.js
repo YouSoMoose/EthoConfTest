@@ -98,7 +98,14 @@ export default function ChatPage() {
   if (loading) return <Loader />;
 
   return (
-    <div className="page-enter" style={{ display: 'flex', flexDirection: 'column', height: '100dvh', paddingBottom: 100 }}>
+    <div className="page-enter" style={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      height: '100dvh', 
+      overflow: 'hidden', // Fix: prevent page-level scroll
+      background: 'var(--bg)',
+      paddingBottom: 85 // Account for bottom nav
+    }}>
       <Topbar title="Ask Admins & Speakers" onBack={() => router.back()} />
 
       <div style={{ 
@@ -107,7 +114,8 @@ export default function ChatPage() {
         borderBottom: '1px solid var(--border)', 
         display: 'flex', 
         alignItems: 'center', 
-        gap: 12 
+        gap: 12,
+        flexShrink: 0
       }}>
         <div style={{ 
           width: 36, height: 36, borderRadius: 12, 
@@ -123,7 +131,7 @@ export default function ChatPage() {
       </div>
 
       {level === 2 && (
-        <div style={{ background: '#FEF3C7', padding: '8px 16px', borderBottom: '1px solid #FCD34D', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ background: '#FEF3C7', padding: '8px 16px', borderBottom: '1px solid #FCD34D', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
           <ShieldAlert size={14} color="#D97706" />
           <p style={{ fontFamily: 'var(--fb)', fontSize: 10, fontWeight: 700, color: '#92400E', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Staff Mode: Direct line to Super Admin
@@ -182,6 +190,7 @@ export default function ChatPage() {
         padding: '12px 16px',
         paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
         background: 'transparent',
+        flexShrink: 0
       }}>
         <form onSubmit={handleSend} style={{
           display: 'flex', gap: 8, maxWidth: 500, margin: '0 auto',

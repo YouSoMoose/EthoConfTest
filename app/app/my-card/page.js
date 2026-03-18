@@ -224,6 +224,33 @@ function MyCardContent() {
   const cardRef = useRef(null);
   const domRefs = useRef({});
 
+  useEffect(() => {
+    if (!profile?.id || profile.checked_in) return;
+
+    console.log('Subscribing to check-in for:', profile.id);
+    const channel = supabase
+      .channel(`checkin-${profile.id}`)
+      .on('postgres_changes', { 
+        event: 'UPDATE', 
+        schema: 'public', 
+        table: 'profiles',
+        filter: `id=eq.${profile.id}`
+      }, (payload) => {
+        console.log('Profile update detected:', payload);
+        if (payload.new.checked_in) {
+          setIsCheckinSuccess(true);
+          updateSession();
+          setTimeout(() => router.push('/app'), 2200);
+        }
+      })
+      .subscribe((status) => {
+        console.log('Subscription status:', status);
+      });
+
+    return () => { supabase.removeChannel(channel); };
+  }, [profile?.id, profile?.checked_in, router, updateSession]);
+
+  useEffect(() => {
     if (qrExpanded) {
       document.body.style.overflow = 'hidden';
     } else {

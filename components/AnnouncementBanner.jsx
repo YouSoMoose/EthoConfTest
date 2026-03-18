@@ -124,12 +124,7 @@ export default function AnnouncementBanner() {
               maxWidth: 420,
               margin: '0 auto',
               width: '100%',
-              animation: isExiting
-                ? 'notifExit 0.3s ease forwards'
-                : 'notifEnter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both',
-              animationDelay: isExiting ? '0s' : `${i * 0.08}s`,
-            }}
-          >
+
             <div style={{
               width: 38, height: 38, borderRadius: 10,
               background: 'linear-gradient(135deg, #2d5016 0%, #1a4a3c 100%)',

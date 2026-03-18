@@ -39,6 +39,7 @@ export default function PageTransition({ children }) {
       setDir(direction);
       setSwipeAnim(doSwipe);
       setPhase('out');
+      prevPathRef.current = pathname; // Update immediately for next click
       
       const timer1 = setTimeout(() => {
         setDisplayChildren(children);
@@ -49,10 +50,10 @@ export default function PageTransition({ children }) {
           
           const timer3 = setTimeout(() => {
             setPhase('idle');
-            prevPathRef.current = pathname;
-          }, 400); // Wait for enter transition
-        }, 30); // small delay to ensure DOM applied 'prep' styles without transition
-      }, 150); // fast exit transition
+          }, 400); 
+        }, 30); 
+      }, 150); 
+
 
       return () => {
         clearTimeout(timer1);
