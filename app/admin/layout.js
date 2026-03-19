@@ -69,7 +69,7 @@ export default function AdminLayout({ children }) {
             </button>
           </div>
           <div style={{ maxWidth: 500, width: '100%', margin: '0 auto' }}>
-            <AdminSwitch initialMode="admin" admin />
+            <AdminSwitch admin />
           </div>
         </header>
         <main style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', position: 'relative', minHeight: 0 }}>
@@ -87,6 +87,7 @@ export default function AdminLayout({ children }) {
         backdropFilter: 'blur(16px)',
         borderRight: '1px solid var(--aborder)',
         padding: '20px 0',
+        animation: 'slideDown 0.8s var(--liquid) both',
       }}>
         <div style={{ padding: '0 16px', marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -124,7 +125,7 @@ export default function AdminLayout({ children }) {
 
         <div style={{ marginTop: 'auto', padding: '12px 16px' }}>
           <div style={{ padding: '0 8px' }}>
-            <AdminSwitch initialMode="admin" admin />
+            <AdminSwitch admin />
           </div>
           <button
             type="button"
@@ -151,9 +152,9 @@ export default function AdminLayout({ children }) {
         padding: '12px 16px 16px',
         flexDirection: 'column',
         gap: 16,
-        position: 'sticky',
-        top: 0,
+        position: 'sticky', top: 0,
         zIndex: 60,
+        animation: 'slideDown 0.8s var(--liquid) both',
       }}>
         <div style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -180,7 +181,7 @@ export default function AdminLayout({ children }) {
           </button>
         </div>
         <div style={{ maxWidth: 500, width: '100%', margin: '0 auto' }}>
-          <AdminSwitch initialMode="admin" admin />
+          <AdminSwitch admin />
         </div>
       </header>
 

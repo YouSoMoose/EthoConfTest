@@ -1,16 +1,19 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Shield, User, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-export default function AdminSwitch({ initialMode, admin }) {
+export default function AdminSwitch({ admin }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { data: session, update } = useSession();
   const [loading, setLoading] = useState(false);
-  const isAdminMode = initialMode === 'admin' || session?.profile?.in_admin;
+  
+  const isAdminPath = pathname.startsWith('/admin');
+  const isAdminMode = isAdminPath;
 
   const handleToggle = async (e) => {
     // Prevent double triggers if clicking container AND button

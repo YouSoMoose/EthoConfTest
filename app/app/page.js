@@ -212,6 +212,7 @@ export default function AttendeeDashboard() {
           boxShadow: '0 4px 20px rgba(65, 52, 41, 0.15)',
           transformOrigin: 'top center',
           willChange: 'transform, opacity',
+          animation: 'slideDown 0.8s var(--liquid) both',
         }}
       >
         <div style={{ maxWidth: 500, margin: '0 auto' }}>
@@ -229,7 +230,7 @@ export default function AttendeeDashboard() {
           </div>
 
           <div style={{ marginTop: 28, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <AdminSwitch initialMode="app" />
+            <AdminSwitch />
             <button
               type="button"
               onClick={(e) => {
