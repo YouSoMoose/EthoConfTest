@@ -13,6 +13,7 @@ export default function LiabilityWaiver({ onComplete }) {
     date: new Date().toISOString().split('T')[0],
     parentName: '',
     parentSignature: '',
+    minorSignature: '',
     emergencyContact: '',
     emergencyPhone: '',
     agreed: false
@@ -140,8 +141,8 @@ I acknowledge that:
     if (ageRange === 'adult') {
       if (!formData.fullName || !formData.signature) return toast.error('Please fill in your name and signature');
     } else {
-      if (!formData.fullName || !formData.parentName || !formData.parentSignature || !formData.emergencyContact || !formData.emergencyPhone) {
-        return toast.error('Please fill in all required fields');
+      if (!formData.fullName || !formData.parentName || !formData.parentSignature || !formData.minorSignature || !formData.emergencyContact || !formData.emergencyPhone) {
+        return toast.error('Please fill in all required fields, including signatures');
       }
     }
     
@@ -281,6 +282,19 @@ I acknowledge that:
                       Type your full name above. This counts as a signature.
                     </p>
                   </div>
+                </div>
+                <div style={styles.field}>
+                  <label style={styles.label}>Participant (Minor) E-Signature</label>
+                  <input 
+                    type="text" required
+                    value={formData.minorSignature}
+                    onChange={(e) => handleInputChange('minorSignature', e.target.value)}
+                    placeholder="Type Minor's Full Name to Sign"
+                    style={{ ...styles.input, fontStyle: 'italic', color: 'var(--g)', fontSize: 16 }}
+                  />
+                  <p style={{ fontSize: 10, color: 'var(--sub)', margin: '4px 0 0', fontWeight: 600 }}>
+                    Type minor's full name. Both participant and guardian must sign.
+                  </p>
                 </div>
                 <div style={styles.inputRow}>
                   <div style={styles.field}>

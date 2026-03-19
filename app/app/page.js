@@ -87,7 +87,7 @@ function AnnouncementCard({ a, index }) {
 }
 
 export default function AttendeeDashboard() {
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
   const [schedule, setSchedule] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -103,6 +103,38 @@ export default function AttendeeDashboard() {
       setShowWaiver(false);
     }
   }, [session]);
+
+  // Polling for onboarding status changes (Waiver, Card, Check-in)
+  useEffect(() => {
+    if (!session?.user) return;
+    
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch('/api/profile');
+        if (res.ok) {
+          const freshProfile = await res.json();
+          const old = session?.profile || {};
+          
+          // Check if key statuses changed
+          const changed = 
+            freshProfile.liability !== old.liability ||
+            freshProfile.card_made !== old.card_made ||
+            freshProfile.checked_in !== old.checked_in;
+          
+          if (changed) {
+            await update({
+              ...session,
+              profile: freshProfile
+            });
+          }
+        }
+      } catch (err) {
+        console.warn("Status polling error:", err);
+      }
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [session, update]);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
