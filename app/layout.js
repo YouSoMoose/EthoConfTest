@@ -6,6 +6,7 @@ import AnnouncementBanner from '@/components/AnnouncementBanner';
 import LayoutWrapper from '@/components/LayoutWrapper';
 import ViewportHeight from '@/components/ViewportHeight';
 import GlobalIsolation from '@/components/GlobalIsolation';
+import GlobalBlockingOverlay from '@/components/GlobalBlockingOverlay';
 
 export const metadata = {
   title: 'The Circular Economy Conference',
@@ -45,9 +46,11 @@ export default function RootLayout({ children }) {
             <MessageNotification />
             <AnnouncementBanner />
           </GlobalIsolation>
-          <LayoutWrapper>
-            {children}
-          </LayoutWrapper>
+          <GlobalBlockingOverlay>
+            <LayoutWrapper>
+              {children}
+            </LayoutWrapper>
+          </GlobalBlockingOverlay>
         </SessionProvider>
       </body>
     </html>

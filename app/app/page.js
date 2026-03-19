@@ -94,16 +94,6 @@ export default function AttendeeDashboard() {
   const [customizations, setCustomizations] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [notifPermission, setNotifPermission] = useState('default');
-  const [showWaiver, setShowWaiver] = useState(false);
-
-  useEffect(() => {
-    if (session?.profile && session.profile.liability !== true) {
-      setShowWaiver(true);
-    } else {
-      setShowWaiver(false);
-    }
-  }, [session]);
-
   // Polling for onboarding status changes (Waiver, Card, Check-in)
   useEffect(() => {
     if (!session?.user) return;
@@ -456,23 +446,6 @@ export default function AttendeeDashboard() {
         </div>
       </div>
 
-      <Modal 
-        open={showWaiver} 
-        onClose={() => {}} // Non-closable until signed
-        title="Welcome! Please Sign the Waiver"
-        center
-      >
-        <div style={{ maxHeight: '80vh', overflowY: 'auto' }}>
-          <LiabilityWaiver onComplete={async (fresh) => {
-            if (fresh) {
-              await update({ ...session, profile: fresh });
-            } else {
-              window.location.reload();
-            }
-            setShowWaiver(false);
-          }} />
-        </div>
-      </Modal>
     </div>
   );
 }

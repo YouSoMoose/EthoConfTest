@@ -288,11 +288,6 @@ function MyCardContent() {
   if (!profile) return <Loader />;
   if (isCheckinSuccess) return <SuccessAnimation />;
 
-  // LIABILITY WAIVER GATE
-  if (profile.liability !== true) {
-    return <LiabilityWaiver onComplete={() => updateSession()} />;
-  }
-
   return (
     <div className="page-enter" style={{ height: '100%', overflowY: 'auto', paddingBottom: 100 }}>
       {/* STEP NAVIGATOR */}
@@ -546,51 +541,6 @@ function MyCardContent() {
           </div>
         )}
       </div>
-
-      {/* Fullscreen Success Screen (Final Gate) */}
-      {(showSuccessQR && !isCheckedIn(profile.checked_in)) && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 1000, 
-          background: 'var(--bg)', display: 'flex', flexDirection: 'column', 
-          alignItems: 'center', padding: 'max(24px, env(safe-area-inset-top)) 24px calc(max(24px, env(safe-area-inset-bottom)) + 24px)',
-          animation: 'fadeUp 0.6s var(--liquid) both'
-        }}>
-          <div style={{ maxWidth: 500, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 32 }}>
-            <div style={{ textAlign: 'center', marginTop: 40 }}>
-              <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'var(--g)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
-                <QrCode size={40} />
-              </div>
-              <h2 style={{ fontFamily: 'var(--fh)', fontSize: 32, fontWeight: 800, color: 'var(--g)', marginBottom: 12 }}>
-                Waiting for Scan
-              </h2>
-              <p style={{ fontFamily: 'var(--fb)', fontSize: 16, color: 'var(--sub)', fontWeight: 600, maxWidth: 300, margin: '0 auto' }}>
-                Please present this code to our staff member at the check-in desk.
-              </p>
-            </div>
-
-            <div style={{ 
-              background: '#fff', padding: 40, borderRadius: 40, 
-              boxShadow: '0 40px 100px rgba(0,0,0,0.15)',
-              border: '4px solid var(--g)'
-            }}>
-              <QRCode value={profile.id} size={240} level="H" />
-            </div>
-
-            <div style={{ textAlign: 'center', borderTop: '1px solid var(--border)', paddingTop: 32, width: '100%' }}>
-               <button 
-                onClick={() => setShowSuccessQR(false)}
-                className="section-label" 
-                style={{ 
-                  background: 'none', border: 'none', cursor: 'pointer', margin: '0 auto',
-                  textDecoration: 'underline'
-                }}
-              >
-                Go back & edit profile
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* QR Zoom Modal */}
       {qrExpanded && (

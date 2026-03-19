@@ -22,6 +22,25 @@ export default function BottomNav({ items, admin }) {
   const tabs = items || attendeeTabs;
   const manyTabs = tabs.length > 5;
   const [realtimeTrigger, setRealtimeTrigger] = useState(0);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
+  const minSwipeDistance = 30;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientY);
+  };
+
+  const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientY);
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    if (distance > minSwipeDistance) setIsExpanded(true);
+    if (distance < -minSwipeDistance) setIsExpanded(false);
+  };
 
   // Fetch unread count on mount + whenever Realtime fires
   useEffect(() => {
@@ -55,7 +74,12 @@ export default function BottomNav({ items, admin }) {
   if (!admin && !session?.profile?.id) return null;
 
   return (
-    <nav className={admin ? 'admin-bottom-nav' : ''} style={{
+    <nav 
+      className={admin ? 'admin-bottom-nav' : ''} 
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      style={{
       position: 'absolute', // Fixed to bottom of container
       bottom: 0,
       left: 0,
@@ -64,8 +88,12 @@ export default function BottomNav({ items, admin }) {
       background: bg,
       borderTop: `1px solid ${border}`,
       paddingTop: 'max(0px, env(safe-area-inset-top))',
-      paddingBottom: 'calc(max(24px, env(safe-area-inset-bottom)) + 28px)',
+      paddingBottom: isExpanded 
+        ? 'calc(max(24px, env(safe-area-inset-bottom)) + 28px)' 
+        : 'max(24px, env(safe-area-inset-bottom))',
       flexShrink: 0,
+      transition: 'padding-bottom 0.4s var(--liquid)',
+      cursor: 'ns-resize',
     }}>
       <div style={{
         display: 'flex',
