@@ -113,8 +113,23 @@ I acknowledge that:
     setStep(2);
   };
 
+  const formatPhoneNumber = (value) => {
+    if (!value) return value;
+    const phoneNumber = value.replace(/[^\d]/g, '');
+    const phoneNumberLength = phoneNumber.length;
+    if (phoneNumberLength < 4) return phoneNumber;
+    if (phoneNumberLength < 7) {
+      return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
+    }
+    return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`;
+  };
+
   const handleInputChange = (field, val) => {
-    setFormData(prev => ({ ...prev, [field]: val }));
+    let finalVal = val;
+    if (field === 'emergencyPhone') {
+      finalVal = formatPhoneNumber(val);
+    }
+    setFormData(prev => ({ ...prev, [field]: finalVal }));
   };
 
   const handleSubmitInitial = (e) => {
@@ -228,20 +243,23 @@ I acknowledge that:
 
             {ageRange === 'adult' ? (
               <div style={styles.field}>
-                <label style={styles.label}>E-Signature (Type your name)</label>
+                <label style={styles.label}>Electronic Signature</label>
                 <input 
                   type="text" required
                   value={formData.signature}
                   onChange={(e) => handleInputChange('signature', e.target.value)}
-                  placeholder="Digitally Sign Here"
-                  style={{ ...styles.input, fontStyle: 'italic', color: 'var(--g)' }}
+                  placeholder="Type Full Name to Sign"
+                  style={{ ...styles.input, fontStyle: 'italic', color: 'var(--g)', fontSize: 16 }}
                 />
+                <p style={{ fontSize: 11, color: 'var(--sub)', margin: '4px 0 0', fontWeight: 600 }}>
+                  Type your full name above. By doing so, this counts as a legally binding signature.
+                </p>
               </div>
             ) : (
               <>
                 <div style={styles.inputRow}>
                   <div style={styles.field}>
-                    <label style={styles.label}>Parent/Guardian Name</label>
+                    <label style={styles.label}>Parent/Guardian Full Name</label>
                     <input 
                       type="text" required
                       value={formData.parentName}
@@ -251,14 +269,17 @@ I acknowledge that:
                     />
                   </div>
                   <div style={styles.field}>
-                    <label style={styles.label}>Guardian Signature</label>
+                    <label style={styles.label}>Guardian E-Signature</label>
                     <input 
                       type="text" required
                       value={formData.parentSignature}
                       onChange={(e) => handleInputChange('parentSignature', e.target.value)}
-                      placeholder="Guardian E-Signature"
-                      style={{ ...styles.input, fontStyle: 'italic', color: 'var(--g)' }}
+                      placeholder="Type Full Name to Sign"
+                      style={{ ...styles.input, fontStyle: 'italic', color: 'var(--g)', fontSize: 16 }}
                     />
+                    <p style={{ fontSize: 10, color: 'var(--sub)', margin: '4px 0 0', fontWeight: 600 }}>
+                      Type your full name above. This counts as a signature.
+                    </p>
                   </div>
                 </div>
                 <div style={styles.inputRow}>
@@ -278,7 +299,7 @@ I acknowledge that:
                       type="tel" required
                       value={formData.emergencyPhone}
                       onChange={(e) => handleInputChange('emergencyPhone', e.target.value)}
-                      placeholder="Phone Number"
+                      placeholder="(555) 000-0000"
                       style={styles.input}
                     />
                   </div>

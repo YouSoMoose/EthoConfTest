@@ -39,6 +39,8 @@ export async function PUT(request) {
   if (updates.checked_in !== undefined) allowed.checked_in = updates.checked_in;
   if (updates.company !== undefined) allowed.company = updates.company;
   if (updates.linkedin !== undefined) allowed.linkedin = updates.linkedin;
+  if (updates.liability !== undefined) allowed.liability = updates.liability;
+  if (updates.card_made !== undefined) allowed.card_made = updates.card_made;
 
   if (Object.keys(allowed).length === 0) {
     return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });

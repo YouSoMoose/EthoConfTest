@@ -6,7 +6,7 @@ import Avatar from '@/components/Avatar';
 import Loader from '@/components/Loader';
 import RoleChip from '@/components/RoleChip';
 import { ACCESS_LABELS } from '@/lib/constants';
-import { RefreshCcw, Users, Check } from 'lucide-react';
+import { RefreshCcw, Users, Check, Shield } from 'lucide-react';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
@@ -16,6 +16,20 @@ export default function AdminUsersPage() {
   useEffect(() => {
     fetch('/api/users').then(r => r.json()).then(d => { setUsers(d || []); setLoading(false); }).catch(() => setLoading(false));
   }, []);
+
+  const toggleUserStatus = async (userId, field, currentVal) => {
+    const newVal = !currentVal;
+    const res = await fetch('/api/users', { 
+      method: 'PUT', 
+      headers: { 'Content-Type': 'application/json' }, 
+      body: JSON.stringify({ id: userId, [field]: newVal }) 
+    });
+    if (res.ok) {
+      const u = await res.json();
+      setUsers(p => p.map(x => x.id === userId ? { ...x, [field]: u[field] } : x));
+      toast.success(`${field.replace('_', ' ')} updated`);
+    } else toast.error('Failed to update status');
+  };
 
   const updateRole = async (userId, newLevel) => {
     const res = await fetch('/api/users', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: userId, access_level: parseInt(newLevel) }) });
@@ -71,7 +85,7 @@ export default function AdminUsersPage() {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'var(--fb)', fontSize: 13 }}>
             <thead>
               <tr style={{ background: 'var(--as3)' }}>
-                {['User', 'Email', 'Checked In', 'Role'].map(h => (
+                {['User', 'Email', 'Liability', 'Card Made', 'Checked In', 'Role'].map(h => (
                   <th key={h} style={{ padding: '12px 14px', textAlign: 'left', fontFamily: 'var(--fhs)', fontWeight: 600, fontSize: 12, color: 'var(--asub)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
                 ))}
               </tr>
@@ -86,41 +100,45 @@ export default function AdminUsersPage() {
                     </div>
                   </td>
                   <td style={{ padding: '12px 14px', color: 'var(--asub)' }}>{u.email}</td>
+                  
+                  {/* Liability Status */}
+                  <td style={{ padding: '12px 14px' }}>
+                    <button 
+                      onClick={() => toggleUserStatus(u.id, 'liability', u.liability)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}
+                    >
+                      <span style={{ color: u.liability ? 'var(--agreen)' : 'var(--amuted)', fontWeight: 600 }}>
+                        {u.liability ? <Check size={18} strokeWidth={3} /> : <div style={{ width: 18, height: 18, border: '2px solid var(--aborder)', borderRadius: 4 }} />}
+                      </span>
+                    </button>
+                  </td>
+
+                  {/* Card Made Status */}
+                  <td style={{ padding: '12px 14px' }}>
+                    <button 
+                      onClick={() => toggleUserStatus(u.id, 'card_made', u.card_made)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}
+                    >
+                      <span style={{ color: u.card_made ? 'var(--agreen)' : 'var(--amuted)', fontWeight: 600 }}>
+                        {u.card_made ? <Check size={18} strokeWidth={3} /> : <div style={{ width: 18, height: 18, border: '2px solid var(--aborder)', borderRadius: 4 }} />}
+                      </span>
+                    </button>
+                  </td>
+
+                  {/* Checked In Status */}
                   <td style={{ padding: '12px 14px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <button 
-                        onClick={() => {
-                          if (u.checked_in) undoCheckin(u.id);
-                          else {
-                            // Logic to check-in
-                            fetch('/api/checkin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: u.id }) })
-                              .then(res => {
-                                if (res.ok) {
-                                  setUsers(p => p.map(x => x.id === u.id ? { ...x, checked_in: true } : x));
-                                  toast.success('Checked in');
-                                } else toast.error('Check-in failed');
-                              });
-                          }
-                        }}
+                        onClick={() => toggleUserStatus(u.id, 'checked_in', u.checked_in)}
                         style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}
                       >
                         <span style={{ color: u.checked_in ? 'var(--agreen)' : 'var(--amuted)', fontWeight: 600, display: 'flex', alignItems: 'center' }}>
                           {u.checked_in ? <Check size={18} strokeWidth={3} /> : <div style={{ width: 18, height: 18, border: '2px solid var(--aborder)', borderRadius: 4 }} />}
                         </span>
                       </button>
-                      {u.checked_in && (
-                        <button 
-                          onClick={() => undoCheckin(u.id)}
-                          title="Undo Check-in"
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--asub)', display: 'flex', padding: 4, borderRadius: 4, transition: 'background 0.2s' }}
-                          onMouseOver={e => e.currentTarget.style.background = 'var(--as3)'}
-                          onMouseOut={e => e.currentTarget.style.background = 'none'}
-                        >
-                          <RefreshCcw size={14} />
-                        </button>
-                      )}
                     </div>
                   </td>
+
                   <td style={{ padding: '12px 14px' }}>
                     <select
                       value={u.access_level}
@@ -155,24 +173,32 @@ export default function AdminUsersPage() {
                 <h3 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 14, color: 'var(--atext)' }}>{u.name || 'No name'}</h3>
                 <p style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--amuted)' }}>{u.email}</p>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <button 
-                  onClick={() => {
-                    if (u.checked_in) undoCheckin(u.id);
-                    else {
-                      fetch('/api/checkin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: u.id }) })
-                        .then(res => {
-                          if (res.ok) {
-                            setUsers(p => p.map(x => x.id === u.id ? { ...x, checked_in: true } : x));
-                            toast.success('Checked in');
-                          } else toast.error('Check-in failed');
-                        });
-                    }
-                  }}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}
-                >
-                  {u.checked_in ? <Check size={18} strokeWidth={3} color="var(--agreen)" /> : <div style={{ width: 18, height: 18, border: '2px solid var(--aborder)', borderRadius: 4 }} />}
-                </button>
+              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12, marginTop: 8 }}>
+                {/* Status Toggles */}
+                <div style={{ display: 'flex', gap: 10, background: 'var(--as3)', padding: '6px 10px', borderRadius: 8, border: '1px solid var(--aborder)' }}>
+                  <button 
+                    onClick={() => toggleUserStatus(u.id, 'liability', u.liability)}
+                    title="Liability"
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', color: u.liability ? 'var(--agreen)' : 'var(--amuted)' }}
+                  >
+                    <Shield size={14} fill={u.liability ? 'var(--agreen)' : 'none'} />
+                  </button>
+                  <button 
+                    onClick={() => toggleUserStatus(u.id, 'card_made', u.card_made)}
+                    title="Card Made"
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', color: u.card_made ? 'var(--agreen)' : 'var(--amuted)' }}
+                  >
+                    <User size={14} fill={u.card_made ? 'var(--agreen)' : 'none'} />
+                  </button>
+                  <button 
+                    onClick={() => toggleUserStatus(u.id, 'checked_in', u.checked_in)}
+                    title="Checked In"
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', color: u.checked_in ? 'var(--agreen)' : 'var(--amuted)' }}
+                  >
+                    <Check size={14} strokeWidth={3} />
+                  </button>
+                </div>
+
                 <select
                   value={u.access_level}
                   onChange={e => updateRole(u.id, e.target.value)}
