@@ -7,14 +7,29 @@ import Loader from '@/components/Loader';
 import Btn from '@/components/Btn';
 import Empty from '@/components/Empty';
 import { Ticket, Dices, Trophy } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export default function AdminRafflePage() {
   const [entries, setEntries] = useState([]);
   const [winner, setWinner] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [realtimeTrigger, setRealtimeTrigger] = useState(0);
 
   useEffect(() => {
     fetch('/api/raffle').then(r => r.json()).then(d => { setEntries(d || []); setLoading(false); }).catch(() => setLoading(false));
+  }, [realtimeTrigger]);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('admin-raffle-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'raffle_entries' }, () => {
+        setRealtimeTrigger(n => n + 1);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const pickWinner = () => {

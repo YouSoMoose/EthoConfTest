@@ -44,16 +44,28 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (level === 2) return;
-    const channel = import('@/lib/supabase').then(({ supabase }) => {
+    const channelPromise = import('@/lib/supabase').then(({ supabase }) => {
       return supabase
-        .channel('admin-dashboard')
+        .channel('admin-dashboard-realtime')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => {
           setRealtimeTrigger(n => n + 1);
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {
+          setRealtimeTrigger(n => n + 1);
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, (payload) => {
+          if (payload.eventType === 'INSERT') {
+            setAnnouncements(prev => [payload.new, ...prev]);
+          } else if (payload.eventType === 'UPDATE') {
+            setAnnouncements(prev => prev.map(a => a.id === payload.new.id ? payload.new : a));
+          } else if (payload.eventType === 'DELETE') {
+            setAnnouncements(prev => prev.filter(a => a.id !== payload.old.id));
+          }
         })
         .subscribe();
     });
     return () => {
-      channel.then(c => import('@/lib/supabase').then(({ supabase }) => supabase.removeChannel(c)));
+      channelPromise.then(c => import('@/lib/supabase').then(({ supabase }) => supabase.removeChannel(c)));
     };
   }, [level]);
 

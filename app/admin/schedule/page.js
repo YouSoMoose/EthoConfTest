@@ -7,6 +7,7 @@ import Btn from '@/components/Btn';
 import FormInput from '@/components/FormInput';
 import Empty from '@/components/Empty';
 import { Calendar, MapPin, Pencil, Trash2 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export default function AdminSchedulePage() {
   const [schedule, setSchedule] = useState([]);
@@ -17,6 +18,26 @@ export default function AdminSchedulePage() {
 
   useEffect(() => {
     fetch('/api/schedule').then(r => r.json()).then(d => { setSchedule(d || []); setLoading(false); }).catch(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('admin-schedule-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'schedule' }, (payload) => {
+        console.log('[DEBUG] Schedule Realtime event:', payload);
+        if (payload.eventType === 'INSERT') {
+          setSchedule(prev => [payload.new, ...prev]);
+        } else if (payload.eventType === 'UPDATE') {
+          setSchedule(prev => prev.map(s => s.id === payload.new.id ? { ...s, ...payload.new } : s));
+        } else if (payload.eventType === 'DELETE') {
+          setSchedule(prev => prev.filter(s => s.id !== payload.old.id));
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const resetForm = () => { setForm({ title: '', description: '', location: '', start_time: '', end_time: '' }); setEditing(null); setShowForm(false); };

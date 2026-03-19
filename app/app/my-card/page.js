@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Loader2, Camera, User, CheckCircle2, ChevronLeft, ChevronRight, QrCode, Save, Edit3, Image as ImageIcon, Briefcase, Globe, Linkedin, FileText, Info, X } from 'lucide-react';
+import { Loader2, User, CheckCircle2, ChevronLeft, ChevronRight, QrCode, Save, Image as ImageIcon, Briefcase, Globe, Linkedin, FileText, Info, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { CardPreview } from '@/components/CardPreview';
 import Topbar from '@/components/Topbar';
@@ -30,8 +30,6 @@ function MyCardContent() {
   // Explicit staging: 1 = Liability (Gate), 2 = Card, 3 = Check-in
   const [navStage, setNavStage] = useState(2); // Default to Card
 
-  // If card_made is false, open editing page. Otherwise, show QR.
-  const [isEditing, setIsEditing] = useState(isOnboarding || profile?.card_made === false);
   const [name, setName] = useState('');
   const [avatar, setAvatar] = useState('');
   const [role, setRole] = useState('');
@@ -323,23 +321,9 @@ function MyCardContent() {
             {/* The Card */}
             <div style={{ position: 'relative', marginBottom: 32 }}>
               <CardPreview user={{ name, avatar, role, company, bio, linkedin }} />
-              <button 
-                onClick={() => setIsEditing(!isEditing)}
-                style={{
-                  position: 'absolute', right: 12, bottom: -12,
-                  width: 44, height: 44, borderRadius: '50%',
-                  background: 'var(--g)', color: '#fff', border: 'none',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)', cursor: 'pointer',
-                  zIndex: 10
-                }}
-              >
-                {isEditing ? <CheckCircle2 size={20} /> : <Edit3 size={20} />}
-              </button>
             </div>
 
-            {isEditing ? (
-              <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 {/* Avatar Section */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16, background: 'var(--s1)', padding: 16, borderRadius: 20 }}>
                   <div style={{ position: 'relative', width: 64, height: 64 }}>
@@ -435,23 +419,6 @@ function MyCardContent() {
                   {profile?.card_made ? "Save Changes" : "Create My Card"}
                 </button>
               </div>
-            ) : (
-               <div style={{ textAlign: 'center', marginTop: 40 }}>
-                 <p style={{ color: 'var(--sub)', fontSize: 14, fontWeight: 600, marginBottom: 20 }}>
-                   Your profile is ready! You can now proceed to check-in.
-                 </p>
-                 <button 
-                    onClick={() => setNavStage(3)}
-                    style={{
-                      padding: '16px 32px', borderRadius: 20, background: 'var(--g)',
-                      color: '#fff', border: 'none', fontSize: 16, fontWeight: 800,
-                      cursor: 'pointer', boxShadow: '0 8px 24px rgba(62, 92, 38, 0.2)'
-                    }}
-                  >
-                    Go to Check-in <ChevronRight size={18} style={{ display: 'inline', marginLeft: 4 }} />
-                  </button>
-               </div>
-            )}
           </>
         ) : (
           <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
