@@ -6,7 +6,7 @@ import Avatar from '@/components/Avatar';
 import Loader from '@/components/Loader';
 import RoleChip from '@/components/RoleChip';
 import { ACCESS_LABELS } from '@/lib/constants';
-import { RefreshCcw, Users, Check, Shield } from 'lucide-react';
+import { RefreshCcw, Users, Check, Shield, User } from 'lucide-react';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
