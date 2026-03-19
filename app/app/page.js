@@ -94,6 +94,15 @@ export default function AttendeeDashboard() {
   const [customizations, setCustomizations] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [notifPermission, setNotifPermission] = useState('default');
+  const [showWaiver, setShowWaiver] = useState(false);
+
+  useEffect(() => {
+    if (session?.profile && session.profile.liability !== true) {
+      setShowWaiver(true);
+    } else {
+      setShowWaiver(false);
+    }
+  }, [session]);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
@@ -414,6 +423,17 @@ export default function AttendeeDashboard() {
           </Link>
         </div>
       </div>
+
+      <Modal 
+        open={showWaiver} 
+        onClose={() => {}} // Non-closable until signed
+        title="Welcome! Please Sign the Waiver"
+        center
+      >
+        <div style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+          <LiabilityWaiver onComplete={() => window.location.reload()} />
+        </div>
+      </Modal>
     </div>
   );
 }
