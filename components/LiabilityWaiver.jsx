@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { CheckCircle2, ShieldCheck, ChevronRight, ChevronLeft, AlertCircle, Info, User, Phone, Signature, CloudLightning as Calendar } from 'lucide-react';
+import { signOut } from 'next-auth/react';
+import { CheckCircle2, ShieldCheck, ChevronRight, ChevronLeft, AlertCircle, Info, User, Phone, Signature, CloudLightning as Calendar, LogOut } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function LiabilityWaiver({ onComplete }) {
@@ -199,6 +200,10 @@ I acknowledge that:
             <ChevronRight size={20} color="var(--muted)" style={styles.chevron} />
           </div>
         </div>
+
+        <button onClick={() => signOut({ callbackUrl: '/' })} style={styles.escapeBtn}>
+          <LogOut size={16} /> Switch Account / Log Out
+        </button>
       </div>
     );
   }
@@ -646,5 +651,20 @@ const styles = {
     alignItems: 'center',
     gap: 8,
     margin: '32px auto 0',
+  },
+  escapeBtn: {
+    background: 'none',
+    border: 'none',
+    color: 'var(--sub)',
+    fontSize: 14,
+    fontWeight: 600,
+    marginTop: 32,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    cursor: 'pointer',
+    padding: '12px',
+    margin: '32px auto 0'
   }
 };

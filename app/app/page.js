@@ -127,12 +127,26 @@ export default function AttendeeDashboard() {
   const { data: session, update } = useSession();
   const [schedule, setSchedule] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
+  const [fullProfile, setFullProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [customizations, setCustomizations] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [notifPermission, setNotifPermission] = useState('default');
   const searchParams = useSearchParams();
   const router = useRouter();
+
+  // Keep fullProfile in sync if session updates (like after onboarding)
+  useEffect(() => {
+    if (session?.profile) {
+      setFullProfile(prev => ({ ...prev, ...session.profile }));
+    }
+  }, [session]);
+
+  useEffect(() => {
+    if (fullProfile?.force_logout) {
+      window.location.href = '/logout';
+    }
+  }, [fullProfile]);
 
   useEffect(() => {
     if (searchParams.get('checkin') === 'success') {
@@ -160,6 +174,11 @@ export default function AttendeeDashboard() {
           const freshProfile = payload.new;
           const old = session?.profile || {};
           
+          if (freshProfile.force_logout) {
+            window.location.href = '/logout';
+            return;
+          }
+
           // Check if key statuses changed
           const changed = 
             freshProfile.liability !== old.liability ||
@@ -196,10 +215,12 @@ export default function AttendeeDashboard() {
   useEffect(() => {
     const fetchSched = fetch('/api/schedule').then(r => r.json());
     const fetchAnn = fetch(`/api/announcements?_t=${Date.now()}`).then(r => r.json());
+    const fetchProfile = fetch('/api/profile').then(r => r.json()).catch(() => null);
 
-    Promise.all([fetchSched, fetchAnn]).then(([sched, ann]) => {
+    Promise.all([fetchSched, fetchAnn, fetchProfile]).then(([sched, ann, prof]) => {
       setSchedule(sched || []);
       setAnnouncements(ann || []);
+      if (prof && !prof.error) setFullProfile(prof);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
@@ -246,8 +267,8 @@ export default function AttendeeDashboard() {
 
   if (loading) return <Loader />;
 
-  const profile = session?.profile;
-  const firstName = profile?.name?.split(' ')[0] || 'there';
+  const displayProfile = fullProfile || session?.profile;
+  const firstName = displayProfile?.name?.split(' ')[0] || 'there';
   const upNext = schedule[0];
 
   return (
@@ -267,7 +288,7 @@ export default function AttendeeDashboard() {
       >
         <div style={{ maxWidth: 500, margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <Avatar src={profile?.avatar} name={profile?.name} size={52} />
+            <Avatar src={displayProfile?.avatar} name={displayProfile?.name} size={52} />
             <div style={{ flex: 1, minWidth: 0 }}>
               <h1 style={{ fontFamily: 'var(--fh)', fontWeight: 800, fontSize: 24, margin: 0, color: 'var(--g)', letterSpacing: '-0.02em' }}>
                 Hey, {firstName}!
@@ -306,22 +327,24 @@ export default function AttendeeDashboard() {
 
       <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 24, paddingBottom: 120 }}>
         {/* COMPREHENSIVE ONBOARDING PROMPT */}
-        {profile && (profile.liability !== true || profile.card_made === false || profile.checked_in !== true) && (
+        {displayProfile && (displayProfile.liability !== true || displayProfile.card_made === false || displayProfile.checked_in !== true) && (
           <Link 
             href="/app/my-card"
             className="bottom-stagger"
             style={{ 
               textDecoration: 'none',
-              background: 'linear-gradient(135deg, var(--g) 0%, #4a6d2f 100%)',
-              borderRadius: 24, padding: '24px', color: '#fff',
+              background: 'var(--white)',
+              border: '1px solid var(--border)',
+              borderRadius: 24, padding: '24px', color: 'var(--text)',
               display: 'flex', alignItems: 'center', gap: 20,
-              boxShadow: '0 12px 32px rgba(62, 92, 38, 0.25)',
-              position: 'relative', overflow: 'hidden',
+              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.04)',
+              transform: 'translateY(0)',
+              transition: 'transform 0.3s ease',
               animation: 'fadeUp 0.6s var(--liquid) 0.2s both'
             }}
           >
             <div style={{
-              width: 52, height: 52, borderRadius: 16, background: 'rgba(255,255,255,0.2)',
+              width: 52, height: 52, borderRadius: 16, background: 'var(--s1)', color: 'var(--g)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
             }}>
               <ShieldCheck size={28} />
@@ -330,20 +353,26 @@ export default function AttendeeDashboard() {
               <h2 style={{ fontFamily: 'var(--fh)', fontSize: 18, fontWeight: 800, margin: '0 0 4px' }}>
                  Complete Your Setup
               </h2>
-              <p style={{ fontFamily: 'var(--fb)', fontSize: 13, opacity: 0.9, fontWeight: 500, margin: 0 }}>
-                {profile.liability !== true ? "Sign the liability waiver to start." : 
-                 profile.card_made === false ? "Create your digital card for networking." : 
+              <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--sub)', fontWeight: 500, margin: 0 }}>
+                {displayProfile.liability !== true ? "Sign the liability waiver to start." : 
+                 displayProfile.card_made === false ? "Create your digital card for networking." : 
                  "Check in at the desk to join the event."}
               </p>
             </div>
-            <ChevronRight size={24} style={{ opacity: 0.8 }} />
-            
-            {/* Subtle background decoration */}
-            <div style={{
-              position: 'absolute', right: -20, top: -20, width: 100, height: 100,
-              background: 'rgba(255,255,255,0.05)', borderRadius: '50%'
-            }} />
+            <ChevronRight size={24} color="var(--muted)" />
           </Link>
+        )}
+
+        {/* ESCAPE HATCH FOR WRONG ACCOUNT */}
+        {displayProfile && (displayProfile.liability !== true || displayProfile.card_made === false || displayProfile.checked_in !== true) && (
+          <div style={{ textAlign: 'center', marginTop: -8 }}>
+             <button 
+               onClick={() => { window.location.href = '/logout'; }} 
+               style={{ background: 'none', border: 'none', color: 'var(--sub)', fontSize: 13, fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}
+             >
+               Wrong Account? Log Out
+             </button>
+          </div>
         )}
 
         {typeof window !== 'undefined' && 'Notification' in window && notifPermission === 'default' && (
@@ -474,7 +503,7 @@ export default function AttendeeDashboard() {
                 transition: `transform 0.4s ${LIQUID}`,
               }}
             >
-              <CardPreview user={profile || {}} style={customizations || undefined} />
+              <CardPreview user={displayProfile || {}} style={customizations || undefined} />
             </div>
           </Link>
         </div>

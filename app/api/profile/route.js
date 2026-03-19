@@ -37,6 +37,7 @@ export async function PUT(request) {
   if (body.company !== undefined) updateData.company = body.company;
   if (body.linkedin !== undefined) updateData.linkedin = body.linkedin;
   if (body.in_admin !== undefined) updateData.in_admin = body.in_admin;
+  if (body.avatar !== undefined) updateData.avatar = body.avatar;
   
   updateData.card_made = true;
 

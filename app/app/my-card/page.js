@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Loader2, User, CheckCircle2, ChevronLeft, ChevronRight, QrCode, Save, Briefcase, Globe, Linkedin, FileText, Info, X } from 'lucide-react';
+import { Loader2, User, CheckCircle2, ChevronLeft, ChevronRight, QrCode, Save, Briefcase, Globe, Linkedin, FileText, Info, X, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { CardPreview } from '@/components/CardPreview';
 import Topbar from '@/components/Topbar';
@@ -219,6 +219,21 @@ function MyCardContent() {
     }
   }, [profile]);
 
+  const handleAvatarChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image must be less than 5MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatar(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const saveProfile = async () => {
     if (!name || name.length < 2) return toast.error('Valid Name is required');
     if (!company || company.length < 2) return toast.error('Company is required');
@@ -230,7 +245,7 @@ function MyCardContent() {
       const res = await fetch('/api/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resume_link: resumeLink, bio, role, name, company, linkedin }),
+        body: JSON.stringify({ resume_link: resumeLink, bio, role, name, company, linkedin, avatar }),
       });
       if (res.ok) {
         toast.success('Profile saved', { id: t });
@@ -331,12 +346,26 @@ function MyCardContent() {
             <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 {/* Avatar Section */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16, background: 'var(--s1)', padding: 16, borderRadius: 20 }}>
-                  <div style={{ position: 'relative', width: 64, height: 64 }}>
-                    <img src={avatar || '/assets/ethos-logo-insignia.png'} alt="" style={{ width: '100%', height: '100%', borderRadius: 16, objectFit: 'cover' }} />
-                  </div>
+                  <label htmlFor="avatar-upload" style={{ position: 'relative', width: 64, height: 64, cursor: 'pointer', display: 'block', borderRadius: 16, overflow: 'hidden' }}>
+                    <img src={avatar || '/assets/ethos-logo-insignia.png'} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <div style={{
+                      position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      opacity: 0, transition: 'opacity 0.2s', ':hover': { opacity: 1 }
+                    }}>
+                      <ImageIcon size={20} color="#fff" />
+                    </div>
+                  </label>
+                  <input
+                    id="avatar-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    style={{ display: 'none' }}
+                  />
                   <div>
                     <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Profile Picture</p>
-                    <p style={{ fontSize: 11, color: 'var(--sub)' }}>Best as 1:1 ratio square.</p>
+                    <p style={{ fontSize: 11, color: 'var(--sub)' }}>Tap image to change. Best as 1:1 ratio square.</p>
                   </div>
                 </div>
 
