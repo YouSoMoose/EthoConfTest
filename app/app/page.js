@@ -213,6 +213,46 @@ export default function AttendeeDashboard() {
       </div>
 
       <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 24, paddingBottom: 120 }}>
+        {/* COMPREHENSIVE ONBOARDING PROMPT */}
+        {profile && (profile.liability !== true || profile.card_made === false || profile.checked_in !== true) && (
+          <Link 
+            href="/app/my-card"
+            className="bottom-stagger"
+            style={{ 
+              textDecoration: 'none',
+              background: 'linear-gradient(135deg, var(--g) 0%, #4a6d2f 100%)',
+              borderRadius: 24, padding: '24px', color: '#fff',
+              display: 'flex', alignItems: 'center', gap: 20,
+              boxShadow: '0 12px 32px rgba(62, 92, 38, 0.25)',
+              position: 'relative', overflow: 'hidden',
+              animation: 'fadeUp 0.6s var(--liquid) 0.2s both'
+            }}
+          >
+            <div style={{
+              width: 52, height: 52, borderRadius: 16, background: 'rgba(255,255,255,0.2)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+            }}>
+              <ShieldCheck size={28} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <h2 style={{ fontFamily: 'var(--fh)', fontSize: 18, fontWeight: 800, margin: '0 0 4px' }}>
+                 Complete Your Setup
+              </h2>
+              <p style={{ fontFamily: 'var(--fb)', fontSize: 13, opacity: 0.9, fontWeight: 500, margin: 0 }}>
+                {profile.liability !== true ? "Sign the liability waiver to start." : 
+                 profile.card_made === false ? "Create your digital card for networking." : 
+                 "Check in at the desk to join the event."}
+              </p>
+            </div>
+            <ChevronRight size={24} style={{ opacity: 0.8 }} />
+            
+            {/* Subtle background decoration */}
+            <div style={{
+              position: 'absolute', right: -20, top: -20, width: 100, height: 100,
+              background: 'rgba(255,255,255,0.05)', borderRadius: '50%'
+            }} />
+          </Link>
+        )}
 
         {typeof window !== 'undefined' && 'Notification' in window && notifPermission === 'default' && (
           <div style={{

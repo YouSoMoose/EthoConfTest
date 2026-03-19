@@ -63,6 +63,9 @@ function MyCardContent() {
   const searchParams = useSearchParams();
   const isOnboarding = searchParams.get('onboarding') === '1';
 
+  // Explicit staging: 1 = Liability (Gate), 2 = Card, 3 = Check-in
+  const [navStage, setNavStage] = useState(2); // Default to Card
+
   // If card_made is false, open editing page. Otherwise, show QR.
   const [isEditing, setIsEditing] = useState(isOnboarding || profile?.card_made === false);
   const [name, setName] = useState('');
@@ -77,6 +80,20 @@ function MyCardContent() {
   const [showSuccessQR, setShowSuccessQR] = useState(false);
   const [isCheckinSuccess, setIsCheckinSuccess] = useState(false);
   const [isBeingScanned, setIsBeingScanned] = useState(false);
+
+  const hasAutoSet = useRef(false);
+  // Auto-set stage based on profile status on first load
+  useEffect(() => {
+    if (profile && !hasAutoSet.current) {
+      if (profile.card_made === false) {
+        setNavStage(2);
+        hasAutoSet.current = true;
+      } else if (!isCheckedIn(profile.checked_in)) {
+        setNavStage(3);
+        hasAutoSet.current = true;
+      }
+    }
+  }, [profile?.card_made, profile?.checked_in]);
 
   const cardRef = useRef(null);
   const domRefs = useRef({});
@@ -257,161 +274,213 @@ function MyCardContent() {
 
   return (
     <div className="page-enter" style={{ height: '100%', overflowY: 'auto', paddingBottom: 100 }}>
-      {isCheckedIn(profile?.checked_in) && (
-        <div style={{ padding: '16px 16px 0', maxWidth: 500, margin: '0 auto', width: '100%' }}>
+      {/* STEP NAVIGATOR */}
+      <div style={{ 
+        padding: '24px 16px 0', maxWidth: 500, margin: '0 auto', width: '100%',
+        display: 'flex', flexDirection: 'column', gap: 20
+      }}>
+        <button 
+          onClick={() => router.push('/app')}
+          style={{ 
+            background: 'none', border: 'none', display: 'flex', alignItems: 'center', 
+            gap: 6, color: 'var(--muted)', fontSize: 13, fontWeight: 700, cursor: 'pointer', width: 'fit-content'
+          }}
+        >
+          <ChevronLeft size={18} /> Back to Dashboard
+        </button>
+
+        <div style={{ 
+          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, 
+          background: 'var(--s1)', padding: 6, borderRadius: 16 
+        }}>
           <button 
-            onClick={() => router.push('/app')}
-            style={{ 
-              background: 'none', border: 'none', display: 'flex', alignItems: 'center', 
-              gap: 6, color: 'var(--muted)', fontSize: 13, fontWeight: 700, cursor: 'pointer' 
+            onClick={() => setNavStage(2)}
+            style={{
+              padding: '10px', borderRadius: 12, border: 'none',
+              background: navStage === 2 ? 'var(--white)' : 'transparent',
+              color: navStage === 2 ? 'var(--g)' : 'var(--sub)',
+              fontSize: 13, fontWeight: 800, cursor: 'pointer',
+              boxShadow: navStage === 2 ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+              transition: 'all 0.3s var(--liquid)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
             }}
           >
-            <ChevronLeft size={18} /> Back to Dashboard
+            <User size={16} /> 1. Digital Card
+            {profile?.card_made && <CheckCircle2 size={14} color="var(--g)" />}
+          </button>
+          <button 
+            onClick={() => setNavStage(3)}
+            style={{
+              padding: '10px', borderRadius: 12, border: 'none',
+              background: navStage === 3 ? 'var(--white)' : 'transparent',
+              color: navStage === 3 ? 'var(--g)' : 'var(--sub)',
+              fontSize: 13, fontWeight: 800, cursor: 'pointer',
+              boxShadow: navStage === 3 ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+              transition: 'all 0.3s var(--liquid)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
+            }}
+          >
+            <QrCode size={16} /> 2. Check-in
+            {isCheckedIn(profile?.checked_in) && <CheckCircle2 size={14} color="var(--g)" />}
           </button>
         </div>
-      )}
+      </div>
 
       <div style={{ maxWidth: 500, margin: '0 auto', padding: '24px 16px' }}>
-        <div style={{ marginBottom: 32 }}>
-          <h1 style={{ fontFamily: 'var(--fh)', fontSize: 32, fontWeight: 800, color: 'var(--g)', marginBottom: 8 }}>
-            My Digital Identity
-          </h1>
-          <p style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'var(--sub)', fontWeight: 500 }}>
-            Curate your profile and display your check-in code.
-          </p>
-        </div>
-
-        {/* The Card */}
-        <div style={{ position: 'relative', marginBottom: 32 }}>
-          <CardPreview user={{ name, avatar, role, company, bio, linkedin }} />
-          <button 
-            onClick={() => setIsEditing(!isEditing)}
-            style={{
-              position: 'absolute', right: 12, bottom: -12,
-              width: 44, height: 44, borderRadius: '50%',
-              background: 'var(--g)', color: '#fff', border: 'none',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.15)', cursor: 'pointer',
-              zIndex: 10
-            }}
-          >
-            {isEditing ? <CheckCircle2 size={20} /> : <Edit3 size={20} />}
-          </button>
-        </div>
-
-        {isEditing ? (
-          <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            {/* Avatar Section */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16, background: 'var(--s1)', padding: 16, borderRadius: 20 }}>
-              <div style={{ position: 'relative', width: 64, height: 64 }}>
-                <img src={avatar || '/assets/ethos-logo-insignia.png'} alt="" style={{ width: '100%', height: '100%', borderRadius: 16, objectFit: 'cover' }} />
-                <label style={{
-                   position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.2)', 
-                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                   color: '#fff', borderRadius: 16, cursor: 'pointer'
-                }}>
-                  <ImageIcon size={20} />
-                  <input type="file" hidden accept="image/*" onChange={handleAvatarChange} />
-                </label>
-              </div>
-              <div>
-                <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Profile Picture</p>
-                <p style={{ fontSize: 11, color: 'var(--sub)' }}>Best as 1:1 ratio square.</p>
-              </div>
+        {navStage === 2 ? (
+          <>
+            <div style={{ marginBottom: 32 }}>
+              <h1 style={{ fontFamily: 'var(--fh)', fontSize: 32, fontWeight: 800, color: 'var(--g)', marginBottom: 8 }}>
+                My Digital Identity
+              </h1>
+              <p style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'var(--sub)', fontWeight: 500 }}>
+                {profile?.card_made ? "Update your networking profile below." : "Create your digital card for the conference."}
+              </p>
             </div>
 
-            <div className="input-group">
-              <label className="section-label">Full Name</label>
-              <input 
-                type="text" value={name} onChange={e => setName(e.target.value)}
-                placeholder="Jane Cooper"
-                style={{ width: '100%', padding: '14px 16px', borderRadius: 14, background: 'var(--white)', border: 'none', color: 'var(--text)', outline: 'none' }}
-              />
+            {/* The Card */}
+            <div style={{ position: 'relative', marginBottom: 32 }}>
+              <CardPreview user={{ name, avatar, role, company, bio, linkedin }} />
+              <button 
+                onClick={() => setIsEditing(!isEditing)}
+                style={{
+                  position: 'absolute', right: 12, bottom: -12,
+                  width: 44, height: 44, borderRadius: '50%',
+                  background: 'var(--g)', color: '#fff', border: 'none',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)', cursor: 'pointer',
+                  zIndex: 10
+                }}
+              >
+                {isEditing ? <CheckCircle2 size={20} /> : <Edit3 size={20} />}
+              </button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div className="input-group">
-                <label className="section-label">Organization</label>
-                <input 
-                  type="text" value={company} onChange={e => setCompany(e.target.value)}
-                  placeholder="GreenTech Solutions"
-                  style={{ width: '100%', padding: '14px 16px', borderRadius: 14, background: 'var(--white)', border: 'none', color: 'var(--text)', outline: 'none' }}
-                />
+            {isEditing ? (
+              <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                {/* Avatar Section */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16, background: 'var(--s1)', padding: 16, borderRadius: 20 }}>
+                  <div style={{ position: 'relative', width: 64, height: 64 }}>
+                    <img src={avatar || '/assets/ethos-logo-insignia.png'} alt="" style={{ width: '100%', height: '100%', borderRadius: 16, objectFit: 'cover' }} />
+                    <label style={{
+                      position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.2)', 
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: '#fff', borderRadius: 16, cursor: 'pointer'
+                    }}>
+                      <ImageIcon size={20} />
+                      <input type="file" hidden accept="image/*" onChange={handleAvatarChange} />
+                    </label>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Profile Picture</p>
+                    <p style={{ fontSize: 11, color: 'var(--sub)' }}>Best as 1:1 ratio square.</p>
+                  </div>
+                </div>
+
+                <div className="input-group">
+                  <label className="section-label">Full Name</label>
+                  <input 
+                    type="text" value={name} onChange={e => setName(e.target.value)}
+                    placeholder="Jane Cooper"
+                    style={{ width: '100%', padding: '14px 16px', borderRadius: 14, background: 'var(--white)', border: 'none', color: 'var(--text)', outline: 'none' }}
+                  />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <div className="input-group">
+                    <label className="section-label">Organization</label>
+                    <input 
+                      type="text" value={company} onChange={e => setCompany(e.target.value)}
+                      placeholder="GreenTech Solutions"
+                      style={{ width: '100%', padding: '14px 16px', borderRadius: 14, background: 'var(--white)', border: 'none', color: 'var(--text)', outline: 'none' }}
+                    />
+                  </div>
+                  <div className="input-group">
+                    <label className="section-label">Your Role</label>
+                    <input 
+                      type="text" value={role} onChange={e => setRole(e.target.value)}
+                      placeholder="Sustainability Lead"
+                      style={{ width: '100%', padding: '14px 16px', borderRadius: 14, background: 'var(--white)', border: 'none', color: 'var(--text)', outline: 'none' }}
+                    />
+                  </div>
+                </div>
+
+                <div className="input-group">
+                  <label className="section-label">Bio (Short & Sweet)</label>
+                  <textarea 
+                    value={bio} onChange={e => setBio(e.target.value)}
+                    placeholder="Passionate about circularity and zero-waste systems..."
+                    style={{ width: '100%', padding: '14px 16px', borderRadius: 14, background: 'var(--white)', border: 'none', color: 'var(--text)', outline: 'none', minHeight: 80, resize: 'none' }}
+                  />
+                </div>
+
+                <div className="input-group">
+                  <label className="section-label">LinkedIn Profile URL</label>
+                  <div style={{ position: 'relative' }}>
+                    <Linkedin size={16} style={{ position: 'absolute', left: 16, top: 16, color: 'var(--muted)' }} />
+                    <input 
+                      type="text" value={linkedin} onChange={e => setLinkedin(e.target.value)}
+                      placeholder="linkedin.com/in/username"
+                      style={{ width: '100%', padding: '14px 16px 14px 44px', borderRadius: 14, background: 'var(--white)', border: 'none', color: 'var(--text)', outline: 'none' }}
+                    />
+                  </div>
+                </div>
+
+                <div className="input-group">
+                  <label className="section-label">Resume / Portfolio Link</label>
+                  <div style={{ position: 'relative' }}>
+                    <FileText size={16} style={{ position: 'absolute', left: 16, top: 16, color: 'var(--muted)' }} />
+                    <input 
+                      type="text" value={resumeLink} onChange={e => setResumeLink(e.target.value)}
+                      placeholder="drive.google.com/..."
+                      style={{ width: '100%', padding: '14px 16px 14px 44px', borderRadius: 14, background: 'var(--white)', border: 'none', color: 'var(--text)', outline: 'none' }}
+                    />
+                  </div>
+                </div>
+
+                <button 
+                  onClick={saveProfile}
+                  disabled={saving}
+                  style={{
+                    width: '100%', padding: '16px', borderRadius: 18, background: 'var(--g)',
+                    color: '#fff', border: 'none', fontSize: 16, fontWeight: 700,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.1)', cursor: 'pointer',
+                    opacity: saving ? 0.7 : 1, transition: 'all 0.2s', marginTop: 12
+                  }}
+                >
+                  {saving ? <Loader2 className="spin" size={20} /> : <Save size={20} />}
+                  {profile?.card_made ? "Save Changes" : "Create My Card"}
+                </button>
               </div>
-              <div className="input-group">
-                <label className="section-label">Your Role</label>
-                <input 
-                  type="text" value={role} onChange={e => setRole(e.target.value)}
-                  placeholder="Sustainability Lead"
-                  style={{ width: '100%', padding: '14px 16px', borderRadius: 14, background: 'var(--white)', border: 'none', color: 'var(--text)', outline: 'none' }}
-                />
-              </div>
-            </div>
-
-            <div className="input-group">
-              <label className="section-label">Bio (Short & Sweet)</label>
-              <textarea 
-                value={bio} onChange={e => setBio(e.target.value)}
-                placeholder="Passionate about circularity and zero-waste systems..."
-                style={{ width: '100%', padding: '14px 16px', borderRadius: 14, background: 'var(--white)', border: 'none', color: 'var(--text)', outline: 'none', minHeight: 80, resize: 'none' }}
-              />
-            </div>
-
-            <div className="input-group">
-              <label className="section-label">LinkedIn Profile URL</label>
-              <div style={{ position: 'relative' }}>
-                <Linkedin size={16} style={{ position: 'absolute', left: 16, top: 16, color: 'var(--muted)' }} />
-                <input 
-                  type="text" value={linkedin} onChange={e => setLinkedin(e.target.value)}
-                  placeholder="linkedin.com/in/username"
-                  style={{ width: '100%', padding: '14px 16px 14px 44px', borderRadius: 14, background: 'var(--white)', border: 'none', color: 'var(--text)', outline: 'none' }}
-                />
-              </div>
-            </div>
-
-            <div className="input-group">
-              <label className="section-label">Resume / Portfolio Link</label>
-              <div style={{ position: 'relative' }}>
-                <FileText size={16} style={{ position: 'absolute', left: 16, top: 16, color: 'var(--muted)' }} />
-                <input 
-                  type="text" value={resumeLink} onChange={e => setResumeLink(e.target.value)}
-                  placeholder="drive.google.com/..."
-                  style={{ width: '100%', padding: '14px 16px 14px 44px', borderRadius: 14, background: 'var(--white)', border: 'none', color: 'var(--text)', outline: 'none' }}
-                />
-              </div>
-            </div>
-
-            <button 
-              onClick={saveProfile}
-              disabled={saving}
-              style={{
-                width: '100%', padding: '16px', borderRadius: 18, background: 'var(--g)',
-                color: '#fff', border: 'none', fontSize: 16, fontWeight: 700,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                boxShadow: '0 8px 24px rgba(0,0,0,0.1)', cursor: 'pointer',
-                opacity: saving ? 0.7 : 1, transition: 'all 0.2s', marginTop: 12
-              }}
-            >
-              {saving ? <Loader2 className="spin" size={20} /> : <Save size={20} />}
-              Save My Profile
-            </button>
-          </div>
+            ) : (
+               <div style={{ textAlign: 'center', marginTop: 40 }}>
+                 <p style={{ color: 'var(--sub)', fontSize: 14, fontWeight: 600, marginBottom: 20 }}>
+                   Your profile is ready! You can now proceed to check-in.
+                 </p>
+                 <button 
+                    onClick={() => setNavStage(3)}
+                    style={{
+                      padding: '16px 32px', borderRadius: 20, background: 'var(--g)',
+                      color: '#fff', border: 'none', fontSize: 16, fontWeight: 800,
+                      cursor: 'pointer', boxShadow: '0 8px 24px rgba(62, 92, 38, 0.2)'
+                    }}
+                  >
+                    Go to Check-in <ChevronRight size={18} style={{ display: 'inline', marginLeft: 4 }} />
+                  </button>
+               </div>
+            )}
+          </>
         ) : (
           <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-            {!isCheckedIn(profile.checked_in) && (
-              <div style={{
-                background: 'var(--warm-dim)', border: '1px solid var(--warm-border)',
-                padding: '16px 20px', borderRadius: 20, display: 'flex', gap: 16,
-                alignItems: 'center'
-              }}>
-                <div style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--warm)', color: 'var(--g)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Info size={24} />
-                </div>
-                <p style={{ margin: 0, fontSize: 13, color: 'var(--g)', fontWeight: 600, lineHeight: 1.4 }}>
-                  Ensure your profile is correct before scanning. Your data is used for the networking features.
-                </p>
-              </div>
-            )}
+             <div style={{ marginBottom: 8 }}>
+              <h1 style={{ fontFamily: 'var(--fh)', fontSize: 32, fontWeight: 800, color: 'var(--g)', marginBottom: 8 }}>
+                Check-in Process
+              </h1>
+              <p style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'var(--sub)', fontWeight: 500 }}>
+                Present the QR code below to a staff member at the registration desk.
+              </p>
+            </div>
 
             {/* Check-in QR Section */}
             <div style={{ 
@@ -421,14 +490,16 @@ function MyCardContent() {
               boxShadow: '0 4px 20px rgba(0,0,0,0.03)'
             }}>
                <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--s2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--g)' }}>
-                <QrCode size={32} />
+                {isCheckedIn(profile?.checked_in) ? <CheckCircle2 size={32} /> : <QrCode size={32} />}
               </div>
               <div>
                 <h3 style={{ fontFamily: 'var(--fh)', fontSize: 18, fontWeight: 800, color: 'var(--g)', marginBottom: 4 }}>
-                   Wallet Sharing
+                   {isCheckedIn(profile?.checked_in) ? "Successfully Checked In" : "Your Conference Code"}
                 </h3>
                 <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--sub)', fontWeight: 500 }}>
-                  Share this QR to get yourself added to others' wallet.
+                  {isCheckedIn(profile?.checked_in) 
+                    ? "Welcome to the event! You're all set to participate." 
+                    : "Tap the code below to enlarge for easier scanning."}
                 </p>
               </div>
               
@@ -439,17 +510,18 @@ function MyCardContent() {
                   border: '1px solid var(--border)', cursor: 'pointer',
                   transition: 'all 0.3s var(--liquid)',
                   transform: 'scale(1)',
+                  opacity: isCheckedIn(profile?.checked_in) ? 0.3 : 1
                 }}
               >
                 <QRCode value={profile.id} size={160} level="H" />
               </div>
               
-              <p style={{ fontSize: 11, fontWeight: 800, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Tap to enlarge
-              </p>
+              {!isCheckedIn(profile?.checked_in) && (
+                <p style={{ fontSize: 11, fontWeight: 800, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Tap to enlarge
+                </p>
+              )}
             </div>
-
-
           </div>
         )}
       </div>
