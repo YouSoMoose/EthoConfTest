@@ -94,22 +94,30 @@ export default function AttendeeDashboard() {
   const [customizations, setCustomizations] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [notifPermission, setNotifPermission] = useState('default');
-  // Polling for onboarding status changes (Waiver, Card, Check-in)
+  // Realtime listener for onboarding status changes (Waiver, Card, Check-in)
   useEffect(() => {
-    if (!session?.user) return;
-    
-    const interval = setInterval(async () => {
-      try {
-        const res = await fetch('/api/profile');
-        if (res.ok) {
-          const freshProfile = await res.json();
+    if (!session?.profile?.id) return;
+
+    const channel = import('@/lib/supabase').then(({ supabase }) => {
+      return supabase
+        .channel(`profile-status-${session.profile.id}`)
+        .on('postgres_changes', { 
+          event: 'UPDATE', 
+          schema: 'public', 
+          table: 'profiles', 
+          filter: `id=eq.${session.profile.id}` 
+        }, async (payload) => {
+          console.log('[DEBUG] Realtime profile update:', payload.new);
+          const freshProfile = payload.new;
           const old = session?.profile || {};
           
           // Check if key statuses changed
           const changed = 
             freshProfile.liability !== old.liability ||
             freshProfile.card_made !== old.card_made ||
-            freshProfile.checked_in !== old.checked_in;
+            freshProfile.checked_in !== old.checked_in ||
+            freshProfile.avatar !== old.avatar ||
+            freshProfile.name !== old.name;
           
           if (changed) {
             await update({
@@ -117,13 +125,13 @@ export default function AttendeeDashboard() {
               profile: freshProfile
             });
           }
-        }
-      } catch (err) {
-        console.warn("Status polling error:", err);
-      }
-    }, 5000);
-    
-    return () => clearInterval(interval);
+        })
+        .subscribe();
+    });
+
+    return () => {
+      channel.then(c => import('@/lib/supabase').then(({ supabase }) => supabase.removeChannel(c)));
+    };
   }, [session, update]);
 
   useEffect(() => {
