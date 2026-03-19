@@ -24,6 +24,8 @@ export const viewport = {
   userScalable: false,
 };
 
+import { SpeedInsights } from "@vercel/speed-insights/next"
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
@@ -52,6 +54,7 @@ export default function RootLayout({ children }) {
             </LayoutWrapper>
           </GlobalBlockingOverlay>
         </SessionProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
