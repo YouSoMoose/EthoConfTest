@@ -195,14 +195,27 @@ function MyCardContent() {
 
   useEffect(() => {
     if (profile && !hasInitialized.current) {
+      // First try to set from session (basic fields)
       setName(profile.name || '');
-      setAvatar(profile.avatar || '');
       setRole(profile.role || '');
-      setBio(profile.bio || '');
       setCompany(profile.company || '');
-      setLinkedin(profile.linkedin || '');
-      setResumeLink(profile.resume_link || '');
       hasInitialized.current = true;
+
+      // Then fetch the full profile for the detailed fields that were stripped from JWT
+      fetch('/api/profile')
+        .then(r => r.json())
+        .then(data => {
+          if (data && !data.error) {
+            setName(data.name || '');
+            setAvatar(data.avatar || '');
+            setRole(data.role || '');
+            setBio(data.bio || '');
+            setCompany(data.company || '');
+            setLinkedin(data.linkedin || '');
+            setResumeLink(data.resume_link || '');
+          }
+        })
+        .catch(err => console.error('Error fetching full profile:', err));
     }
   }, [profile]);
 
