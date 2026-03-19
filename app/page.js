@@ -73,10 +73,7 @@ export default function LandingPage() {
 
   useEffect(() => {
     if (session?.profile) {
-      const level = session.profile.access_level ?? 0;
-      if (level >= 2) return router.replace('/admin');
-      else if (level === 1) return router.replace('/company');
-      else return router.replace('/app');
+      return router.replace('/app');
     }
     if (!isLoading && !session?.profile) {
       const isForced = new URLSearchParams(window.location.search).get('carousel') === '1';

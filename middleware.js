@@ -26,12 +26,6 @@ export async function middleware(request) {
 
   // If logged in and visiting landing or login → redirect to their dashboard
   if (token && (pathname === '/' || pathname === '/login')) {
-    const accessLevel = token.profile?.access_level ?? 0;
-
-    if (accessLevel >= 2) {
-      return NextResponse.redirect(new URL('/admin', request.url));
-    }
-    
     return NextResponse.redirect(new URL('/app', request.url));
   }
 

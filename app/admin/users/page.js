@@ -166,36 +166,47 @@ export default function AdminUsersPage() {
           {filtered.map(u => (
             <div key={u.id} style={{
               background: 'var(--as2)', border: '1px solid var(--aborder)', borderRadius: 'var(--r)',
-              padding: 16, display: 'flex', alignItems: 'center', gap: 12,
+              padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 16,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
             }}>
-              <Avatar src={u.avatar} name={u.name} size={36} />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <h3 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 14, color: 'var(--atext)' }}>{u.name || 'No name'}</h3>
-                <p style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--amuted)' }}>{u.email}</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <Avatar src={u.avatar} name={u.name} size={40} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <h3 style={{ fontFamily: 'var(--fhs)', fontWeight: 700, fontSize: 15, color: 'var(--atext)', margin: 0 }}>{u.name || 'No name'}</h3>
+                  <p style={{ fontFamily: 'var(--fb)', fontSize: 12, color: 'var(--amuted)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.email}</p>
+                </div>
               </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12, marginTop: 8 }}>
+
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'space-between', 
+                gap: 12,
+                paddingTop: 12,
+                borderTop: '1px solid var(--aborder)',
+              }}>
                 {/* Status Toggles */}
-                <div style={{ display: 'flex', gap: 10, background: 'var(--as3)', padding: '6px 10px', borderRadius: 8, border: '1px solid var(--aborder)' }}>
+                <div style={{ display: 'flex', gap: 14, background: 'var(--as3)', padding: '8px 12px', borderRadius: 10, border: '1px solid var(--aborder)' }}>
                   <button 
                     onClick={() => toggleUserStatus(u.id, 'liability', u.liability)}
                     title="Liability"
                     style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', color: u.liability ? 'var(--agreen)' : 'var(--amuted)' }}
                   >
-                    <Shield size={14} fill={u.liability ? 'var(--agreen)' : 'none'} />
+                    <Shield size={16} fill={u.liability ? 'var(--agreen)' : 'none'} />
                   </button>
                   <button 
                     onClick={() => toggleUserStatus(u.id, 'card_made', u.card_made)}
                     title="Card Made"
                     style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', color: u.card_made ? 'var(--agreen)' : 'var(--amuted)' }}
                   >
-                    <User size={14} fill={u.card_made ? 'var(--agreen)' : 'none'} />
+                    <User size={16} fill={u.card_made ? 'var(--agreen)' : 'none'} />
                   </button>
                   <button 
                     onClick={() => toggleUserStatus(u.id, 'checked_in', u.checked_in)}
                     title="Checked In"
                     style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', color: u.checked_in ? 'var(--agreen)' : 'var(--amuted)' }}
                   >
-                    <Check size={14} strokeWidth={3} />
+                    <Check size={16} strokeWidth={3} />
                   </button>
                 </div>
 
@@ -204,8 +215,9 @@ export default function AdminUsersPage() {
                   onChange={e => updateRole(u.id, e.target.value)}
                   style={{
                     background: 'var(--as3)', border: '1px solid var(--aborder)',
-                    borderRadius: 6, padding: '4px 6px', fontSize: 11,
+                    borderRadius: 8, padding: '6px 10px', fontSize: 12,
                     fontFamily: 'var(--fb)', color: 'var(--atext)', outline: 'none',
+                    minWidth: 100,
                   }}
                 >
                   <option value={0}>Attendee</option>
