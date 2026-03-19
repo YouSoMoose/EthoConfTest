@@ -3,6 +3,8 @@
 import { signOut, useSession } from 'next-auth/react';
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { MapPin } from 'lucide-react';
+import Link from 'next/link';
 import Avatar from '@/components/Avatar';
 import Loader from '@/components/Loader';
 import { Home, Calendar, Wallet, Scan, MessageCircle, FileText, CreditCard, ChevronRight, LogOut, Settings, Bell, ShieldCheck, CheckCircle2 } from 'lucide-react';
