@@ -128,6 +128,7 @@ export default function AttendeeDashboard() {
   const [loading, setLoading] = useState(true);
   const [customizations, setCustomizations] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [notifPermission, setNotifPermission] = useState('default');
   const searchParams = useSearchParams();
   const router = useRouter();
 
