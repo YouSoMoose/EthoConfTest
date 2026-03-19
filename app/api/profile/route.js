@@ -34,7 +34,6 @@ export async function PUT(request) {
   if (body.bio !== undefined) updateData.bio = body.bio;
   if (body.role !== undefined) updateData.role = body.role;
   if (body.name !== undefined) updateData.name = body.name;
-  if (body.avatar !== undefined) updateData.avatar = body.avatar;
   if (body.company !== undefined) updateData.company = body.company;
   if (body.linkedin !== undefined) updateData.linkedin = body.linkedin;
   if (body.in_admin !== undefined) updateData.in_admin = body.in_admin;

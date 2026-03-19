@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Loader2, User, CheckCircle2, ChevronLeft, ChevronRight, QrCode, Save, Image as ImageIcon, Briefcase, Globe, Linkedin, FileText, Info, X } from 'lucide-react';
+import { Loader2, User, CheckCircle2, ChevronLeft, ChevronRight, QrCode, Save, Briefcase, Globe, Linkedin, FileText, Info, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { CardPreview } from '@/components/CardPreview';
 import Topbar from '@/components/Topbar';
@@ -217,7 +217,7 @@ function MyCardContent() {
       const res = await fetch('/api/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resume_link: resumeLink, bio, role, name, avatar, company, linkedin }),
+        body: JSON.stringify({ resume_link: resumeLink, bio, role, name, company, linkedin }),
       });
       if (res.ok) {
         toast.success('Profile saved', { id: t });
@@ -236,14 +236,6 @@ function MyCardContent() {
     setSaving(false);
   };
 
-  const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (file.size > 2 * 1024 * 1024) return toast.error('File too large (max 2MB)');
-    const reader = new FileReader();
-    reader.onload = (ev) => setAvatar(ev.target.result);
-    reader.readAsDataURL(file);
-  };
 
   if (!profile) return <Loader />;
 
@@ -328,14 +320,6 @@ function MyCardContent() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16, background: 'var(--s1)', padding: 16, borderRadius: 20 }}>
                   <div style={{ position: 'relative', width: 64, height: 64 }}>
                     <img src={avatar || '/assets/ethos-logo-insignia.png'} alt="" style={{ width: '100%', height: '100%', borderRadius: 16, objectFit: 'cover' }} />
-                    <label style={{
-                      position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.2)', 
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: '#fff', borderRadius: 16, cursor: 'pointer'
-                    }}>
-                      <ImageIcon size={20} />
-                      <input type="file" hidden accept="image/*" onChange={handleAvatarChange} />
-                    </label>
                   </div>
                   <div>
                     <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Profile Picture</p>

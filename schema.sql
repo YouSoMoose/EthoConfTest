@@ -14,6 +14,13 @@ CREATE TABLE profiles (
   checked_in BOOL DEFAULT FALSE,
   checked_in_at TIMESTAMPTZ,
   resume_link TEXT,
+  phone TEXT,
+  bio TEXT,
+  role TEXT,
+  company TEXT,
+  linkedin TEXT,
+  card_made BOOLEAN DEFAULT FALSE,
+  in_admin BOOLEAN DEFAULT FALSE,
   liability BOOLEAN DEFAULT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -131,6 +138,15 @@ CREATE TABLE wallet_items (
   UNIQUE(user_id, company_id)
 );
 
+-- Connections
+CREATE TABLE connections (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  scanned_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, scanned_id)
+);
+
 -- Enable RLS on all tables
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE schedule_items ENABLE ROW LEVEL SECURITY;
@@ -144,6 +160,7 @@ ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE raffle_entries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE announcements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE wallet_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE connections ENABLE ROW LEVEL SECURITY;
 
 -- Public read policies
 CREATE POLICY "Public read schedule_items" ON schedule_items FOR SELECT USING (true);
