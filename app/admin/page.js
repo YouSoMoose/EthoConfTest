@@ -7,7 +7,7 @@ import Loader from '@/components/Loader';
 import toast from 'react-hot-toast';
 import Modal from '@/components/Modal';
 import QRScanner from '@/components/QRScanner';
-import { LayoutDashboard, Users, CheckCircle, MessageSquare, CreditCard, Printer, Send } from 'lucide-react';
+import { LayoutDashboard, Users, CheckCircle, MessageSquare, CreditCard, Printer, Send, LogOut, AlertTriangle } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { data: session } = useSession();
@@ -130,6 +130,8 @@ export default function AdminDashboard() {
     { label: 'Checked In', value: stats?.checkedIn || 0, icon: CheckCircle, href: '/admin/checkin', minLevel: 2 },
     { label: 'Unread Messages', value: stats?.unreadMessages || 0, icon: MessageSquare, href: '/admin/messages', minLevel: 2 },
     { label: 'Print ID Cards', value: <CreditCard size={28} />, icon: Printer, href: '/admin/cards', minLevel: 3 },
+    { label: 'Logout Users', value: <LogOut size={28} />, icon: LogOut, href: '/admin/logout', minLevel: 3 },
+    { label: 'Hard Reset QR', value: <AlertTriangle size={28} />, icon: AlertTriangle, href: '/admin/reset', minLevel: 3 },
   ];
 
   return (

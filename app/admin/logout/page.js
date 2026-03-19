@@ -58,9 +58,9 @@ export default function AdminLogoutPage() {
           padding: 24, marginBottom: 32, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
           textAlign: 'center'
         }}>
-          <h3 style={{ fontFamily: 'var(--fhs)', margin: 0, color: 'var(--atext)' }}>Failsafe QR Code</h3>
+          <h3 style={{ fontFamily: 'var(--fhs)', margin: 0, color: 'var(--atext)' }}>Soft Logout QR Code</h3>
           <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--asub)', maxWidth: 400, margin: 0, lineHeight: 1.5 }}>
-            If a user's app is frozen or they are experiencing the 431 Cookie Error, have them scan this code with their camera app. It will securely wipe their session.
+            Standard logout via NextAuth. If a user scans this, it will destroy their active session.
           </p>
           <div 
             onClick={() => setQrSize(qrSize === 120 ? 300 : 120)}

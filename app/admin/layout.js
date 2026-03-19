@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import PageTransition from '@/components/PageTransition';
 import AdminSwitch from '@/components/AdminSwitch';
 
-import { LayoutDashboard, CheckCircle, MessageSquare, Calendar, Users, User, Leaf, Menu, X, CreditCard, LogOut } from 'lucide-react';
+import { LayoutDashboard, CheckCircle, MessageSquare, Calendar, Users, User, Leaf, Menu, X, CreditCard, LogOut, AlertTriangle } from 'lucide-react';
 
 const tabs = [
   { label: 'Dashboard', href: '/admin', icon: LayoutDashboard, show: (level) => level >= 3 },
@@ -17,6 +17,7 @@ const tabs = [
   { label: 'ID Cards', href: '/admin/cards', icon: CreditCard, show: (level) => level >= 3 },
   { label: 'Users', href: '/admin/users', icon: Users, show: (level) => level >= 3 },
   { label: 'Logout Users', href: '/admin/logout', icon: LogOut, show: (level) => level >= 3 },
+  { label: 'Hard Reset QR', href: '/admin/reset', icon: AlertTriangle, show: (level) => level >= 3 },
 ];
 
 export default function AdminLayout({ children }) {
