@@ -153,7 +153,7 @@ function MyCardContent() {
 
     // 2. High-frequency polling ONLY when the QR screen is active
     let pollInterval;
-    if (showSuccessQR && !isCheckinSuccess) {
+    if (!isCheckinSuccess && !isCheckedIn(profile?.checked_in)) {
       console.log('[DEBUG] Starting 1s internal API poll...');
       pollInterval = setInterval(async () => {
         try {
@@ -175,7 +175,7 @@ function MyCardContent() {
       supabase.removeChannel(channel);
       if (pollInterval) clearInterval(pollInterval);
     };
-  }, [profile?.id, profile?.checked_in, router, updateSession, showSuccessQR, isCheckinSuccess]);
+  }, [profile?.id, profile?.checked_in, router, updateSession, isCheckinSuccess]);
 
   // 3. New Connection Realtime Listener + Polling Fallback (for "You got scanned")
   useEffect(() => {
