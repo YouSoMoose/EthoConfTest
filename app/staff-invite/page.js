@@ -11,10 +11,21 @@ export default function StaffInvitePage() {
   const [upgrading, setUpgrading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [alreadyStaff, setAlreadyStaff] = useState(false);
+  const [initialized, setInitialized] = useState(false);
   const router = useRouter();
 
+  // Step 1: Force signout on enter to ensure a fresh session start
   useEffect(() => {
-    if (status === 'authenticated' && session?.profile && !success) {
+    if (status === 'authenticated' && !initialized && !success) {
+      signOut({ redirect: false }).then(() => setInitialized(true));
+    } else if (status === 'unauthenticated' && !initialized) {
+      setInitialized(true);
+    }
+  }, [status, initialized, success]);
+
+  // Step 2: Handle the authenticated state once they sign in specifically for this tool
+  useEffect(() => {
+    if (status === 'authenticated' && session?.profile && initialized && !success) {
       const level = session.profile.access_level ?? 0;
       if (level < 2) {
         handleUpgrade();
@@ -23,7 +34,7 @@ export default function StaffInvitePage() {
         handleFinishUpgrade();
       }
     }
-  }, [status, session]);
+  }, [status, session, initialized, success]);
 
   async function handleUpgrade() {
     setUpgrading(true);
@@ -45,7 +56,7 @@ export default function StaffInvitePage() {
   async function handleFinishUpgrade() {
     setUpgrading(true);
     setSuccess(true);
-    // Immediate logout to keep it isolated
+    // Step 3: Immediate logout after verification to keep it isolated
     await signOut({ redirect: false });
     setUpgrading(false);
   }
@@ -95,7 +106,7 @@ export default function StaffInvitePage() {
           <div style={{ animation: 'successPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both' }}>
             <div style={{
               width: 64, height: 64, borderRadius: '50%',
-              background: alreadyStaff ? 'var(--sub)' : 'var(--g)',
+              background: alreadyStaff ? '#333' : 'var(--g)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               margin: '0 auto 20px', color: '#fff'
             }}>
@@ -138,17 +149,17 @@ export default function StaffInvitePage() {
               Sign in to Dashboard <ArrowRight size={18} />
             </button>
           </div>
-        ) : (status === 'loading' || upgrading || (status === 'authenticated' && !success)) ? (
+        ) : (!initialized || upgrading || (status === 'authenticated' && !success)) ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
             <Loader2 className="spin" size={32} />
             <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14 }}>
-              {upgrading ? 'Processing permissions...' : 'Verifying Gmail Auth...'}
+              {upgrading ? 'Finalizing permissions & clearing session...' : 'Preparing isolated session...'}
             </p>
           </div>
         ) : (
           <div>
             <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 15, marginBottom: 32, lineHeight: 1.5 }}>
-              Sign in with Gmail to verify your identity and receive Staff Access 2.
+              Please sign in with your Gmail to verify your identity and receive Staff Access 2.
             </p>
             <button
               onClick={() => signIn('google', { callbackUrl: '/staff-invite' })}
