@@ -20,65 +20,8 @@ export default function MyCardPage() {
   );
 }
 
-function SuccessAnimation() {
-  return (
-    <div style={{
-      position: 'fixed', inset: 0, zIndex: 9999,
-      background: 'var(--bg)',
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      animation: 'fadeIn 0.5s ease both',
-    }}>
-      <div style={{
-        width: 120, height: 120, borderRadius: '50%',
-        background: 'var(--g)', color: '#fff',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        marginBottom: 24,
-        animation: 'stampBounce 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both',
-      }}>
-        <CheckCircle2 size={64} />
-      </div>
-      <h2 style={{ fontFamily: 'var(--fh)', fontSize: 28, fontWeight: 800, color: 'var(--g)', marginBottom: 8 }}>
-        Check-in Success!
-      </h2>
-      <p style={{ fontFamily: 'var(--fb)', fontSize: 16, color: 'var(--sub)', fontWeight: 600 }}>
-        Welcome to the conference.
-      </p>
-      
-      <style>{`
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes stampBounce {
-          0% { transform: scale(0) rotate(-20deg); opacity: 0; }
-          50% { transform: scale(1.2) rotate(5deg); opacity: 1; }
-          100% { transform: scale(1) rotate(0deg); opacity: 1; }
-        }
-      `}</style>
-    </div>
-  );
-}
-
-function MyCardContent() {
-  const { data: session, update: updateSession } = useSession();
-  const profile = session?.profile;
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const isOnboarding = searchParams.get('onboarding') === '1';
-  const importToken = searchParams.get('import_token');
-
-  // Explicit staging: 1 = Liability (Gate), 2 = Card, 3 = Check-in
-  const [navStage, setNavStage] = useState(2); // Default to Card
-
-  // If card_made is false, open editing page. Otherwise, show QR.
-  const [isEditing, setIsEditing] = useState(isOnboarding || profile?.card_made === false);
-  const [name, setName] = useState('');
-  const [avatar, setAvatar] = useState('');
-  const [role, setRole] = useState('');
-  const [bio, setBio] = useState('');
-  const [company, setCompany] = useState('');
-  const [linkedin, setLinkedin] = useState('');
-  const [resumeLink, setResumeLink] = useState('');
-  const [saving, setSaving] = useState(false);
   const [qrExpanded, setQrExpanded] = useState(false);
-  const [isCheckinSuccess, setIsCheckinSuccess] = useState(false);
+  const [isBeingScanned, setIsBeingScanned] = useState(false);
   const [isBeingScanned, setIsBeingScanned] = useState(false);
 
   const hasAutoSet = useRef(false);
