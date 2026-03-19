@@ -7,6 +7,7 @@ import Loader from '@/components/Loader';
 import RoleChip from '@/components/RoleChip';
 import { ACCESS_LABELS } from '@/lib/constants';
 import { RefreshCcw, Users, Check, Shield, User } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
@@ -15,6 +16,26 @@ export default function AdminUsersPage() {
 
   useEffect(() => {
     fetch('/api/users').then(r => r.json()).then(d => { setUsers(d || []); setLoading(false); }).catch(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('admin-users-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, (payload) => {
+        console.log('[DEBUG] Users Realtime event:', payload);
+        if (payload.eventType === 'INSERT') {
+          setUsers(prev => [payload.new, ...prev]);
+        } else if (payload.eventType === 'UPDATE') {
+          setUsers(prev => prev.map(u => u.id === payload.new.id ? { ...u, ...payload.new } : u));
+        } else if (payload.eventType === 'DELETE') {
+          setUsers(prev => prev.filter(u => u.id !== payload.old.id));
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const toggleUserStatus = async (userId, field, currentVal) => {

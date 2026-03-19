@@ -136,7 +136,7 @@ function MyCardContent() {
       supabase.removeChannel(channel);
       if (pollInterval) clearInterval(pollInterval);
     };
-  }, [profile?.id, profile?.checked_in, router, updateSession, isCheckinSuccess]);
+  }, [profile?.id, profile?.checked_in, router, updateSession]);
 
   // 3. New Connection Realtime Listener + Polling Fallback (for "You got scanned")
   useEffect(() => {
