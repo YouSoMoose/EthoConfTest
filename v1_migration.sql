@@ -15,7 +15,8 @@ ALTER TABLE connections ENABLE ROW LEVEL SECURITY;
 -- 2. Add contact info to profiles
 ALTER TABLE profiles 
   ADD COLUMN IF NOT EXISTS phone TEXT,
-  ADD COLUMN IF NOT EXISTS bio TEXT;
+  ADD COLUMN IF NOT EXISTS bio TEXT,
+  ADD COLUMN IF NOT EXISTS liability BOOLEAN DEFAULT NULL;
 
 -- 2. Drop legacy company-related tables
 DROP TABLE IF EXISTS wallet_items CASCADE;

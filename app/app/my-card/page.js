@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase';
 import { CardPreview } from '@/components/CardPreview';
 import Topbar from '@/components/Topbar';
 import Loader from '@/components/Loader';
+import LiabilityWaiver from '@/components/LiabilityWaiver';
 import toast from 'react-hot-toast';
 import QRCode from 'qrcode.react';
 
@@ -248,6 +249,11 @@ function MyCardContent() {
 
   if (!profile) return <Loader />;
   if (isCheckinSuccess) return <SuccessAnimation />;
+
+  // LIABILITY WAIVER GATE
+  if (profile.liability !== true) {
+    return <LiabilityWaiver onComplete={() => updateSession()} />;
+  }
 
   return (
     <div className="page-enter" style={{ height: '100%', overflowY: 'auto', paddingBottom: 100 }}>

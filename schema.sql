@@ -14,6 +14,7 @@ CREATE TABLE profiles (
   checked_in BOOL DEFAULT FALSE,
   checked_in_at TIMESTAMPTZ,
   resume_link TEXT,
+  liability BOOLEAN DEFAULT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

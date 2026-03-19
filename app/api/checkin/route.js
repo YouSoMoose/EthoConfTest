@@ -32,6 +32,10 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Already checked in', profile }, { status: 409 });
   }
 
+  if (profile.liability !== true) {
+    return NextResponse.json({ error: 'Liability waiver not signed', profile }, { status: 403 });
+  }
+
   const { data, error } = await supabaseAdmin
     .from('profiles')
     .update({
