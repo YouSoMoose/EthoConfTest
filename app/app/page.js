@@ -463,7 +463,14 @@ export default function AttendeeDashboard() {
         center
       >
         <div style={{ maxHeight: '80vh', overflowY: 'auto' }}>
-          <LiabilityWaiver onComplete={() => window.location.reload()} />
+          <LiabilityWaiver onComplete={async (fresh) => {
+            if (fresh) {
+              await update({ ...session, profile: fresh });
+            } else {
+              window.location.reload();
+            }
+            setShowWaiver(false);
+          }} />
         </div>
       </Modal>
     </div>
