@@ -82,6 +82,7 @@ function MyCardContent() {
   const [isBeingScanned, setIsBeingScanned] = useState(false);
 
   const hasAutoSet = useRef(false);
+  const hasInitialized = useRef(false);
   // Auto-set stage based on profile status on first load
   useEffect(() => {
     // If an import token is present, attempt to claim it (secure flow)
@@ -234,7 +235,7 @@ function MyCardContent() {
   }, [qrExpanded]);
 
   useEffect(() => {
-    if (profile) {
+    if (profile && !hasInitialized.current) {
       setName(profile.name || '');
       setAvatar(profile.avatar || '');
       setRole(profile.role || '');
@@ -242,6 +243,7 @@ function MyCardContent() {
       setCompany(profile.company || '');
       setLinkedin(profile.linkedin || '');
       setResumeLink(profile.resume_link || '');
+      hasInitialized.current = true;
     }
   }, [profile]);
 
