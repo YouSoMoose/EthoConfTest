@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Carbon Game — Embeddable</title>
+  <link rel="stylesheet" href="/carbon-game/css/style.css?v=1">
+</head>
+<body>
+  <main class="app">
+    <header>
+      <h1>Carbon Footprint Game</h1>
+      <p class="subtitle">Answer a short questionnaire to find out about your carbon footprint! — lower points are better.</p>
+    </header>
+
+    <section id="question-area" class="card">
+      <div id="progress" class="progress"><div id="progress-bar"></div></div>
+      <div id="question-root"></div>
+      <div class="controls">
+        <button id="prevBtn" class="btn">Back</button>
+        <button id="nextBtn" class="btn primary">Next</button>
+      </div>
+    </section>
+
+    <section id="result-area" class="card hidden">
+      <h2>Your Score</h2>
+      <div id="score" class="score">—</div>
+      <div id="score-label" class="score-label"></div>
+
+      <div class="leaderboard-entry">
+        <label for="nameInput">Save your score to the leaderboard</label>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <input id="nameInput" placeholder="Your name" />
+        </div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
+        <button id="submitLeaderboardBtn" class="btn primary">Submit to leaderboard</button>
+      </div>
+    </section>
+
+    <section id="leaderboard-area" class="card hidden">
+      <h2>Leaderboard</h2>
+      <div id="leaderboard-list">No entries yet.</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;align-items:flex-start;">
+        <button id="exportToCardBtn" class="btn primary">Export to Conference Card</button>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="/carbon-game/js/app.js?v=1"></script>
+</body>
+</html>
