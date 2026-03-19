@@ -19,6 +19,7 @@ export default function Topbar({ title, onBack, rightEl, admin }) {
       justifyContent: 'space-between',
       padding: '0 16px',
       paddingTop: 'max(0px, env(safe-area-inset-top))',
+      animation: 'slideDown 0.8s var(--liquid) both',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         {onBack && (

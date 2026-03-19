@@ -78,7 +78,6 @@ function MyCardContent() {
   const [resumeLink, setResumeLink] = useState('');
   const [saving, setSaving] = useState(false);
   const [qrExpanded, setQrExpanded] = useState(false);
-  const [showSuccessQR, setShowSuccessQR] = useState(false);
   const [isCheckinSuccess, setIsCheckinSuccess] = useState(false);
   const [isBeingScanned, setIsBeingScanned] = useState(false);
 
@@ -263,7 +262,7 @@ function MyCardContent() {
         toast.success('Profile saved', { id: t });
         updateSession(); 
         if (!isCheckedIn(profile.checked_in)) {
-          setShowSuccessQR(true);
+          setNavStage(3); // Go to QR code check-in thing
         } else {
           router.push('/app');
         }
@@ -288,59 +287,64 @@ function MyCardContent() {
   if (!profile) return <Loader />;
   if (isCheckinSuccess) return <SuccessAnimation />;
 
+  const checkedIn = isCheckedIn(profile?.checked_in);
+
   return (
     <div className="page-enter" style={{ height: '100%', overflowY: 'auto', paddingBottom: 100 }}>
-      {/* STEP NAVIGATOR */}
-      <div style={{ 
-        padding: '24px 16px 0', maxWidth: 500, margin: '0 auto', width: '100%',
-        display: 'flex', flexDirection: 'column', gap: 20
-      }}>
-        <button 
-          onClick={() => router.push('/app')}
-          style={{ 
-            background: 'none', border: 'none', display: 'flex', alignItems: 'center', 
-            gap: 6, color: 'var(--muted)', fontSize: 13, fontWeight: 700, cursor: 'pointer', width: 'fit-content'
-          }}
-        >
-          <ChevronLeft size={18} /> Back to Dashboard
-        </button>
-
+      {/* STEP NAVIGATOR - Only show if already checked in */}
+      {checkedIn && (
         <div style={{ 
-          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, 
-          background: 'var(--s1)', padding: 6, borderRadius: 16 
+          padding: '24px 16px 0', maxWidth: 500, margin: '0 auto', width: '100%',
+          display: 'flex', flexDirection: 'column', gap: 20,
+          animation: 'slideDown 0.8s var(--liquid) both',
         }}>
           <button 
-            onClick={() => setNavStage(2)}
-            style={{
-              padding: '10px', borderRadius: 12, border: 'none',
-              background: navStage === 2 ? 'var(--white)' : 'transparent',
-              color: navStage === 2 ? 'var(--g)' : 'var(--sub)',
-              fontSize: 13, fontWeight: 800, cursor: 'pointer',
-              boxShadow: navStage === 2 ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
-              transition: 'all 0.3s var(--liquid)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
+            onClick={() => router.push('/app')}
+            style={{ 
+              background: 'none', border: 'none', display: 'flex', alignItems: 'center', 
+              gap: 6, color: 'var(--muted)', fontSize: 13, fontWeight: 700, cursor: 'pointer', width: 'fit-content'
             }}
           >
-            <User size={16} /> 1. Digital Card
-            {profile?.card_made && <CheckCircle2 size={14} color="var(--g)" />}
+            <ChevronLeft size={18} /> Back to Dashboard
           </button>
-          <button 
-            onClick={() => setNavStage(3)}
-            style={{
-              padding: '10px', borderRadius: 12, border: 'none',
-              background: navStage === 3 ? 'var(--white)' : 'transparent',
-              color: navStage === 3 ? 'var(--g)' : 'var(--sub)',
-              fontSize: 13, fontWeight: 800, cursor: 'pointer',
-              boxShadow: navStage === 3 ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
-              transition: 'all 0.3s var(--liquid)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
-            }}
-          >
-            <QrCode size={16} /> 2. Check-in
-            {isCheckedIn(profile?.checked_in) && <CheckCircle2 size={14} color="var(--g)" />}
-          </button>
+
+          <div style={{ 
+            display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, 
+            background: 'var(--s1)', padding: 6, borderRadius: 16 
+          }}>
+            <button 
+              onClick={() => setNavStage(2)}
+              style={{
+                padding: '10px', borderRadius: 12, border: 'none',
+                background: navStage === 2 ? 'var(--white)' : 'transparent',
+                color: navStage === 2 ? 'var(--g)' : 'var(--sub)',
+                fontSize: 13, fontWeight: 800, cursor: 'pointer',
+                boxShadow: navStage === 2 ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                transition: 'all 0.3s var(--liquid)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
+              }}
+            >
+              <User size={16} /> 1. Edit Card
+              {profile?.card_made && <CheckCircle2 size={14} color="var(--g)" />}
+            </button>
+            <button 
+              onClick={() => setNavStage(3)}
+              style={{
+                padding: '10px', borderRadius: 12, border: 'none',
+                background: navStage === 3 ? 'var(--white)' : 'transparent',
+                color: navStage === 3 ? 'var(--g)' : 'var(--sub)',
+                fontSize: 13, fontWeight: 800, cursor: 'pointer',
+                boxShadow: navStage === 3 ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                transition: 'all 0.3s var(--liquid)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
+              }}
+            >
+              <QrCode size={16} /> 2. Share ID
+              {checkedIn && <CheckCircle2 size={14} color="var(--g)" />}
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       <div style={{ maxWidth: 500, margin: '0 auto', padding: '24px 16px' }}>
         {navStage === 2 ? (
@@ -491,10 +495,12 @@ function MyCardContent() {
           <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
              <div style={{ marginBottom: 8 }}>
               <h1 style={{ fontFamily: 'var(--fh)', fontSize: 32, fontWeight: 800, color: 'var(--g)', marginBottom: 8 }}>
-                Check-in Process
+                {isCheckedIn(profile?.checked_in) ? "Share Your ID" : "Check-in Process"}
               </h1>
               <p style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'var(--sub)', fontWeight: 500 }}>
-                Present the QR code below to a staff member at the registration desk.
+                {isCheckedIn(profile?.checked_in) 
+                  ? "Here's your card to share with others." 
+                  : "Present the QR code below to a staff member at the registration desk."}
               </p>
             </div>
 
@@ -506,15 +512,15 @@ function MyCardContent() {
               boxShadow: '0 4px 20px rgba(0,0,0,0.03)'
             }}>
                <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--s2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--g)' }}>
-                {isCheckedIn(profile?.checked_in) ? <CheckCircle2 size={32} /> : <QrCode size={32} />}
+                {isCheckedIn(profile?.checked_in) ? <QrCode size={32} /> : <QrCode size={32} />}
               </div>
               <div>
                 <h3 style={{ fontFamily: 'var(--fh)', fontSize: 18, fontWeight: 800, color: 'var(--g)', marginBottom: 4 }}>
-                   {isCheckedIn(profile?.checked_in) ? "Successfully Checked In" : "Your Conference Code"}
+                   {isCheckedIn(profile?.checked_in) ? "Your Networking QR" : "Your Conference Code"}
                 </h3>
                 <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--sub)', fontWeight: 500 }}>
                   {isCheckedIn(profile?.checked_in) 
-                    ? "Welcome to the event! You're all set to participate." 
+                    ? "Other attendees can scan this to add you to their wallet." 
                     : "Tap the code below to enlarge for easier scanning."}
                 </p>
               </div>
