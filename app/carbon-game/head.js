@@ -1,0 +1,52 @@
+export default function Head() {
+  return (
+    <>
+      <link rel="stylesheet" href="/carbon-game/css/style.css?v=1" />
+      <style>{` 
+    :root{--bg:#f5f7fb;--card:#ffffff;--accent:#2b6ef6;--muted:#6b7280}
+    *{box-sizing:border-box;font-family:Inter,Segoe UI,system-ui,Arial,sans-serif}
+    body{margin:0;background:var(--bg);color:#0f172a;min-height:100vh;display:flex;align-items:center;justify-content:center}
+    .app{max-width:720px;margin:0 auto;padding:16px}
+header h1{margin:0;font-size:1.6rem}
+.subtitle{color:var(--muted);margin:6px 0 18px}
+.card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(12,24,64,0.06);margin-bottom:16px}
+.hidden{display:none}
+.controls{display:flex;justify-content:space-between;margin-top:12px}
+.btn{padding:8px 14px;border-radius:8px;border:1px solid #e6eefb;background:white;cursor:pointer}
+.btn.primary{background:var(--accent);color:white;border:none}
+.btn.full{width:100%}
+.progress{height:8px;background:#e9eefc;border-radius:999px;overflow:hidden;margin-bottom:12px}
+#progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#6d9bff)}
+.question{display:flex;flex-direction:column;gap:8px}
+.question label{font-weight:600}
+.question input[type=number],.question select{padding:8px;border-radius:8px;border:1px solid #e6eefb}
+.score{font-size:3rem;font-weight:700;margin:8px 0}
+.score-label{font-size:1.1rem;color:var(--muted)}
+footer{font-size:12px;color:var(--muted);text-align:center;margin-top:8px}
+
+/* Leaderboard styles */
+#leaderboard-list table{border-collapse:collapse;width:100%}
+#leaderboard-list th,#leaderboard-list td{padding:8px;border-bottom:1px solid #eef3ff;text-align:left}
+#leaderboard-list thead th{background:#f6f9ff;font-weight:700}
+.leaderboard-entry input{padding:8px;border-radius:8px;border:1px solid #e6eefb}
+
+/* Mobile-first: center single question */
+@media (max-width: 600px) {
+	.app{padding:12px}
+	.card{padding:16px}
+	.question{align-items:center}
+	.controls{flex-direction:column;gap:8px}
+	.controls .btn{width:100%}
+}
+
+/* All-questions layout */
+.all-questions .question{margin-bottom:10px}
+.all-questions input[type=number],.all-questions select{width:100%}
+
+/* Inline validation and helpers */
+.error-message{color:#b91c1c;font-size:0.9rem;margin-top:6px}
+.help-text{color:var(--muted);font-size:0.9rem;margin-top:6px}
+      `}</style>
+    </>
+  );
+}

@@ -5,15 +5,24 @@ export async function middleware(request) {
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
   const { pathname } = request.nextUrl;
 
-  // Always allow auth API, static files
-  if (
+  // (No short-circuit) - allow middleware to rewrite the /carbon-game root to the static index
+  const isStaticOrAuth = (
     pathname.startsWith('/api/auth') ||
     pathname.startsWith('/_next') ||
     pathname.includes('favicon') ||
-    pathname.startsWith('/assets')
-  ) {
-    return NextResponse.next();
+    pathname.startsWith('/assets') ||
+    // Allow static assets placed under /carbon-game/*
+    pathname.startsWith('/carbon-game/') ||
+    pathname.startsWith('/api/carbon-game')
+  );
+
+  // Serve the static game's index directly when requesting /carbon-game
+  if (pathname === '/carbon-game' || pathname === '/carbon-game/') {
+    return NextResponse.rewrite(new URL('/carbon-game/index.html', request.url));
   }
+
+  // Always allow auth API and static assets
+  if (isStaticOrAuth) return NextResponse.next();
 
   // If logged in and visiting landing or login → redirect to their dashboard
   if (token && (pathname === '/' || pathname === '/login')) {

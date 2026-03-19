@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "smoke:carbon-game": "node scripts/smoke-carbon-game.js"
   },
   "dependencies": {
     "@supabase/auth-helpers-nextjs": "^0.15.0",

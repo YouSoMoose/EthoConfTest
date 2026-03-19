@@ -62,6 +62,7 @@ function MyCardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isOnboarding = searchParams.get('onboarding') === '1';
+  const importToken = searchParams.get('import_token');
 
   // Explicit staging: 1 = Liability (Gate), 2 = Card, 3 = Check-in
   const [navStage, setNavStage] = useState(2); // Default to Card
@@ -84,6 +85,26 @@ function MyCardContent() {
   const hasAutoSet = useRef(false);
   // Auto-set stage based on profile status on first load
   useEffect(() => {
+    // If an import token is present, attempt to claim it (secure flow)
+    if (importToken) {
+      (async () => {
+        try {
+          const res = await fetch('/api/carbon-game/claim', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: importToken }) });
+          if (res.ok) {
+            toast.success('Imported score to your card');
+            // refresh session/profile
+            updateSession();
+          } else {
+            const err = await res.json().catch(() => ({}));
+            console.error('Import failed', err);
+            toast.error('Failed to import score');
+          }
+        } catch (e) {
+          console.error('Import error', e);
+          toast.error('Failed to import score');
+        }
+      })();
+    }
     if (profile && !hasAutoSet.current) {
       if (profile.card_made === false) {
         setNavStage(2);
