@@ -128,9 +128,8 @@ function MyCardContent() {
 
     const handleSuccess = () => {
       console.log('[DEBUG] Check-in success detected!');
-      setIsCheckinSuccess(true);
       updateSession();
-      setTimeout(() => router.push('/app'), 2200);
+      router.push('/app?checkin=success'); 
     };
 
     // 1. Primary: Realtime Listener
@@ -287,7 +286,6 @@ function MyCardContent() {
   };
 
   if (!profile) return <Loader />;
-  if (isCheckinSuccess) return <SuccessAnimation />;
 
   const checkedIn = isCheckedIn(profile?.checked_in);
 
@@ -534,7 +532,7 @@ function MyCardContent() {
                   border: '1px solid var(--border)', cursor: 'pointer',
                   transition: 'all 0.3s var(--liquid)',
                   transform: 'scale(1)',
-                  opacity: isCheckedIn(profile?.checked_in) ? 0.3 : 1
+                  opacity: 1
                 }}
               >
                 <QRCode value={profile.id} size={160} level="H" />
