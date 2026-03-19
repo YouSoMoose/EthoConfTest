@@ -2,11 +2,10 @@
 
 import { signOut, useSession } from 'next-auth/react';
 import { useEffect, useState, useRef } from 'react';
-import { MapPin } from 'lucide-react';
-import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Avatar from '@/components/Avatar';
 import Loader from '@/components/Loader';
-import { Home, Calendar, Wallet, Scan, MessageCircle, FileText, CreditCard, ChevronRight, LogOut, Settings, Bell, ShieldCheck } from 'lucide-react';
+import { Home, Calendar, Wallet, Scan, MessageCircle, FileText, CreditCard, ChevronRight, LogOut, Settings, Bell, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { CardPreview } from '@/components/CardPreview';
 import { useScrollHero } from '@/lib/animations';
 import AdminSwitch from '@/components/AdminSwitch';
@@ -15,6 +14,42 @@ import LiabilityWaiver from '@/components/LiabilityWaiver';
 
 const LIQUID = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
 const LIQUID_SLOW = 'cubic-bezier(0.32, 0.72, 0, 1)';
+
+function SuccessAnimation() {
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 9999,
+      background: 'var(--bg)',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      animation: 'fadeIn 0.5s ease both',
+    }}>
+      <div style={{
+        width: 120, height: 120, borderRadius: '50%',
+        background: 'var(--g)', color: '#fff',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        marginBottom: 24,
+        animation: 'stampBounce 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both',
+      }}>
+        <CheckCircle2 size={64} />
+      </div>
+      <h2 style={{ fontFamily: 'var(--fh)', fontSize: 28, fontWeight: 800, color: 'var(--g)', marginBottom: 8 }}>
+        Check-in Success!
+      </h2>
+      <p style={{ fontFamily: 'var(--fb)', fontSize: 16, color: 'var(--sub)', fontWeight: 600 }}>
+        Welcome to the conference.
+      </p>
+      
+      <style>{`
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes stampBounce {
+          0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+          50% { transform: scale(1.2) rotate(5deg); opacity: 1; }
+          100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
+}
 
 function AnnouncementCard({ a, index }) {
   const [expanded, setExpanded] = useState(false);
@@ -93,7 +128,18 @@ export default function AttendeeDashboard() {
   const [loading, setLoading] = useState(true);
   const [customizations, setCustomizations] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [notifPermission, setNotifPermission] = useState('default');
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (searchParams.get('checkin') === 'success') {
+      setShowSuccess(true);
+      // Clean URL
+      const newUrl = window.location.pathname;
+      window.history.replaceState({ path: newUrl }, '', newUrl);
+      setTimeout(() => setShowSuccess(false), 2600);
+    }
+  }, [searchParams]);
   // Realtime listener for onboarding status changes (Waiver, Card, Check-in)
   useEffect(() => {
     if (!session?.profile?.id) return;
@@ -203,6 +249,7 @@ export default function AttendeeDashboard() {
 
   return (
     <div className="page-enter" style={{ height: '100%', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+      {showSuccess && <SuccessAnimation />}
       <div
         ref={heroRef}
         style={{

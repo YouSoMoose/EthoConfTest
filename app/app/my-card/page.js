@@ -19,9 +19,28 @@ export default function MyCardPage() {
     </Suspense>
   );
 }
+function MyCardContent() {
+  const { data: session, update: updateSession } = useSession();
+  const profile = session?.profile;
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const isOnboarding = searchParams.get('onboarding') === '1';
+  const importToken = searchParams.get('import_token');
 
+  // Explicit staging: 1 = Liability (Gate), 2 = Card, 3 = Check-in
+  const [navStage, setNavStage] = useState(2); // Default to Card
+
+  // If card_made is false, open editing page. Otherwise, show QR.
+  const [isEditing, setIsEditing] = useState(isOnboarding || profile?.card_made === false);
+  const [name, setName] = useState('');
+  const [avatar, setAvatar] = useState('');
+  const [role, setRole] = useState('');
+  const [bio, setBio] = useState('');
+  const [company, setCompany] = useState('');
+  const [linkedin, setLinkedin] = useState('');
+  const [resumeLink, setResumeLink] = useState('');
+  const [saving, setSaving] = useState(false);
   const [qrExpanded, setQrExpanded] = useState(false);
-  const [isBeingScanned, setIsBeingScanned] = useState(false);
   const [isBeingScanned, setIsBeingScanned] = useState(false);
 
   const hasAutoSet = useRef(false);
@@ -95,7 +114,7 @@ export default function MyCardPage() {
 
     // 2. High-frequency polling ONLY when the QR screen is active
     let pollInterval;
-    if (!isCheckinSuccess && !isCheckedIn(profile?.checked_in)) {
+    if (!isCheckedIn(profile?.checked_in)) {
       console.log('[DEBUG] Starting 1s internal API poll...');
       pollInterval = setInterval(async () => {
         try {
