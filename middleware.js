@@ -26,8 +26,8 @@ export async function middleware(request) {
     return NextResponse.redirect(new URL('/app', request.url));
   }
 
-  // Public routes (landing + login) for non-authenticated users
-  if (pathname === '/' || pathname === '/login') {
+  // Public routes (landing + login + staff-invite) for non-authenticated users
+  if (pathname === '/' || pathname === '/login' || pathname === '/staff-invite' || pathname === '/app/staff-invite') {
     return NextResponse.next();
   }
 

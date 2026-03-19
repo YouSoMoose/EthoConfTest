@@ -5,6 +5,7 @@ import MessageNotification from '@/components/MessageNotification';
 import AnnouncementBanner from '@/components/AnnouncementBanner';
 import LayoutWrapper from '@/components/LayoutWrapper';
 import ViewportHeight from '@/components/ViewportHeight';
+import GlobalIsolation from '@/components/GlobalIsolation';
 
 export const metadata = {
   title: 'The Circular Economy Conference',
@@ -28,20 +29,22 @@ export default function RootLayout({ children }) {
       <body style={{ fontFamily: 'var(--fb)', background: 'var(--bg)', color: 'var(--text)', minHeight: '100vh' }}>
         <SessionProvider>
           <ViewportHeight />
-          <Toaster
-            position="top-center"
-            toastOptions={{
-              style: {
-                borderRadius: '12px',
-                background: 'var(--g)',
-                color: '#fff',
-                fontFamily: 'var(--fb)',
-                fontSize: '14px',
-              },
-            }}
-          />
-          <MessageNotification />
-          <AnnouncementBanner />
+          <GlobalIsolation>
+            <Toaster
+              position="top-center"
+              toastOptions={{
+                style: {
+                  borderRadius: '12px',
+                  background: 'var(--g)',
+                  color: '#fff',
+                  fontFamily: 'var(--fb)',
+                  fontSize: '14px',
+                },
+              }}
+            />
+            <MessageNotification />
+            <AnnouncementBanner />
+          </GlobalIsolation>
           <LayoutWrapper>
             {children}
           </LayoutWrapper>
