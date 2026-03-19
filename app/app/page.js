@@ -6,10 +6,12 @@ import { MapPin } from 'lucide-react';
 import Link from 'next/link';
 import Avatar from '@/components/Avatar';
 import Loader from '@/components/Loader';
-import { Home, Calendar, Wallet, Scan, MessageCircle, FileText, CreditCard, ChevronRight, LogOut, Settings, Bell } from 'lucide-react';
+import { Home, Calendar, Wallet, Scan, MessageCircle, FileText, CreditCard, ChevronRight, LogOut, Settings, Bell, ShieldCheck } from 'lucide-react';
 import { CardPreview } from '@/components/CardPreview';
 import { useScrollHero } from '@/lib/animations';
 import AdminSwitch from '@/components/AdminSwitch';
+import Modal from '@/components/Modal';
+import LiabilityWaiver from '@/components/LiabilityWaiver';
 
 const LIQUID = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
 const LIQUID_SLOW = 'cubic-bezier(0.32, 0.72, 0, 1)';

@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Loader2, Camera, User, CheckCircle2, ChevronLeft, QrCode, Save, Edit3, Image as ImageIcon, Briefcase, Globe, Linkedin, FileText, Info, X } from 'lucide-react';
+import { Loader2, Camera, User, CheckCircle2, ChevronLeft, ChevronRight, QrCode, Save, Edit3, Image as ImageIcon, Briefcase, Globe, Linkedin, FileText, Info, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { CardPreview } from '@/components/CardPreview';
 import Topbar from '@/components/Topbar';
