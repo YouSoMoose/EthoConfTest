@@ -2,32 +2,25 @@
 
 import { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
+import { signOut } from 'next-auth/react';
 
 export default function ResetPage() {
   useEffect(() => {
-    // Blast all NextAuth cookies
-    const cookiesToClear = [
-      'next-auth.session-token',
-      'next-auth.callback-url',
-      'next-auth.csrf-token',
-      '__Secure-next-auth.session-token',
-      '__Secure-next-auth.callback-url',
-      '__Host-next-auth.csrf-token',
-      // Supabase specific if you use them elsewhere
-      'sb-access-token', 
-      'sb-refresh-token'
-    ];
+    async function hardClear() {
+      // Attempt manual wipe for non-HttpOnly cookies (legacy Supabase)
+      ['sb-access-token', 'sb-refresh-token'].forEach(name => {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      });
+      
+      // Blast local storage
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Use NextAuth to properly destroy HttpOnly session cookies
+      await signOut({ redirect: true, callbackUrl: '/login' });
+    }
     
-    cookiesToClear.forEach(name => {
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-    });
-    
-    // Blast local storage
-    localStorage.clear();
-    sessionStorage.clear();
-    
-    // Hard navigate to login to completely refresh Next.js state
-    window.location.href = '/login';
+    hardClear();
   }, []);
 
   return (

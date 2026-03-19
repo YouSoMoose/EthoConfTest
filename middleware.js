@@ -3,11 +3,20 @@ import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request) {
   try {
-    // If the cookie header is insanely large, Node will 431. 
-    // We try to catch it here at the Edge before the app server crashes.
     const cookieHeader = request.headers.get('cookie') || '';
-    if (cookieHeader.length > 10000) {
-      throw new Error('Cookie header too large');
+    
+    // Proactively catch legacy Supabase cookies that bloat the header
+    const hasLegacyCookies = request.cookies.has('sb-access-token') || request.cookies.has('sb-refresh-token');
+
+    // If perfectly normal NextAuth + others somehow exceeds 8KB, blast them to prevent Node 431 crash.
+    // Or if they have a legacy Supabase cookie, definitely blast it.
+    if (cookieHeader.length > 8000 || hasLegacyCookies) {
+      const errorResponse = NextResponse.redirect(new URL("/login", request.url));
+      errorResponse.cookies.delete("sb-access-token");
+      errorResponse.cookies.delete("sb-refresh-token");
+      errorResponse.cookies.delete("next-auth.session-token");
+      errorResponse.cookies.delete("__Secure-next-auth.session-token");
+      return errorResponse;
     }
 
     const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
@@ -72,7 +81,7 @@ export async function middleware(request) {
     // Check-in gating for attendees
     const isPublicPath = pathname.startsWith('/api/auth') || pathname.startsWith('/_next') || pathname === '/favicon.ico' || pathname === '/' || pathname === '/login';
     
-    if (token && !isPublicPath && !pathname.startsWith('/api') && pathname !== '/app/my-card') {
+    if (token && !isPublicPath && !pathname.startsWith('/api') && !pathname.startsWith('/app/my-card')) {
       const profile = token.profile || {};
       // Gated by checked_in status (handles both boolean and TRUE/FALSE strings)
       const isCheckedIn = profile.checked_in === true || profile.checked_in === 'TRUE';
