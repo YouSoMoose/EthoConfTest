@@ -7,7 +7,7 @@ import { MapPin } from 'lucide-react';
 import Link from 'next/link';
 import Avatar from '@/components/Avatar';
 import Loader from '@/components/Loader';
-import { Home, Calendar, Wallet, Scan, MessageCircle, FileText, CreditCard, ChevronRight, LogOut, Settings, Bell, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Home, Calendar, Wallet, Scan, MessageCircle, FileText, CreditCard, ChevronRight, LogOut, Settings, Bell, ShieldCheck, CheckCircle2, Smartphone, X } from 'lucide-react';
 import { CardPreview } from '@/components/CardPreview';
 import { useScrollHero } from '@/lib/animations';
 import AdminSwitch from '@/components/AdminSwitch';
@@ -132,6 +132,10 @@ export default function AttendeeDashboard() {
   const [customizations, setCustomizations] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [notifPermission, setNotifPermission] = useState('default');
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [showPwaPrompt, setShowPwaPrompt] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -207,6 +211,54 @@ export default function AttendeeDashboard() {
       setNotifPermission(Notification.permission);
     }
   }, []);
+
+  // PWA Install Prompt Logic
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Check if installed or dismissed
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    const dismissed = localStorage.getItem('hide_pwa_prompt');
+    
+    if (isStandalone || dismissed) {
+      setShowPwaPrompt(false);
+      return;
+    }
+
+    const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    setIsIOS(ios);
+
+    // iOS doesn't explicitly support beforeinstallprompt, so we just show instructions manually
+    if (ios) {
+      setShowPwaPrompt(true);
+    }
+
+    // Android / Desktop Chrome PWA prompt listener
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowPwaPrompt(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  }, []);
+
+  const dismissPwa = () => {
+    localStorage.setItem('hide_pwa_prompt', 'true');
+    setShowPwaPrompt(false);
+  };
+
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setShowPwaPrompt(false);
+      }
+      setDeferredPrompt(null);
+    }
+  };
 
   const heroRef = useScrollHero({ minScale: 0.96, distance: 180 });
   const cardPreviewRef = useRef(null);
@@ -372,6 +424,43 @@ export default function AttendeeDashboard() {
              >
                Wrong Account? Log Out
              </button>
+          </div>
+        )}
+
+        {/* PWA INSTALL PROMPT */}
+        {showPwaPrompt && (
+          <div style={{
+            background: 'var(--accent)', color: 'var(--text)', borderRadius: 16, padding: '16px 20px',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+            boxShadow: '0 8px 24px rgba(0,0,0,0.1)', 
+            animation: 'fadeUp 0.5s ease both',
+            position: 'relative'
+          }}>
+            <button onClick={dismissPwa} style={{ position: 'absolute', top: 6, right: 6, background: 'none', border: 'none', color: 'var(--sub)', padding: 4, cursor: 'pointer' }}>
+                <X size={14} />
+            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <Smartphone size={20} style={{ flexShrink: 0 }} />
+              <div style={{ flex: 1, paddingRight: isIOS ? 16 : 0 }}>
+                <p style={{ margin: 0, fontWeight: 700, fontSize: 13 }}>Install the App</p>
+                <p style={{ margin: '2px 0 0', fontSize: 11, opacity: 0.9, lineHeight: 1.4 }}>
+                   {isIOS ? "Tap the Share icon below, then select 'Add to Home Screen' for the best experience." : "Add to your home screen for faster access."}
+                </p>
+              </div>
+            </div>
+            {!isIOS && (
+                <button
+                onClick={handleInstallClick}
+                className="bubble-click"
+                style={{
+                    background: 'var(--text)', color: 'var(--white)', border: 'none', borderRadius: 8,
+                    padding: '6px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0,
+                    transition: 'all 0.4s var(--liquid)'
+                }}
+                >
+                Install
+                </button>
+            )}
           </div>
         )}
 
