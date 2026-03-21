@@ -8,7 +8,7 @@ import Loader from '@/components/Loader';
 import Empty from '@/components/Empty';
 import Modal from '@/components/Modal';
 import { QRCodeSVG } from 'qrcode.react';
-import { X, User, Mail, Phone, Briefcase, Link as LinkIcon, FileText, Smartphone } from 'lucide-react';
+import { X, User, Mail, Phone, Briefcase, Link as LinkIcon, FileText, Smartphone, Linkedin } from 'lucide-react';
 
 const CardPreview = memo(function CardPreview({ user }) {
   const style = {
@@ -38,8 +38,12 @@ const CardPreview = memo(function CardPreview({ user }) {
       }} />
 
       <div style={{ flex: 1, minWidth: 0, zIndex: 1 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: 8 }}>
           <img src="/assets/ethos-logo.png" alt="E" style={{ width: style.logoSize, height: style.logoSize, objectFit: 'contain' }} />
+          <div style={{ display: 'flex', gap: 8 }}>
+             {user.linkedin && <Linkedin size={14} color="#0077b5" />}
+             {user.resume_link && <FileText size={14} color="var(--g)" />}
+          </div>
         </div>
 
         <h3 style={{
@@ -66,12 +70,29 @@ const CardPreview = memo(function CardPreview({ user }) {
           {user.company || 'Conference Attendee'}
         </p>
 
-        <p style={{
-          fontFamily: 'var(--fb)', fontSize: style.emailSize, color: '#9CA3AF', margin: 0,
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
-        }}>
-          {user.email}
-        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4 }}>
+           <p style={{
+             fontFamily: 'var(--fb)', fontSize: style.emailSize, color: '#9CA3AF', margin: 0,
+             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1
+           }}>
+             {user.email}
+           </p>
+           {user.game_score ? (
+             <div style={{ 
+               background: 'var(--g)', color: '#fff', fontSize: 10, fontWeight: 800, 
+               padding: '2px 8px', borderRadius: 20, boxShadow: '0 2px 4px rgba(0,0,0,0.1)' 
+             }}>
+               {user.game_score.points} pts
+             </div>
+           ) : (
+             <div style={{ 
+               background: 'var(--s1)', color: 'var(--muted)', fontSize: 10, fontWeight: 700, 
+               padding: '2px 8px', borderRadius: 20, border: '1px solid var(--border)' 
+             }}>
+               No score
+             </div>
+           )}
+        </div>
       </div>
 
       <div style={{
@@ -92,8 +113,19 @@ export default function WalletPage() {
 
   useEffect(() => {
     fetch('/api/connections').then(r => r.json())
-      .then(d => { setItems(d || []); setLoading(false); })
-      .catch(() => setLoading(false));
+      .then(d => { 
+        if (Array.isArray(d)) {
+          setItems(d);
+        } else {
+          setItems([]);
+          if (d.error) toast.error(d.error);
+        }
+        setLoading(false); 
+      })
+      .catch((err) => {
+        console.error('[Wallet] Fetch error:', err);
+        setLoading(false);
+      });
   }, []);
 
   const remove = async (id) => {
@@ -109,11 +141,11 @@ export default function WalletPage() {
     <div className="page-enter">
       <Topbar title="Wallet" />
       <div style={{ maxWidth: 500, margin: '0 auto', padding: '20px 16px', paddingBottom: 100 }}>
-        {items.length === 0 ? (
+        {(!items || items.length === 0) ? (
           <Empty icon={<Smartphone size={48} />} text="No connections yet. Scan someone's QR code!" />
         ) : (
           <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            {items.map(item => {
+            {Array.isArray(items) && items.map(item => {
               const p = item.profile;
               if (!p) return null;
               return (
@@ -158,26 +190,61 @@ export default function WalletPage() {
                  <Mail size={14} color="var(--muted)" />
                  <span style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'var(--sub)' }}>{activeProfile.email}</span>
                </div>
+               {activeProfile.phone && (
+                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                   <Phone size={14} color="var(--muted)" />
+                   <span style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'var(--sub)' }}>{activeProfile.phone}</span>
+                 </div>
+               )}
                {activeProfile.linkedin && (
-                 <a href={activeProfile.linkedin} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-                   <LinkIcon size={14} color="var(--g)" />
+                 <a href={activeProfile.linkedin.startsWith('http') ? activeProfile.linkedin : `https://${activeProfile.linkedin}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+                   <Linkedin size={14} color="#0077b5" />
                    <span style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'var(--g)', fontWeight: 600 }}>LinkedIn Profile</span>
                  </a>
                )}
             </div>
             
+            {activeProfile.game_score ? (
+              <div style={{ 
+                display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20,
+                background: 'var(--s1)', border: '1px solid var(--border)',
+                padding: '16px', borderRadius: 20, color: 'var(--text)', 
+                boxShadow: '0 10px 25px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.03)'
+              }}>
+                <div style={{ textAlign: 'center', borderRight: '1px solid var(--border)' }}>
+                  <p style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', color: 'var(--muted)', margin: 0 }}>Carbon Score</p>
+                  <p style={{ fontSize: 24, fontWeight: 800, color: 'var(--g)', margin: '4px 0' }}>{activeProfile.game_score.per_person_kg?.toFixed(1) || 0}</p>
+                  <p style={{ fontSize: 9, fontWeight: 700, color: 'var(--sub)', margin: 0 }}>kg CO₂ / year</p>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <p style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', color: 'var(--muted)', margin: 0 }}>Game Points</p>
+                  <p style={{ fontSize: 24, fontWeight: 800, color: 'var(--g)', margin: '4px 0' }}>{activeProfile.game_score.points || 0}</p>
+                  <p style={{ fontSize: 9, fontWeight: 700, color: 'var(--sub)', margin: 0 }}>Points earned</p>
+                </div>
+              </div>
+            ) : (
+              <div style={{ 
+                marginBottom: 20, background: 'var(--s1)', padding: '16px', borderRadius: 20, 
+                textAlign: 'center', border: '1px dashed var(--border)'
+              }}>
+                <p style={{ margin: 0, fontFamily: 'var(--fb)', fontSize: 14, color: 'var(--muted)', fontWeight: 600 }}>
+                  No game score yet
+                </p>
+              </div>
+            )}
+
             {activeProfile.bio && (
-              <p style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'var(--text)', margin: '0 0 24px', lineHeight: 1.6, fontStyle: 'italic' }}>
+              <p style={{ fontFamily: 'var(--fb)', fontSize: 14, color: 'var(--text)', margin: '0 0 24px', lineHeight: 1.6, fontStyle: 'italic', background: 'var(--s1)', padding: '12px', borderRadius: '12px', borderLeft: '4px solid var(--g)' }}>
                 "{activeProfile.bio}"
               </p>
             )}
 
             {activeProfile.resume_link && (
-              <a href={activeProfile.resume_link} target="_blank" rel="noopener noreferrer" style={{
+              <a href={activeProfile.resume_link.startsWith('http') ? activeProfile.resume_link : `https://${activeProfile.resume_link}`} target="_blank" rel="noopener noreferrer" style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, background: 'var(--g)', color: '#fff', textDecoration: 'none', padding: '14px 24px', borderRadius: 12, fontFamily: 'var(--fb)', fontWeight: 700, fontSize: 15, width: '100%', boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
               }}>
                 <FileText size={18} />
-                View Full Portfolio
+                View Full Portfolio / Resume
               </a>
             )}
           </div>

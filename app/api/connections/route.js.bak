@@ -28,8 +28,6 @@ export async function GET(req) {
     // Fetch profile details for each connection
     if (connections.length > 0) {
       const ids = connections.map(c => type === 'received' ? c.user_id : c.scanned_id);
-      
-      // Select exactly the columns we know exist + the new score columns
       const { data: profiles } = await supabaseAdmin
         .from('profiles')
         .select('id, name, email, avatar, resume_link, phone, bio, linkedin, company, role, points, per_person_kg')
@@ -73,7 +71,7 @@ export async function POST(req) {
     } catch (e) {}
 
     if (finalScannedId === session.profile.id) {
-       return NextResponse.json({ error: 'Cannot scan yourself' }, { status: 400 });
+      return NextResponse.json({ error: 'Cannot scan yourself' }, { status: 400 });
     }
 
     const { data: existingProfile, error: profileError } = await supabaseAdmin
